@@ -30,7 +30,7 @@ dependencies {
 	modImplementation ("net.fabricmc:fabric-loader-1.8.9:${project.loader_version}") {
 		exclude module: "guava"
 	}
-	modImplementation "net.legacy-fabric.legacy-fabric-api:legacy-fabric-api:${fabric_version}"
+	modImplementation "net.legacyfabric.legacy-fabric-api:legacy-fabric-api:${fabric_version}"
 
 	if (System.getProperty("os.name").toLowerCase().contains("mac")) {
 		implementation 'org.lwjgl.lwjgl:lwjgl_util:2.9.4-nightly-20150209'
