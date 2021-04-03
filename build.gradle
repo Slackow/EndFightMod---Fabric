@@ -13,13 +13,13 @@ group = project.maven_group
 repositories {
 	maven {
 		name = 'legacy-fabric'
-		url = 'https://dl.bintray.com/legacy-fabric/Legacy-Fabric-Maven'
+		url = 'https://maven.legacyfabric.net'
 	}
 }
 
 minecraft {
 	intermediaryUrl = {
-		return "https://dl.bintray.com/legacy-fabric/Legacy-Fabric-Maven/net/fabricmc/intermediary/" + it + "/intermediary-" + it + "-v2.jar";
+		return "https://maven.legacyfabric.net/net/fabricmc/intermediary/" + it + "/intermediary-" + it + "-v2.jar";
 	}
 }
 
@@ -30,7 +30,7 @@ dependencies {
 	modImplementation ("net.fabricmc:fabric-loader-1.8.9:${project.loader_version}") {
 		exclude module: "guava"
 	}
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
+	modImplementation "net.legacy-fabric.legacy-fabric-api:legacy-fabric-api:${fabric_version}"
 
 	if (System.getProperty("os.name").toLowerCase().contains("mac")) {
 		implementation 'org.lwjgl.lwjgl:lwjgl_util:2.9.4-nightly-20150209'
