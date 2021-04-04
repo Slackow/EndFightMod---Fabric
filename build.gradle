@@ -24,14 +24,19 @@ minecraft {
 }
 
 dependencies {
+	// We use this version of Guava as 1.8.9's is outdated
 	implementation "com.google.guava:guava:23.5-jre"
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
 	modImplementation ("net.fabricmc:fabric-loader-1.8.9:${project.loader_version}") {
 		exclude module: "guava"
 	}
+	// Fabric API. You probably want it anyway.
 	modImplementation "net.legacyfabric.legacy-fabric-api:legacy-fabric-api:${fabric_version}"
+	// An extra dependency. Uncomment to add.
+	//modImplementation "io.github.boogiemonster1o1:modmenu:0.1.0+1.8.9"
 
+	// Hacks that make mac os work
 	if (System.getProperty("os.name").toLowerCase().contains("mac")) {
 		implementation 'org.lwjgl.lwjgl:lwjgl_util:2.9.4-nightly-20150209'
 		implementation 'org.lwjgl.lwjgl:lwjgl:2.9.4-nightly-20150209'
@@ -39,6 +44,7 @@ dependencies {
 	}
 }
 
+// More hacks that make mac os work
 if (System.getProperty("os.name").toLowerCase().contains("mac")) {
 	configurations.all {
 		resolutionStrategy {
