@@ -18,6 +18,7 @@ repositories {
 }
 
 minecraft {
+	// Comment out this block if you're using Chocoloom
 	intermediaryUrl = {
 		return "https://maven.legacyfabric.net/net/fabricmc/intermediary/" + it + "/intermediary-" + it + "-v2.jar";
 	}
