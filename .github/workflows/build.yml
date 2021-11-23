@@ -11,7 +11,9 @@ jobs:
     strategy:
       matrix:
         java: [
-            "16", # Minimal version supported by Loom
+            "8",  # Minecraft default
+            "11", # Current Java LTS
+            "17", # Latest version
           ]
     runs-on: ubuntu-latest
     steps:
