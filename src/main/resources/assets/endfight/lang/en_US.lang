@@ -1,0 +1,5 @@
+delete.directory.failed=Failed to delete directory
+failed.dragon.charge=Failed to force Dragon Charge, might wanna report this
+invalid.input=Invalid input
+inventory.save.failure=Problem Saving Inventory
+file.read.error=Unable To Read inv.txt
