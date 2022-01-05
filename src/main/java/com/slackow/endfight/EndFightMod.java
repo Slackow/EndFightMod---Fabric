@@ -8,7 +8,6 @@ import net.minecraft.command.CommandException;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import org.apache.commons.io.FileDeleteStrategy;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -41,8 +40,8 @@ public class EndFightMod implements ModInitializer {
 		if(Files.notExists(path)){
 			try {
 				Files.write(path,
-						Collections.singleton("[16777483,16777473,16777571,16777477,1073741842,0,16777542,16777491," +
-								"83886446,16777274,16777571,16777571,16777571,16777571,16777571,16777489,402653446," +
+						Collections.singleton("[16777483,16777473,16777571,16777477,1073741842,16777584,16777542," +
+								"16777491,83886446,16777274,16777571,16777571,16777571,16777571,16777571,16777489,402653446," +
 								"0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]"));
 			} catch (IOException e) {
 				throw new CommandException("file.read.error");

@@ -24,10 +24,10 @@ public abstract class EnderDragonEntityMixin extends LivingEntity {
     @Inject(method = "method_6302", at = @At("RETURN"))
     public void onDamage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir){
         if (cir.getReturnValue()) {
-            MinecraftClient.getInstance().player.sendMessage(new LiteralText("Dragon damaged by " + source.getName() + ": " + amount));
+            MinecraftClient.getInstance().field_3805.sendMessage(new LiteralText("Dragon damaged by " + source.getName() + ": " + amount));
             if (getHealth() <= amount) {
                 long millis = System.currentTimeMillis() - EndFightMod.time;
-                MinecraftClient.getInstance().player.sendMessage(
+                MinecraftClient.getInstance().field_3805.sendMessage(
                         new LiteralText("Dragon Killed in about " + LocalTime.ofSecondOfDay(millis/1000).format(DateTimeFormatter.ofPattern("mm:ss")) + " [RTA]"));
                 EndFightMod.time = 0;
             }

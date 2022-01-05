@@ -3,9 +3,10 @@ package com.slackow.endfight.mixin;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonPrimitive;
+import com.slackow.endfight.CommandBase;
 import com.slackow.endfight.EndFightMod;
+import net.minecraft.class_1157;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.command.AbstractCommand;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.CommandSource;
 import net.minecraft.entity.EndCrystalEntity;
@@ -16,11 +17,9 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.CommandRegistry;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.server.world.ServerWorldManager;
 import net.minecraft.text.LiteralText;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.MultiServerWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.level.LevelInfo;
@@ -56,7 +55,7 @@ public abstract class CommandManagerMixin extends CommandRegistry {
     @Inject(method = "<init>", at = @At("TAIL"))
     public void epicCommands(CallbackInfo ci) {
         // heal
-        this.registerCommand(new AbstractCommand() {
+        this.registerCommand(new CommandBase() {
             @Override
             public String getCommandName() {
                 return "heal";
@@ -79,7 +78,7 @@ public abstract class CommandManagerMixin extends CommandRegistry {
             }
         });
         // killcrystals
-        this.registerCommand(new AbstractCommand() {
+        this.registerCommand(new CommandBase() {
             @Override
             public String getCommandName() {
                 return "killcrystals";
@@ -92,11 +91,15 @@ public abstract class CommandManagerMixin extends CommandRegistry {
 
             @Override
             public void execute(CommandSource source, String[] args) {
-                long count = source.getWorld().getLoadedEntities().stream()
-                        .filter(Entity::isAlive)
-                        .filter(entity -> entity instanceof EndCrystalEntity)
-                        .peek(Entity::kill)
-                        .count();
+                long count = 0;
+                for (Object loadedEntity : source.getWorld().getLoadedEntities()) {
+                    if (loadedEntity instanceof EndCrystalEntity) {
+                        if (((EndCrystalEntity) loadedEntity).isAlive()) {
+                            ((EndCrystalEntity) loadedEntity).remove();
+                            count++;
+                        }
+                    }
+                }
                 if (count <= 0) {
                     source.sendMessage(new LiteralText(RED + "No End Crystals Found"));
                 } else {
@@ -105,7 +108,7 @@ public abstract class CommandManagerMixin extends CommandRegistry {
             }
         });
         // setinv
-        this.registerCommand(new AbstractCommand() {
+        this.registerCommand(new CommandBase() {
             @Override
             public String getCommandName() {
                 return "setinv";
@@ -136,7 +139,7 @@ public abstract class CommandManagerMixin extends CommandRegistry {
             }
         });
         // getinv
-        this.registerCommand(new AbstractCommand() {
+        this.registerCommand(new CommandBase() {
             @Override
             public String getCommandName() {
                 return "getinv";
@@ -155,7 +158,7 @@ public abstract class CommandManagerMixin extends CommandRegistry {
             }
         });
         // reset (THE BIG ONE)
-        this.registerCommand(new AbstractCommand() {
+        this.registerCommand(new CommandBase() {
             @Override
             public String getCommandName() {
                 return "reset";
@@ -176,12 +179,16 @@ public abstract class CommandManagerMixin extends CommandRegistry {
                 if (source instanceof PlayerEntity) {
                     PlayerEntity player = (PlayerEntity) source;
                     MinecraftServer server = MinecraftServer.getServer();
-                    for (ServerPlayerEntity p : server.getPlayerManager().getPlayers()) {
-                        if (p.dimension == 1) {
-                            Arrays.fill(p.inventory.main, null);
-                            Arrays.fill(p.inventory.armor, null);
-                            p.setGameMode(LevelInfo.GameMode.CREATIVE);
-                            p.teleportToDimension(0);
+                    for (Object objP : server.getPlayerManager().players) {
+                        if (objP instanceof PlayerEntity) {
+                            PlayerEntity p = (PlayerEntity) objP;
+                            if (p.dimension == 1) {
+                                Arrays.fill(p.inventory.main, null);
+                                Arrays.fill(p.inventory.armor, null);
+                                // set creative mode
+                                p.method_3170(class_1157.field_4574);
+                                p.teleportToDimension(0);
+                            }
                         }
                     }
                     File dim1 = new File(MinecraftClient.getInstance().runDirectory, "saves/" + server.getLevelName() + "/DIM1");
@@ -205,16 +212,17 @@ public abstract class CommandManagerMixin extends CommandRegistry {
                         }
                     }
                     if (twice || !createIt){
-                        ServerWorld newEnd = (ServerWorld) new MultiServerWorld(server, server.worlds[0].getSaveHandler(), 1, server.worlds[0], server.profiler).getWorld();
+                        ServerWorld newEnd = new MultiServerWorld(server, server.worlds[0].getSaveHandler(), server.getLevelName(), 1, new LevelInfo(server.worlds[0].getLevelProperties()), server.worlds[0], server.profiler);
                         server.worlds = ArrayUtils.add(server.worlds, newEnd);
                         server.field_3858 = ArrayUtils.add(server.field_3858, new long[100]);
                         newEnd.addListener(new ServerWorldManager(server, newEnd));
                         player.setHealth(20f);
                         player.extinguish();
-                        player.addStatusEffect(new StatusEffectInstance(11, 4, 255, true, false));
+                        player.addStatusEffect(new StatusEffectInstance(11, 4, 255, true));
                         player.getHungerManager().add(20, 1);
                         player.getHungerManager().add(1, -8); // -16
-                        player.setGameMode(LevelInfo.GameMode.SURVIVAL);
+                        // set survival
+                        player.method_3170(class_1157.field_4573);
                         EndFightMod.giveInventory(player);
                         player.teleportToDimension(1);
                         player.sendMessage(new LiteralText("Sent to End"));
@@ -225,7 +233,7 @@ public abstract class CommandManagerMixin extends CommandRegistry {
             }
         });
         // dragon health
-        registerCommand(new AbstractCommand() {
+        registerCommand(new CommandBase() {
             @Override
             public String getCommandName() {
                 return "dragonhealth";
@@ -242,7 +250,7 @@ public abstract class CommandManagerMixin extends CommandRegistry {
             }
         });
         // charge
-        registerCommand(new AbstractCommand() {
+        registerCommand(new CommandBase() {
             @Override
             public String getCommandName() {
                 return "charge";
@@ -259,7 +267,7 @@ public abstract class CommandManagerMixin extends CommandRegistry {
             }
         });
         // goodcharge
-        registerCommand(new AbstractCommand() {
+        registerCommand(new CommandBase() {
             @Override
             public String getCommandName() {
                 return "goodcharge";
@@ -289,12 +297,10 @@ public abstract class CommandManagerMixin extends CommandRegistry {
                         float yaw = ((PlayerEntity) source).getHeadRotation();
                         double sin = Math.sin((yaw + 90) * Math.PI / 180f),
                                 cos = Math.cos((yaw + 90) * Math.PI / 180f);
-
-                        Vec3d playerLocation = source.getPos();
                         EnderDragonEntity entityDragon = dragon.get();
-                        entityDragon.updatePositionAndAngles(playerLocation.x + cos * dist,
-                                playerLocation.y + height,
-                                playerLocation.z + sin * dist,
+                        entityDragon.updatePositionAndAngles(((PlayerEntity) source).x + cos * dist,
+                                ((PlayerEntity) source).y + height,
+                                ((PlayerEntity) source).z + sin * dist,
                                 0,
                                 (yaw + 360) % 360 - 180);
                         entityDragon.velocityX = 0;
@@ -344,9 +350,11 @@ public abstract class CommandManagerMixin extends CommandRegistry {
         source.sendMessage(new LiteralText(dragon.map(entityDragon -> "Dragon Health is: " + entityDragon.getHealth()).orElseGet(() -> RED + "No Dragon Found")));
     }
     private static Optional<EnderDragonEntity> getDragon(World world) {
-        return world.getLoadedEntities().stream()
-                .filter(Entity::isAlive)
-                .filter(entity -> entity instanceof EnderDragonEntity)
-                .map(entity -> (EnderDragonEntity) entity).findFirst();
+        for (Object loadedEntity : world.getLoadedEntities()) {
+            if (loadedEntity instanceof EnderDragonEntity) {
+                return Optional.of((EnderDragonEntity) loadedEntity);
+            }
+        }
+        return Optional.empty();
     }
 }
