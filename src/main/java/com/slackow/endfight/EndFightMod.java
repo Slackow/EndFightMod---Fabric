@@ -18,7 +18,7 @@ import java.util.stream.StreamSupport;
 
 public class EndFightMod implements ModInitializer {
 
-	public static long time;
+	public static long time = System.currentTimeMillis();
 
 	@Override
 	public void onInitialize() {

@@ -15,6 +15,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
+import static net.minecraft.util.math.MathHelper.clamp;
+
 @Mixin(EnderDragonEntity.class)
 public abstract class EnderDragonEntityMixin extends LivingEntity {
     public EnderDragonEntityMixin(World world) {
@@ -25,11 +27,12 @@ public abstract class EnderDragonEntityMixin extends LivingEntity {
     public void onDamage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir){
         if (cir.getReturnValue()) {
             MinecraftClient.getInstance().field_3805.sendMessage(new LiteralText("Dragon damaged by " + source.getName() + ": " + amount));
-            if (getHealth() <= amount) {
-                long millis = System.currentTimeMillis() - EndFightMod.time;
+            if (getHealth() <= 0) {
+                int seconds = (int) ((System.currentTimeMillis() - EndFightMod.time) / 1000);
+                seconds = clamp(seconds, 0, 86399);
                 MinecraftClient.getInstance().field_3805.sendMessage(
-                        new LiteralText("Dragon Killed in about " + LocalTime.ofSecondOfDay(millis/1000).format(DateTimeFormatter.ofPattern("mm:ss")) + " [RTA]"));
-                EndFightMod.time = 0;
+                        new LiteralText("Dragon Killed in about " + LocalTime.ofSecondOfDay(seconds).format(DateTimeFormatter.ofPattern("mm:ss")) + " [RTA]"));
+                EndFightMod.time = System.currentTimeMillis();
             }
         }
     }
