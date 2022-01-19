@@ -20,6 +20,7 @@ import net.minecraft.server.command.CommandRegistry;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.server.world.ServerWorldManager;
 import net.minecraft.text.LiteralText;
+import net.minecraft.world.Difficulty;
 import net.minecraft.world.MultiServerWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.level.LevelInfo;
@@ -213,6 +214,7 @@ public abstract class CommandManagerMixin extends CommandRegistry {
                     }
                     if (twice || !createIt){
                         ServerWorld newEnd = new MultiServerWorld(server, server.worlds[0].getSaveHandler(), server.getLevelName(), 1, new LevelInfo(server.worlds[0].getLevelProperties()), server.worlds[0], server.profiler);
+                        newEnd.field_7173 = server.worlds[0].field_7173;
                         server.worlds = ArrayUtils.add(server.worlds, newEnd);
                         server.field_3858 = ArrayUtils.add(server.field_3858, new long[100]);
                         newEnd.addListener(new ServerWorldManager(server, newEnd));
