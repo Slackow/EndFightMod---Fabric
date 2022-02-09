@@ -4,9 +4,17 @@
   "package": "com.slackow.endfight.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+    "BossBarMixin",
+    "ClientPlayNetworkHandlerMixin",
     "CommandManagerMixin",
+    "CreditsScreenMixin",
     "EnderDragonAccessor",
-    "EnderDragonEntityMixin"
+    "EnderDragonEntityMixin",
+    "EntityRenderMixin",
+    "HungerManagerMixin",
+    "PlayerMixin",
+    "RenderDragonMixin",
+    "ServerPlayerMixin"
   ],
   "client": [
   ],

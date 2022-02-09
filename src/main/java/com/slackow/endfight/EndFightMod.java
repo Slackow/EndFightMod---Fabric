@@ -8,20 +8,22 @@ import net.minecraft.command.CommandException;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import org.lwjgl.input.Keyboard;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
-import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 public class EndFightMod implements ModInitializer {
 
 	public static long time = System.currentTimeMillis();
+	public static boolean godMode = false;
 
-	@Override
+    @Override
 	public void onInitialize() {
+		MinecraftClient.getInstance().options.debugEnabled = true;
 
 	}
 
@@ -48,8 +50,7 @@ public class EndFightMod implements ModInitializer {
 			}
 		}
 		try {
-			String content = Files.lines(path).collect(Collectors.joining());
-			ItemStack[] full = StreamSupport.stream(new JsonParser().parse(content).getAsJsonArray().spliterator(), false)
+			ItemStack[] full = StreamSupport.stream(new JsonParser().parse(Files.newBufferedReader(path)).getAsJsonArray().spliterator(), false)
 					.mapToInt(JsonElement::getAsInt)
 					.mapToObj(EndFightMod::intToItem).toArray(ItemStack[]::new);
 			if (full.length < 40) {
