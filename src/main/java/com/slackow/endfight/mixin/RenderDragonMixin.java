@@ -11,6 +11,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import static com.slackow.endfight.config.BigConfig.getSelectedConfig;
+
 @Mixin(EnderDragonEntityRenderer.class)
 public class RenderDragonMixin {
     // method_4328
@@ -32,7 +34,8 @@ public class RenderDragonMixin {
 
     @Inject(method = "render(Lnet/minecraft/entity/boss/dragon/EnderDragonEntity;DDDFF)V", at = @At("TAIL"))
     private void render(EnderDragonEntity d, double e, double f, double g, float h, float par6, CallbackInfo ci) {
-        if (EntityRenderDispatcher.field_5192) {
+        int a = getSelectedConfig().deathBox;
+        if (a != 0 && (a == 2 || EntityRenderDispatcher.field_5192)) {
             double dx = e - d.x;
             double dy = f - d.y;
             double dz = g - d.z;

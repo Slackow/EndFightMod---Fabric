@@ -15,6 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
+import static com.slackow.endfight.config.BigConfig.getSelectedConfig;
 import static net.minecraft.util.math.MathHelper.clamp;
 
 @Mixin(EnderDragonEntity.class)
@@ -26,7 +27,9 @@ public abstract class EnderDragonEntityMixin extends LivingEntity {
     @Inject(method = "method_6302", at = @At("RETURN"))
     public void onDamage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir){
         if (cir.getReturnValue()) {
-            MinecraftClient.getInstance().field_3805.sendMessage(new LiteralText("Dragon damaged by " + source.getName() + ": " + amount));
+            if (getSelectedConfig().damageInfo) {
+                MinecraftClient.getInstance().field_3805.sendMessage(new LiteralText("Dragon damaged by " + source.getName() + ": " + amount));
+            }
             if (getHealth() <= 0) {
                 int seconds = (int) ((System.currentTimeMillis() - EndFightMod.time) / 1000);
                 seconds = clamp(seconds, 0, 86399);

@@ -14,7 +14,8 @@
     "HungerManagerMixin",
     "PlayerMixin",
     "RenderDragonMixin",
-    "ServerPlayerMixin"
+    "ServerPlayerMixin",
+    "SettingsScreenMixin"
   ],
   "client": [
   ],

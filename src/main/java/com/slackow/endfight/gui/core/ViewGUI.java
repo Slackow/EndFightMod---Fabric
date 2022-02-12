@@ -23,7 +23,7 @@ public class ViewGUI<T extends Renameable> extends Screen {
     public void init() {
         this.buttons.clear();
         ButtonWidget select = new ButtonWidget(0, width / 2 - 100, height / 2 - 30, 100, 20, "Select");
-        select.active = !selected;
+        select.active = !selected && from.isSelectable();
         this.buttons.add(select);
         this.buttons.add(new ButtonWidget(1, width / 2, height / 2 - 30, 100, 20, "Edit"));
         this.buttons.add(new ButtonWidget(2, width / 2 - 100, height / 2 - 10, 100, 20 , "Rename"));
@@ -40,6 +40,10 @@ public class ViewGUI<T extends Renameable> extends Screen {
                 selected = true;
                 from.select(obj);
                 init();
+                break;
+            case 1:
+                // EDIT BUTTON?!?!?
+                from.getEditObj().accept(this, obj);
                 break;
             case 2:
                 MinecraftClient.getInstance().openScreen(new RenameGUI<>(this, obj));

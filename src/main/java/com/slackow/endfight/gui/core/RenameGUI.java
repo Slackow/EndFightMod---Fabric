@@ -48,8 +48,9 @@ public class RenameGUI<T extends Renameable> extends Screen {
 
     @Override
     protected void buttonClicked(ButtonWidget button) {
-        if (cached != null && !cached.trim().isEmpty())
-        obj.setName(cached.trim());
+        if (cached != null && !cached.trim().isEmpty()) {
+            obj.setName(cached.trim());
+        }
         MinecraftClient.getInstance().openScreen(from);
         super.buttonClicked(button);
     }

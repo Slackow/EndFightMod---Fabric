@@ -7,17 +7,25 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
 public class ListGUI<T extends Renameable> extends Screen {
-    private final List<T> data = new ArrayList<>();
+    private final List<T> data;
     private final Supplier<T> getNewItem;
+    private final Screen from;
+    private final BiConsumer<ViewGUI<T>, T> editObj;
     private int page = 0;
     int selected;
-    public ListGUI(List<T> data, Supplier<T> getNew) {
-       this.data.addAll(data);
-       this.selected = 0;
-       this.getNewItem = getNew;
+    private final BiConsumer<List<T>, Integer> save;
+
+    public ListGUI(Screen from, List<T> data, int selected, Supplier<T> getNew, BiConsumer<ViewGUI<T>, T> editObj, BiConsumer<List<T>, Integer> save) {
+        this.from = from;
+        this.editObj = editObj;
+        this.data = new ArrayList<>(data);
+        this.selected = selected;
+        this.getNewItem = getNew;
+        this.save = save;
     }
     @SuppressWarnings("unchecked")
     public void init() {
@@ -40,6 +48,7 @@ public class ListGUI<T extends Renameable> extends Screen {
         ButtonWidget right = new ButtonWidget(7, width / 2 + 12, homeRow, 20, 20, ">");
         right.active = (data.size() - 1) / 5 > page;
         buttons.add(right);
+        buttons.add(new ButtonWidget(8, width / 2 - 50, homeRow + 25, 100, 20, "Done"));
     }
 
     @Override
@@ -74,6 +83,9 @@ public class ListGUI<T extends Renameable> extends Screen {
                 selected = data.size() - 1;
                 reinit();
             }
+        } else if (button.id == 8) {
+            save.accept(data, selected);
+            MinecraftClient.getInstance().openScreen(from);
         }
         super.buttonClicked(button);
     }
@@ -103,4 +115,11 @@ public class ListGUI<T extends Renameable> extends Screen {
     }
 
 
+    public BiConsumer<ViewGUI<T>, T> getEditObj() {
+        return editObj;
+    }
+
+    public boolean isSelectable() {
+        return true;
+    }
 }

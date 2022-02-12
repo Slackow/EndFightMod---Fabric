@@ -197,13 +197,14 @@ public abstract class CommandManagerMixin extends CommandRegistry {
                     });
 
                     MinecraftClient.getInstance().openScreen(
-                            new ListGUI<>(Arrays.asList(
+                            new ListGUI<>(null, Arrays.asList(
                                     new SimpleStr("one"),
                                     new SimpleStr("two"),
                                     new SimpleStr("three"),
                                     new SimpleStr("four"),
                                     new SimpleStr("five")),
-                                    () -> new SimpleStr("Added")));
+                                    0, () -> new SimpleStr("Added"), (a, b) -> {}, (data, selected) -> {
+                            }));
                     return;
                 }
                 boolean twice = args.length == 0 || !args[0].contains("o");
