@@ -4,7 +4,6 @@ import com.slackow.endfight.EndFightMod;
 import com.slackow.endfight.gui.core.ViewGUI;
 import com.slackow.endfight.util.Kit;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.server.MinecraftServer;
@@ -31,8 +30,10 @@ public class InventoryCfgGUI extends Screen {
 
     @Override
     public void render(int mouseX, int mouseY, float tickDelta) {
-        from.render(-1, -1, tickDelta);
+
         renderBackground();
+        drawCenteredString(textRenderer, "Inventory", width / 2, height / 6 - 2, 0xFFFFFF);
+        drawCenteredString(textRenderer, obj.getName(), width / 2, height / 6 + 10, 0xFFFFFF);
         super.render(mouseX, mouseY, tickDelta);
     }
 

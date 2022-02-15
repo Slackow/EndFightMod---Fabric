@@ -4,6 +4,7 @@ import com.slackow.endfight.util.Renameable;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.resource.language.I18n;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,14 +19,17 @@ public class ListGUI<T extends Renameable> extends Screen {
     private int page = 0;
     int selected;
     private final BiConsumer<List<T>, Integer> save;
+    final String title;
+    private int y;
 
-    public ListGUI(Screen from, List<T> data, int selected, Supplier<T> getNew, BiConsumer<ViewGUI<T>, T> editObj, BiConsumer<List<T>, Integer> save) {
+    public ListGUI(Screen from, List<T> data, int selected, Supplier<T> getNew, BiConsumer<ViewGUI<T>, T> editObj, BiConsumer<List<T>, Integer> save, String title) {
         this.from = from;
         this.editObj = editObj;
         this.data = new ArrayList<>(data);
         this.selected = selected;
         this.getNewItem = getNew;
         this.save = save;
+        this.title = title;
     }
     @SuppressWarnings("unchecked")
     public void init() {
@@ -34,13 +38,14 @@ public class ListGUI<T extends Renameable> extends Screen {
         List<T> displayed = hasPages ? data.subList(page * 5, Math.min(page * 5 + 5, data.size())) : data;
         for (int i = 0; i < displayed.size(); i++) {
             String buttonMsg = displayed.get(i).getName();
-            if (i + page * 5 == selected) {
+            if (isSelectable() && i + page * 5 == selected) {
                 buttonMsg = "> " + buttonMsg + " <";
             }
             int textWidth = Math.max(100, textRenderer.getStringWidth(buttonMsg) + 20);
-            buttons.add(new ButtonWidget(i, width / 2 - textWidth / 2, height / 2 + i * 24 - displayed.size() * 12, textWidth, 20, buttonMsg));
+            buttons.add(new ButtonWidget(i, width / 2 - textWidth / 2, height / 6 + 30 + i * 24 - displayed.size() * 12, textWidth, 20, buttonMsg));
         }
-        int homeRow = height / 2 + displayed.size() * 12;
+        y = height / 6 + 30 - 24 - displayed.size() * 12;
+        int homeRow = height / 6 + 30 + displayed.size() * 12;
         buttons.add(new ButtonWidget(5, width / 2 - 10, homeRow, 20, 20, "+"));
         ButtonWidget left = new ButtonWidget(6, width / 2 - 32, homeRow, 20, 20, "<");
         left.active = page > 0;
@@ -48,14 +53,13 @@ public class ListGUI<T extends Renameable> extends Screen {
         ButtonWidget right = new ButtonWidget(7, width / 2 + 12, homeRow, 20, 20, ">");
         right.active = (data.size() - 1) / 5 > page;
         buttons.add(right);
-        buttons.add(new ButtonWidget(8, width / 2 - 50, homeRow + 25, 100, 20, "Done"));
+        buttons.add(new ButtonWidget(8, width / 2 - 50, homeRow + 25, 100, 20, I18n.translate("gui.done")));
     }
 
     @Override
     public void render(int mouseX, int mouseY, float tickDelta) {
-        if (mouseX >= 0 || mouseY >= 0) {
-            renderBackground();
-        }
+        renderBackground();
+        drawCenteredString(textRenderer, title, width / 2, y, 0xFFFFFF);
         super.render(mouseX, mouseY, tickDelta);
     }
 
@@ -69,7 +73,12 @@ public class ListGUI<T extends Renameable> extends Screen {
         lastTick = tick;
         if (button.id >= 0 && button.id < 5) {
             int index = button.id + page * 5;
-            MinecraftClient.getInstance().openScreen(new ViewGUI<>(this, data.get(index), index == selected));
+            if (!isSelectable() || index == selected) {
+                MinecraftClient.getInstance().openScreen(new ViewGUI<>(this, data.get(index)));
+            } else {
+                selected = index;
+                reinit();
+            }
         } else if (button.id == 6) {
             page--;
             reinit();
@@ -79,8 +88,9 @@ public class ListGUI<T extends Renameable> extends Screen {
         } else if (button.id == 5) {
             T obj = getNewItem.get();
             if (obj != null) {
+                obj.setName("");
                 data.add(obj);
-                selected = data.size() - 1;
+                MinecraftClient.getInstance().openScreen(new ViewGUI<>(this, obj));
                 reinit();
             }
         } else if (button.id == 8) {

@@ -4,31 +4,35 @@ import com.slackow.endfight.util.Renameable;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.resource.language.I18n;
+
+import java.util.stream.Stream;
 
 import static net.minecraft.util.Formatting.RED;
 
 public class ViewGUI<T extends Renameable> extends Screen {
     final ListGUI<T> from;
     private final T obj;
-    private boolean selected;
+    private boolean isNew;
 
-    public ViewGUI(ListGUI<T> from, T obj, boolean selected) {
+    public ViewGUI(ListGUI<T> from, T obj) {
         this.from = from;
         this.obj = obj;
-        this.selected = selected;
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public void init() {
         this.buttons.clear();
-        ButtonWidget select = new ButtonWidget(0, width / 2 - 100, height / 2 - 30, 100, 20, "Select");
-        select.active = !selected && from.isSelectable();
-        this.buttons.add(select);
-        this.buttons.add(new ButtonWidget(1, width / 2, height / 2 - 30, 100, 20, "Edit"));
-        this.buttons.add(new ButtonWidget(2, width / 2 - 100, height / 2 - 10, 100, 20 , "Rename"));
-        this.buttons.add(new ButtonWidget(3, width / 2, height / 2 - 10, 100, 20, RED + "Remove"));
-        this.buttons.add(new ButtonWidget(4, width / 2 - 100, height / 2 + 10, 200, 20, "Done"));
+        ButtonWidget edit = new ButtonWidget(1, width / 2 - 100, height / 2 - 30, 200, 20, "Edit");
+        this.buttons.add(edit);
+        isNew = obj.getName().isEmpty();
+        this.buttons.add(new ButtonWidget(2, width / 2 - 100, height / 2 - 10, 100, 20 , isNew ? "Name" : "Rename"));
+        ButtonWidget remove = new ButtonWidget(3, width / 2, height / 2 - 10, 100, 20, RED + "Remove");
+        this.buttons.add(remove);
+        this.buttons.add(new ButtonWidget(4, width / 2 - 100, height / 2 + 10, 200, 20, isNew ? "Cancel" : I18n.translate("gui.done")));
+        edit.active = !isNew;
+        remove.active = !isNew;
         super.init();
         from.init();
     }
@@ -37,7 +41,6 @@ public class ViewGUI<T extends Renameable> extends Screen {
     protected void buttonClicked(ButtonWidget button) {
         switch (button.id) {
             case 0:
-                selected = true;
                 from.select(obj);
                 init();
                 break;
@@ -52,6 +55,9 @@ public class ViewGUI<T extends Renameable> extends Screen {
                 MinecraftClient.getInstance().openScreen(new RemoveGUI<>(this));
                 break;
             case 4:
+                if (obj.getName().isEmpty()) {
+                    remove();
+                }
                 MinecraftClient.getInstance().openScreen(from);
                 break;
         }
@@ -64,11 +70,13 @@ public class ViewGUI<T extends Renameable> extends Screen {
 
     @Override
     public void render(int mouseX, int mouseY, float tickDelta) {
-        from.render(-1, -1, tickDelta);
-        if (mouseX >= 0 || mouseY >= 0) {
-            renderBackground();
+
+        renderBackground();
+        if (isNew) {
+            drawCenteredString(textRenderer, "Please name this new " + from.title.substring(0, from.title.length() - 1), width / 2, height / 2 - 80, 0xFFFFFF);
+        } else {
+            drawCenteredString(textRenderer, obj.getName(), width / 2, height / 2 - 80, 0xFFFFFF);
         }
-        drawCenteredString(textRenderer, obj.getName(), width / 2, height / 2 - 80, 0xFFFFFF);
 
         super.render(mouseX, mouseY, tickDelta);
     }

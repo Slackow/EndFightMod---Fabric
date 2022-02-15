@@ -36,7 +36,7 @@ public class RemoveGUI <T extends Renameable> extends Screen {
     @Override
     public void render(int mouseX, int mouseY, float tickDelta) {
         from.render(-1, -1, tickDelta);
-        renderBackground();
+        this.fillGradient(0, 0, this.width, this.height, -1072689136, -804253680);
         super.render(mouseX, mouseY, tickDelta);
     }
 }

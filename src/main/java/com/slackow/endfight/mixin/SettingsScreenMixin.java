@@ -13,12 +13,21 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.function.Predicate;
+
 @Mixin(SettingsScreen.class)
 public class SettingsScreenMixin extends Screen {
     @SuppressWarnings("unchecked")
     @Inject(method = "init", at = @At("TAIL"))
     private void init(CallbackInfo ci){
-        buttons.add(new ButtonWidget(6_22_2019, width / 2 + 200, height / 6 - 12, 60, 20, "End"));
+        buttons.removeIf((Predicate<ButtonWidget>) button -> button.id == 107);
+        BigConfig bigConfig = BigConfig.getBigConfig();
+        boolean exists = !bigConfig.configs.isEmpty();
+        if (exists) {
+            buttons.add(new ButtonWidget(4_23_2013, width / 2 + 75, height / 6 + 72 - 6, 80, 20, "'" +
+                    BigConfig.getSelectedConfig().name + "'..."));
+        }
+        buttons.add(new ButtonWidget(6_22_2019, width / 2 + 5, height / 6 + 72 - 6, exists ? 70 : 150, 20, exists ? "End..." : "End Fight Settings..."));
     }
 
     @Inject(method = "buttonClicked", at = @At("TAIL"))
@@ -31,12 +40,15 @@ public class SettingsScreenMixin extends Screen {
                             (gui, obj) -> {
                                 // open config GUI
                                 MinecraftClient.getInstance().openScreen(new ConfigGUI(gui, obj));
-                             },
+                            },
                             (data, selected) -> {
                                 bigConfig.configs = data;
                                 bigConfig.selectedConfig = selected;
-                                BigConfig.save();
-                            }));
+                                bigConfig.save();
+                            }, "Profiles"));
+        }
+        if (par1.id == 4_23_2013) {
+            //MinecraftClient.getInstance().openScreen(new ConfigGUI((SettingsScreen) (Object) this, BigConfig.getSelectedConfig()));
         }
     }
 }

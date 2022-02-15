@@ -6,20 +6,18 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.slackow.endfight.EndFightMod.getInventoryPath;
+import static com.slackow.endfight.EndFightMod.getDataPath;
 import static java.util.Collections.emptyList;
 
 public class BigConfig {
 
     private static BigConfig mine;
 
-    public static void save() {
-        if (mine != null) {
-            try {
-                ConfigLoader.saveConfig(mine, getInventoryPath().toFile());
-            } catch (IOException e) {
-                throw new RuntimeException("Unable to save configs", e);
-            }
+    public void save() {
+        try {
+            ConfigLoader.saveConfig(this, getDataPath().toFile());
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to save configs", e);
         }
     }
 
@@ -28,7 +26,11 @@ public class BigConfig {
             return mine;
         } else {
             try {
-                return mine = ConfigLoader.loadConfig(BigConfig.class, getInventoryPath().toFile());
+                mine = ConfigLoader.loadConfig(BigConfig.class, getDataPath().toFile());
+                if (mine == null) {
+                    return mine = new BigConfig();
+                }
+                return mine;
             } catch (IOException e) {
                 return new BigConfig();
             }

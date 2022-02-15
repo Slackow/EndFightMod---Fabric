@@ -4,13 +4,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.slackow.endfight.util.Kit;
 import net.fabricmc.api.ModInitializer;
-import net.minecraft.class_481;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.command.CommandException;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import org.lwjgl.input.Keyboard;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -32,7 +30,7 @@ public class EndFightMod implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		MinecraftClient.getInstance().options.debugEnabled = true;
+		//MinecraftClient.getInstance().options.debugEnabled = true;
 
 	}
 
@@ -57,7 +55,7 @@ public class EndFightMod implements ModInitializer {
 
 
 	public static void giveInventory(PlayerEntity player) throws CommandException {
-		Path path = getInventoryPath();
+		Path path = getDataPath();
 		if(Files.notExists(path)){
 			try {
 				Files.write(path,
@@ -82,7 +80,7 @@ public class EndFightMod implements ModInitializer {
 		}
 	}
 
-	public static Path getInventoryPath() {
-		return MinecraftClient.getInstance().runDirectory.toPath().resolve("inv.txt");
+	public static Path getDataPath() {
+		return MinecraftClient.getInstance().runDirectory.toPath().resolve("end.json");
 	}
 }

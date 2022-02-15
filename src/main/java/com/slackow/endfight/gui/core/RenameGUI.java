@@ -33,7 +33,7 @@ public class RenameGUI<T extends Renameable> extends Screen {
 
     @Override
     public void render(int mouseX, int mouseY, float tickDelta) {
-        from.render(-1, -1, tickDelta);
+
         renderBackground();
         textField.render();
         super.render(mouseX, mouseY, tickDelta);

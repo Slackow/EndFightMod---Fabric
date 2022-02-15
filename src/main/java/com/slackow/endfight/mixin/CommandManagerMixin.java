@@ -147,7 +147,7 @@ public abstract class CommandManagerMixin extends CommandRegistry {
                                     .mapToObj(JsonPrimitive::new)
                                     .collect(JsonArray::new, JsonArray::add, JsonArray::addAll);
                     try {
-                        Files.write(EndFightMod.getInventoryPath(), Collections.singleton(new Gson().toJson(result)));
+                        Files.write(EndFightMod.getDataPath(), Collections.singleton(new Gson().toJson(result)));
                     } catch (IOException e) {
                         throw new CommandException("commands.generic.exception");
                     }
@@ -204,7 +204,7 @@ public abstract class CommandManagerMixin extends CommandRegistry {
                                     new SimpleStr("four"),
                                     new SimpleStr("five")),
                                     0, () -> new SimpleStr("Added"), (a, b) -> {}, (data, selected) -> {
-                            }));
+                            }, "Profiles"));
                     return;
                 }
                 boolean twice = args.length == 0 || !args[0].contains("o");
@@ -263,7 +263,7 @@ public abstract class CommandManagerMixin extends CommandRegistry {
                         heal(player);
                         // set survival
                         player.method_3170(GameMode.SURVIVAL);
-                        EndFightMod.giveInventory(player);
+                        //EndFightMod.giveInventory(player);
                         player.teleportToDimension(1);
                         player.sendMessage(new LiteralText("Sent to End"));
                         EndFightMod.time = System.currentTimeMillis();

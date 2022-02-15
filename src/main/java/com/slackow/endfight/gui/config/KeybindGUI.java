@@ -6,6 +6,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.resource.language.I18n;
 import org.lwjgl.input.Keyboard;
 
 public class KeybindGUI extends Screen {
@@ -22,20 +23,22 @@ public class KeybindGUI extends Screen {
     @SuppressWarnings("unchecked")
     @Override
     public void init() {
-        textField = new TextFieldWidget(textRenderer, width / 2 - 48, height / 2 - 22, 96, 20);
+        textField = new TextFieldWidget(textRenderer, width / 2 - 73, height / 2 - 22, 146, 20);
         textField.setText(obj.message);
-        buttons.add((new ButtonWidget(0, width / 2 - 35, height / 2, 70, 20, choosing ? "> Key <" : ("Key: " + (obj.code != Keyboard.KEY_ESCAPE ? "None" : Keyboard.getKeyName(obj.code))))));
-        ButtonWidget reset = new ButtonWidget(1, width / 2 + 40, height / 2, 50, 20, "Reset");
+        buttons.add((new ButtonWidget(0, width / 2 - 75, height / 2, 90, 20, choosing ? "> Key <" : ("Key: " + (obj.code == Keyboard.KEY_ESCAPE ? "None" : Keyboard.getKeyName(obj.code))))));
+        ButtonWidget reset = new ButtonWidget(1, width / 2 + 20, height / 2, 60, 20, "Reset");
         reset.active = obj.code != Keyboard.KEY_ESCAPE;
         buttons.add(reset);
-        buttons.add(new ButtonWidget(2, width / 2 - 50 , height / 2 + 22, 100, 20, "Done"));
+        buttons.add(new ButtonWidget(2, width / 2 - 75 , height / 2 + 22, 150, 20, I18n.translate("gui.done")));
         super.init();
     }
 
     @Override
     public void render(int mouseX, int mouseY, float tickDelta) {
-        from.render(-1, -1, tickDelta);
+
         renderBackground();
+        drawCenteredString(textRenderer, "Keybind", width / 2, height / 6 - 2, 0xFFFFFF);
+        drawCenteredString(textRenderer, obj.getName(), width / 2, height / 6 + 10, 0xFFFFFF);
         textField.render();
         super.render(mouseX, mouseY, tickDelta);
     }
@@ -47,6 +50,7 @@ public class KeybindGUI extends Screen {
         if (choosing){
             obj.code = code;
             choosing = false;
+            init();
         } else {
             super.keyPressed(character, code);
         }
@@ -58,12 +62,22 @@ public class KeybindGUI extends Screen {
         if (button.id == 2) {
             MinecraftClient.getInstance().openScreen(from);
             return;
-        }
-        if (button.id == 1) {
+        } else if (button.id == 1) {
             obj.code = Keyboard.KEY_ESCAPE;
         }
-        init();
         super.buttonClicked(button);
+    }
+
+    @Override
+    protected void mouseClicked(int mouseX, int mouseY, int button) {
+        textField.mouseClicked(mouseX, mouseY, button);
+        super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
+    protected void mouseReleased(int mouseX, int mouseY, int button) {
+        init();
+        super.mouseReleased(mouseX, mouseY, button);
     }
 
     @Override
