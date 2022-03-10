@@ -24,9 +24,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Iterator;
 import java.util.List;
 
+import static com.slackow.endfight.config.BigConfig.getSelectedConfig;
+import java.util.Iterator;
+import java.util.List;
 import static net.minecraft.util.math.MathHelper.clamp;
 
 @Mixin(EnderDragonEntity.class)
@@ -44,11 +46,11 @@ public abstract class EnderDragonEntityMixin extends LivingEntity {
     @Inject(method = "method_6302", at = @At("RETURN"))
     public void onDamage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir){
         if (cir.getReturnValue()) {
-            MinecraftClient.getInstance().player.sendMessage(new LiteralText("Dragon damaged by " + source.getName() + ": " + amount));
+            MinecraftClient.getInstance().field_3805.sendMessage(new LiteralText("Dragon damaged by " + source.getName() + ": " + amount));
             if (getHealth() <= 0) {
                 int seconds = (int) ((System.currentTimeMillis() - EndFightMod.time) / 1000);
                 seconds = clamp(seconds, 0, 86399);
-                MinecraftClient.getInstance().player.sendMessage(
+                MinecraftClient.getInstance().field_3805.sendMessage(
                         new LiteralText("Dragon Killed in about " + LocalTime.ofSecondOfDay(seconds).format(DateTimeFormatter.ofPattern("mm:ss")) + " [RTA]"));
                 EndFightMod.time = 0;
             }
@@ -68,7 +70,6 @@ public abstract class EnderDragonEntityMixin extends LivingEntity {
         r = o * o + p * p + q * q;
         return Math.sqrt(r);
     }
-
     @Inject(method = "tickMovement", at = @At("HEAD"))
     public void onUpdates(CallbackInfo ci) {
         if (lastSetNewTargetCount != setNewTargetCounter) {

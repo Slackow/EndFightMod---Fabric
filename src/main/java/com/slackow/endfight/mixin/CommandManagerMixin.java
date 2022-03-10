@@ -3,27 +3,28 @@ package com.slackow.endfight.mixin;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonPrimitive;
+import com.slackow.endfight.EndFightCommand;
 import com.slackow.endfight.EndFightMod;
+import com.slackow.endfight.gui.core.ListGUI;
+import com.slackow.endfight.util.SimpleStr;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.command.AbstractCommand;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.CommandSource;
 import net.minecraft.entity.EndCrystalEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.boss.dragon.EnderDragonEntity;
-import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.CommandRegistry;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.server.world.ServerWorldManager;
 import net.minecraft.text.LiteralText;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.GameMode;
 import net.minecraft.world.MultiServerWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.level.LevelInfo;
+import net.minecraft.world.level.LevelProperties;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.spongepowered.asm.mixin.Mixin;
@@ -37,6 +38,7 @@ import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
+import java.util.Random;
 import java.util.stream.Stream;
 
 import static net.minecraft.util.Formatting.RED;
@@ -44,19 +46,35 @@ import static net.minecraft.util.Formatting.RED;
 @Mixin(CommandManager.class)
 public abstract class CommandManagerMixin extends CommandRegistry {
 
-    private static final String commandOptions = "/heal" +
-            "\n/killcrystals" +
-            "\n/setinv" +
-            "\n/getinv" +
-            "\n/reset [out] | /reset options" +
-            "\n/charge [new health]" +
-            "\n/goodcharge [distance, height] [health]" +
-            "\n/dragonhealth [new health]";
-
     @Inject(method = "<init>", at = @At("TAIL"))
     public void epicCommands(CallbackInfo ci) {
+        // god
+        registerCommand(new EndFightCommand() {
+            @Override
+            public String getCommandName() {
+                return "god";
+            }
+
+            @Override
+            public String getUsageTranslationKey(CommandSource source) {
+                return "/god";
+            }
+
+            @Override
+            public void execute(CommandSource source, String[] args) {
+                if (source instanceof PlayerEntity) {
+                    source.sendMessage(new LiteralText((EndFightMod.godMode ^= true) ? "God Mode Enabled" :
+                            "God Mode Disabled"));
+                    PlayerEntity player = (PlayerEntity) source;
+                    player.setHealth(20f);
+                    player.extinguish();
+                    player.getHungerManager().add(20, 1);
+                    player.getHungerManager().add(1, -8); // -16
+                }
+            }
+        });
         // heal
-        this.registerCommand(new AbstractCommand() {
+        registerCommand(new EndFightCommand() {
             @Override
             public String getCommandName() {
                 return "heal";
@@ -71,15 +89,13 @@ public abstract class CommandManagerMixin extends CommandRegistry {
             public void execute(CommandSource source, String[] args) {
                 if (source instanceof PlayerEntity) {
                     PlayerEntity player = (PlayerEntity) source;
-                    player.setHealth(20f);
-                    player.extinguish();
-                    player.getHungerManager().add(20, 1);
-                    player.getHungerManager().add(1, -8); // -16
+                    heal(player);
+                    player.sendMessage(new LiteralText("Healed"));
                 }
             }
         });
         // killcrystals
-        this.registerCommand(new AbstractCommand() {
+        registerCommand(new EndFightCommand() {
             @Override
             public String getCommandName() {
                 return "killcrystals";
@@ -92,11 +108,15 @@ public abstract class CommandManagerMixin extends CommandRegistry {
 
             @Override
             public void execute(CommandSource source, String[] args) {
-                long count = source.getWorld().getLoadedEntities().stream()
-                        .filter(Entity::isAlive)
-                        .filter(entity -> entity instanceof EndCrystalEntity)
-                        .peek(Entity::kill)
-                        .count();
+                long count = 0;
+                for (Object loadedEntity : source.getWorld().getLoadedEntities()) {
+                    if (loadedEntity instanceof EndCrystalEntity) {
+                        if (((EndCrystalEntity) loadedEntity).isAlive()) {
+                            ((EndCrystalEntity) loadedEntity).remove();
+                            count++;
+                        }
+                    }
+                }
                 if (count <= 0) {
                     source.sendMessage(new LiteralText(RED + "No End Crystals Found"));
                 } else {
@@ -105,7 +125,7 @@ public abstract class CommandManagerMixin extends CommandRegistry {
             }
         });
         // setinv
-        this.registerCommand(new AbstractCommand() {
+        registerCommand(new EndFightCommand() {
             @Override
             public String getCommandName() {
                 return "setinv";
@@ -127,7 +147,7 @@ public abstract class CommandManagerMixin extends CommandRegistry {
                                     .mapToObj(JsonPrimitive::new)
                                     .collect(JsonArray::new, JsonArray::add, JsonArray::addAll);
                     try {
-                        Files.write(EndFightMod.getInventoryPath(), Collections.singleton(new Gson().toJson(result)));
+                        Files.write(EndFightMod.getDataPath(), Collections.singleton(new Gson().toJson(result)));
                     } catch (IOException e) {
                         throw new CommandException("commands.generic.exception");
                     }
@@ -136,7 +156,7 @@ public abstract class CommandManagerMixin extends CommandRegistry {
             }
         });
         // getinv
-        this.registerCommand(new AbstractCommand() {
+        registerCommand(new EndFightCommand() {
             @Override
             public String getCommandName() {
                 return "getinv";
@@ -155,7 +175,7 @@ public abstract class CommandManagerMixin extends CommandRegistry {
             }
         });
         // reset (THE BIG ONE)
-        this.registerCommand(new AbstractCommand() {
+        registerCommand(new EndFightCommand() {
             @Override
             public String getCommandName() {
                 return "reset";
@@ -169,19 +189,41 @@ public abstract class CommandManagerMixin extends CommandRegistry {
             @Override
             public void execute(CommandSource source, String[] args) throws CommandException {
                 if (args.length > 0 && "options".equals(args[0])) {
-                    source.sendMessage(new LiteralText(commandOptions));
+                    //noinspection unchecked
+                    getCommandMap().values().stream().sorted().forEachOrdered(command -> {
+                        if (command instanceof EndFightCommand) {
+                            source.sendMessage(new LiteralText(RED + ((EndFightCommand) command).getUsageTranslationKey(source)));
+                        }
+                    });
+
+                    MinecraftClient.getInstance().openScreen(
+                            new ListGUI<>(null, Arrays.asList(
+                                    new SimpleStr("one"),
+                                    new SimpleStr("two"),
+                                    new SimpleStr("three"),
+                                    new SimpleStr("four"),
+                                    new SimpleStr("five")),
+                                    0, () -> new SimpleStr("Added"), (a, b) -> {}, (data, selected) -> {
+                            }, "Profiles"));
                     return;
                 }
                 boolean twice = args.length == 0 || !args[0].contains("o");
                 if (source instanceof PlayerEntity) {
                     PlayerEntity player = (PlayerEntity) source;
                     MinecraftServer server = MinecraftServer.getServer();
-                    for (ServerPlayerEntity p : server.getPlayerManager().getPlayers()) {
-                        if (p.dimension == 1) {
-                            Arrays.fill(p.inventory.main, null);
-                            Arrays.fill(p.inventory.armor, null);
-                            p.setGameMode(LevelInfo.GameMode.CREATIVE);
-                            p.teleportToDimension(0);
+                    for (Object objP : server.getPlayerManager().players) {
+                        if (objP instanceof PlayerEntity) {
+                            PlayerEntity p = (PlayerEntity) objP;
+                            if (p.dimension == 1) {
+                                Arrays.fill(p.inventory.main, null);
+                                Arrays.fill(p.inventory.armor, null);
+                                // set creative mode
+                                p.method_3170(GameMode.CREATIVE);
+                                if (!twice) {
+                                    p.teleportToDimension(1);
+                                }
+                                p.teleportToDimension(0);
+                            }
                         }
                     }
                     File dim1 = new File(MinecraftClient.getInstance().runDirectory, "saves/" + server.getLevelName() + "/DIM1");
@@ -205,17 +247,23 @@ public abstract class CommandManagerMixin extends CommandRegistry {
                         }
                     }
                     if (twice || !createIt){
-                        ServerWorld newEnd = (ServerWorld) new MultiServerWorld(server, server.worlds[0].getSaveHandler(), 1, server.worlds[0], server.profiler).getWorld();
+                        ServerWorld overWorld = server.worlds[0];
+                        LevelProperties oldInfo = overWorld.getLevelProperties();
+                        LevelInfo levelInfo = new LevelInfo(new Random().nextLong(),
+                                oldInfo.method_233(),
+                                oldInfo.hasStructures(),
+                                oldInfo.isHardcore(),
+                                oldInfo.getGeneratorType());
+                        System.out.println(levelInfo.getSeed());
+                        ServerWorld newEnd = new MultiServerWorld(server, overWorld.getSaveHandler(), server.getLevelName(), 1, levelInfo, overWorld, server.profiler);
+                        newEnd.field_7173 = overWorld.field_7173;
                         server.worlds = ArrayUtils.add(server.worlds, newEnd);
                         server.field_3858 = ArrayUtils.add(server.field_3858, new long[100]);
                         newEnd.addListener(new ServerWorldManager(server, newEnd));
-                        player.setHealth(20f);
-                        player.extinguish();
-                        player.addStatusEffect(new StatusEffectInstance(11, 4, 255, true, false));
-                        player.getHungerManager().add(20, 1);
-                        player.getHungerManager().add(1, -8); // -16
-                        player.setGameMode(LevelInfo.GameMode.SURVIVAL);
-                        EndFightMod.giveInventory(player);
+                        heal(player);
+                        // set survival
+                        player.method_3170(GameMode.SURVIVAL);
+                        //EndFightMod.giveInventory(player);
                         player.teleportToDimension(1);
                         player.sendMessage(new LiteralText("Sent to End"));
                         EndFightMod.time = System.currentTimeMillis();
@@ -225,7 +273,7 @@ public abstract class CommandManagerMixin extends CommandRegistry {
             }
         });
         // dragon health
-        registerCommand(new AbstractCommand() {
+        registerCommand(new EndFightCommand() {
             @Override
             public String getCommandName() {
                 return "dragonhealth";
@@ -242,7 +290,7 @@ public abstract class CommandManagerMixin extends CommandRegistry {
             }
         });
         // charge
-        registerCommand(new AbstractCommand() {
+        registerCommand(new EndFightCommand() {
             @Override
             public String getCommandName() {
                 return "charge";
@@ -259,7 +307,7 @@ public abstract class CommandManagerMixin extends CommandRegistry {
             }
         });
         // goodcharge
-        registerCommand(new AbstractCommand() {
+        registerCommand(new EndFightCommand() {
             @Override
             public String getCommandName() {
                 return "goodcharge";
@@ -289,12 +337,10 @@ public abstract class CommandManagerMixin extends CommandRegistry {
                         float yaw = ((PlayerEntity) source).getHeadRotation();
                         double sin = Math.sin((yaw + 90) * Math.PI / 180f),
                                 cos = Math.cos((yaw + 90) * Math.PI / 180f);
-
-                        Vec3d playerLocation = source.getPos();
                         EnderDragonEntity entityDragon = dragon.get();
-                        entityDragon.updatePositionAndAngles(playerLocation.x + cos * dist,
-                                playerLocation.y + height,
-                                playerLocation.z + sin * dist,
+                        entityDragon.updatePositionAndAngles(((PlayerEntity) source).x + cos * dist,
+                                ((PlayerEntity) source).y + height,
+                                ((PlayerEntity) source).z + sin * dist,
                                 0,
                                 (yaw + 360) % 360 - 180);
                         entityDragon.velocityX = 0;
@@ -326,10 +372,18 @@ public abstract class CommandManagerMixin extends CommandRegistry {
                 ((EnderDragonAccessor) entityDragon).setTarget((Entity) source);
 
                 source.sendMessage(new LiteralText("Forced Dragon Charge"));
-            } else if (args.length == 0){
+            } else if (args.length == 0) {
                 source.sendMessage(new LiteralText(RED + "No Dragon Found"));
             }
         }
+    }
+
+    private static void heal(PlayerEntity player) {
+        player.setHealth(20f);
+        player.extinguish();
+        player.getHungerManager().add(20, 1);
+        player.getHungerManager().add(1, -8); // -16
+        player.fallDistance = 0;
     }
 
     private static void dragonHealth(CommandSource source, String[] args) {
@@ -344,9 +398,11 @@ public abstract class CommandManagerMixin extends CommandRegistry {
         source.sendMessage(new LiteralText(dragon.map(entityDragon -> "Dragon Health is: " + entityDragon.getHealth()).orElseGet(() -> RED + "No Dragon Found")));
     }
     private static Optional<EnderDragonEntity> getDragon(World world) {
-        return world.getLoadedEntities().stream()
-                .filter(Entity::isAlive)
-                .filter(entity -> entity instanceof EnderDragonEntity)
-                .map(entity -> (EnderDragonEntity) entity).findFirst();
+        for (Object loadedEntity : world.getLoadedEntities()) {
+            if (loadedEntity instanceof EnderDragonEntity) {
+                return Optional.of((EnderDragonEntity) loadedEntity);
+            }
+        }
+        return Optional.empty();
     }
 }
