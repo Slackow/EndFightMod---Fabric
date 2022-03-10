@@ -5,40 +5,29 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonPrimitive;
 import com.slackow.endfight.EndFightCommand;
 import com.slackow.endfight.EndFightMod;
-import com.slackow.endfight.gui.core.ListGUI;
-import com.slackow.endfight.util.SimpleStr;
-import net.minecraft.client.MinecraftClient;
+import com.slackow.endfight.commands.ResetCommand;
+import com.slackow.endfight.config.BigConfig;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.CommandSource;
 import net.minecraft.entity.EndCrystalEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.boss.dragon.EnderDragonEntity;
+import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.CommandRegistry;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.server.world.ServerWorldManager;
 import net.minecraft.text.LiteralText;
-import net.minecraft.world.GameMode;
-import net.minecraft.world.MultiServerWorld;
 import net.minecraft.world.World;
-import net.minecraft.world.level.LevelInfo;
-import net.minecraft.world.level.LevelProperties;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.ArrayUtils;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
-import java.util.Random;
 import java.util.stream.Stream;
 
 import static net.minecraft.util.Formatting.RED;
@@ -63,11 +52,17 @@ public abstract class CommandManagerMixin extends CommandRegistry {
             @Override
             public void execute(CommandSource source, String[] args) {
                 if (source instanceof PlayerEntity) {
-                    source.sendMessage(new LiteralText((EndFightMod.godMode ^= true) ? "God Mode Enabled" :
+                    boolean god = BigConfig.getSelectedConfig().dGodPlayer ^= true;
+                    source.sendMessage(new LiteralText((god) ? "God Mode Enabled" :
                             "God Mode Disabled"));
                     PlayerEntity player = (PlayerEntity) source;
                     player.setHealth(20f);
                     player.extinguish();
+                    if (god) {
+                        player.addStatusEffect(new StatusEffectInstance(11, 100000, 255, true));
+                    } else {
+                        player.clearStatusEffects();
+                    }
                     player.getHungerManager().add(20, 1);
                     player.getHungerManager().add(1, -8); // -16
                 }
@@ -109,7 +104,7 @@ public abstract class CommandManagerMixin extends CommandRegistry {
             @Override
             public void execute(CommandSource source, String[] args) {
                 long count = 0;
-                for (Object loadedEntity : source.getWorld().getLoadedEntities()) {
+                for (Object loadedEntity : ((PlayerEntity) source).world.getLoadedEntities()) {
                     if (loadedEntity instanceof EndCrystalEntity) {
                         if (((EndCrystalEntity) loadedEntity).isAlive()) {
                             ((EndCrystalEntity) loadedEntity).remove();
@@ -139,18 +134,7 @@ public abstract class CommandManagerMixin extends CommandRegistry {
             @Override
             public void execute(CommandSource source, String[] args) throws CommandException {
                 if (source instanceof PlayerEntity) {
-                    PlayerEntity player = (PlayerEntity) source;
-                    JsonArray result =
-                            Stream.concat(Arrays.stream(player.inventory.main),
-                                            Arrays.stream(player.inventory.armor))
-                                    .mapToInt(EndFightMod::itemToInt)
-                                    .mapToObj(JsonPrimitive::new)
-                                    .collect(JsonArray::new, JsonArray::add, JsonArray::addAll);
-                    try {
-                        Files.write(EndFightMod.getDataPath(), Collections.singleton(new Gson().toJson(result)));
-                    } catch (IOException e) {
-                        throw new CommandException("commands.generic.exception");
-                    }
+                    EndFightMod.setInventory((PlayerEntity) source, BigConfig.getSelectedConfig().inventory);
                     source.sendMessage(new LiteralText("Saved Inventory"));
                 }
             }
@@ -170,108 +154,12 @@ public abstract class CommandManagerMixin extends CommandRegistry {
             @Override
             public void execute(CommandSource source, String[] args) throws CommandException {
                 if (source instanceof PlayerEntity) {
-                    EndFightMod.giveInventory((PlayerEntity) source);
+                    EndFightMod.giveInventory((PlayerEntity) source, BigConfig.getSelectedConfig().getInv());
                 }
             }
         });
         // reset (THE BIG ONE)
-        registerCommand(new EndFightCommand() {
-            @Override
-            public String getCommandName() {
-                return "reset";
-            }
-
-            @Override
-            public String getUsageTranslationKey(CommandSource source) {
-                return "/reset [out] | /reset options";
-            }
-
-            @Override
-            public void execute(CommandSource source, String[] args) throws CommandException {
-                if (args.length > 0 && "options".equals(args[0])) {
-                    //noinspection unchecked
-                    getCommandMap().values().stream().sorted().forEachOrdered(command -> {
-                        if (command instanceof EndFightCommand) {
-                            source.sendMessage(new LiteralText(RED + ((EndFightCommand) command).getUsageTranslationKey(source)));
-                        }
-                    });
-
-                    MinecraftClient.getInstance().openScreen(
-                            new ListGUI<>(null, Arrays.asList(
-                                    new SimpleStr("one"),
-                                    new SimpleStr("two"),
-                                    new SimpleStr("three"),
-                                    new SimpleStr("four"),
-                                    new SimpleStr("five")),
-                                    0, () -> new SimpleStr("Added"), (a, b) -> {}, (data, selected) -> {
-                            }, "Profiles"));
-                    return;
-                }
-                boolean twice = args.length == 0 || !args[0].contains("o");
-                if (source instanceof PlayerEntity) {
-                    PlayerEntity player = (PlayerEntity) source;
-                    MinecraftServer server = MinecraftServer.getServer();
-                    for (Object objP : server.getPlayerManager().players) {
-                        if (objP instanceof PlayerEntity) {
-                            PlayerEntity p = (PlayerEntity) objP;
-                            if (p.dimension == 1) {
-                                Arrays.fill(p.inventory.main, null);
-                                Arrays.fill(p.inventory.armor, null);
-                                // set creative mode
-                                p.method_3170(GameMode.CREATIVE);
-                                if (!twice) {
-                                    p.teleportToDimension(1);
-                                }
-                                p.teleportToDimension(0);
-                            }
-                        }
-                    }
-                    File dim1 = new File(MinecraftClient.getInstance().runDirectory, "saves/" + server.getLevelName() + "/DIM1");
-                    boolean createIt = dim1.exists();
-                    if (createIt) {
-                        ServerWorld end = server.getWorld(1);
-                        // delete it then
-                        end.close();
-                        server.worlds = ArrayUtils.remove(server.worlds, 2);
-                        server.field_3858 = ArrayUtils.remove(server.field_3858, 2);
-                        end.close();
-                        try {
-                            FileUtils.forceDelete(dim1);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        if (!dim1.exists() || FileUtils.deleteQuietly(dim1)) {
-                            player.sendMessage(new LiteralText("Completely Removed the End Dimension"));
-                        } else {
-                            player.sendMessage(new LiteralText(RED + "Failed to remove End Dimension :("));
-                        }
-                    }
-                    if (twice || !createIt){
-                        ServerWorld overWorld = server.worlds[0];
-                        LevelProperties oldInfo = overWorld.getLevelProperties();
-                        LevelInfo levelInfo = new LevelInfo(new Random().nextLong(),
-                                oldInfo.method_233(),
-                                oldInfo.hasStructures(),
-                                oldInfo.isHardcore(),
-                                oldInfo.getGeneratorType());
-                        System.out.println(levelInfo.getSeed());
-                        ServerWorld newEnd = new MultiServerWorld(server, overWorld.getSaveHandler(), server.getLevelName(), 1, levelInfo, overWorld, server.profiler);
-                        newEnd.field_7173 = overWorld.field_7173;
-                        server.worlds = ArrayUtils.add(server.worlds, newEnd);
-                        server.field_3858 = ArrayUtils.add(server.field_3858, new long[100]);
-                        newEnd.addListener(new ServerWorldManager(server, newEnd));
-                        heal(player);
-                        // set survival
-                        player.method_3170(GameMode.SURVIVAL);
-                        //EndFightMod.giveInventory(player);
-                        player.teleportToDimension(1);
-                        player.sendMessage(new LiteralText("Sent to End"));
-                        EndFightMod.time = System.currentTimeMillis();
-                    }
-
-                }
-            }
-        });
+        registerCommand(new ResetCommand());
         // dragon health
         registerCommand(new EndFightCommand() {
             @Override
@@ -304,6 +192,28 @@ public abstract class CommandManagerMixin extends CommandRegistry {
             @Override
             public void execute(CommandSource source, String[] args) {
                 chargeCommand(source, args);
+            }
+        });
+        // roll
+        registerCommand(new EndFightCommand() {
+            @Override
+            public String getCommandName() {
+                return "roll";
+            }
+
+            @Override
+            public String getUsageTranslationKey(CommandSource source) {
+                return "/roll";
+            }
+
+            @Override
+            public void execute(CommandSource source, String[] args) {
+                getDragon(source.getWorld()).ifPresent(dragon -> {
+                    dragon.field_3742 = dragon.x;
+                    dragon.field_3751 = dragon.y + 1;
+                    dragon.field_3752 = dragon.z;
+                });
+                source.sendMessage(new LiteralText("Rolled"));
             }
         });
         // goodcharge
@@ -376,14 +286,6 @@ public abstract class CommandManagerMixin extends CommandRegistry {
                 source.sendMessage(new LiteralText(RED + "No Dragon Found"));
             }
         }
-    }
-
-    private static void heal(PlayerEntity player) {
-        player.setHealth(20f);
-        player.extinguish();
-        player.getHungerManager().add(20, 1);
-        player.getHungerManager().add(1, -8); // -16
-        player.fallDistance = 0;
     }
 
     private static void dragonHealth(CommandSource source, String[] args) {

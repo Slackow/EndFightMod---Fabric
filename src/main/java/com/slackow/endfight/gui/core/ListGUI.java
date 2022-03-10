@@ -53,7 +53,7 @@ public class ListGUI<T extends Renameable> extends Screen {
         ButtonWidget right = new ButtonWidget(7, width / 2 + 12, homeRow, 20, 20, ">");
         right.active = (data.size() - 1) / 5 > page;
         buttons.add(right);
-        buttons.add(new ButtonWidget(8, width / 2 - 50, homeRow + 25, 100, 20, I18n.translate("gui.done")));
+        buttons.add(new ButtonWidget(8, width / 2 - 100, height / 6 + 150, 200, 20, I18n.translate("gui.done")));
     }
 
     @Override

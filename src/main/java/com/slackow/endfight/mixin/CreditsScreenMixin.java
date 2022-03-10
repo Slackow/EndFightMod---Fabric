@@ -12,10 +12,9 @@ public abstract class CreditsScreenMixin {
 
     @Shadow protected abstract void close();
 
-    @Inject(method = "init", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "init", at = @At("HEAD"))
     private void init(CallbackInfo ci){
         close();
-        ci.cancel();
     }
 
 }

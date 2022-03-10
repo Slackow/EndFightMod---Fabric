@@ -21,7 +21,6 @@ import java.util.stream.StreamSupport;
 public class EndFightMod implements ModInitializer {
 
 	public static long time = System.currentTimeMillis();
-	public static boolean godMode = false;
 
 	public static void setInventory(PlayerEntity player, Kit kit) {
 		kit.contents = Stream.concat(Arrays.stream(player.inventory.main), Arrays.stream(player.inventory.armor))
@@ -54,6 +53,7 @@ public class EndFightMod implements ModInitializer {
 
 
 
+	@Deprecated
 	public static void giveInventory(PlayerEntity player) throws CommandException {
 		Path path = getDataPath();
 		if(Files.notExists(path)){
@@ -67,6 +67,7 @@ public class EndFightMod implements ModInitializer {
 			}
 		}
 		try {
+
 			ItemStack[] full = StreamSupport.stream(new JsonParser().parse(Files.newBufferedReader(path)).getAsJsonArray().spliterator(), false)
 					.mapToInt(JsonElement::getAsInt)
 					.mapToObj(EndFightMod::intToItem).toArray(ItemStack[]::new);

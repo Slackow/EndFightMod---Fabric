@@ -1,6 +1,7 @@
 package com.slackow.endfight.mixin;
 
 import com.slackow.endfight.EndFightMod;
+import com.slackow.endfight.config.BigConfig;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
@@ -20,19 +21,9 @@ public abstract class PlayerMixin extends LivingEntity {
 
     @Inject(method = "damage", at = @At("TAIL"))
     public void onDamage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
-        if (EndFightMod.godMode && !source.isOutOfWorld()) {
+        if (BigConfig.getSelectedConfig().dGodPlayer && !source.isOutOfWorld()) {
             setHealth(20f);
         }
-    }
-
-    @Inject(method = "onKilled", at = @At("HEAD"), cancellable = true)
-    public void onKilled(DamageSource source, CallbackInfo ci) {
-        System.out.println("ABOVE");
-        if (EndFightMod.godMode && !source.isOutOfWorld()) {
-            System.out.println("CANCELED");
-            ci.cancel();
-        }
-        System.out.println("COINTUNEDU");
     }
 
 }

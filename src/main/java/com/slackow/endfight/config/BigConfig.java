@@ -1,13 +1,19 @@
 package com.slackow.endfight.config;
 
-import com.slackow.endfight.util.ConfigLoader;
+import com.slackow.endfight.util.Island;
+import com.slackow.endfight.util.Kit;
+import net.minecraft.world.GameMode;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.StringJoiner;
+import java.util.stream.Collectors;
 
 import static com.slackow.endfight.EndFightMod.getDataPath;
-import static java.util.Collections.emptyList;
 
 public class BigConfig {
 
@@ -15,7 +21,7 @@ public class BigConfig {
 
     public void save() {
         try {
-            ConfigLoader.saveConfig(this, getDataPath().toFile());
+            Files.write(getDataPath(), Arrays.asList(toString().split("\n")));
         } catch (IOException e) {
             throw new RuntimeException("Unable to save configs", e);
         }
@@ -26,13 +32,81 @@ public class BigConfig {
             return mine;
         } else {
             try {
-                mine = ConfigLoader.loadConfig(BigConfig.class, getDataPath().toFile());
-                if (mine == null) {
-                    return mine = new BigConfig();
+                Path dataPath = getDataPath();
+                int selected = 0;
+                List<Config> configs = new ArrayList<>();
+                for (String line : Files.lines(dataPath).collect(Collectors.toList())) {
+                    if (line.startsWith(";")) {
+                        Config cfg = new Config();
+                        cfg.setName(line.substring(1).trim());
+                        configs.add(cfg);
+                    }
+                    int sign = line.indexOf('=');
+                    if (sign >= 0) {
+                        String key = line.substring(0, sign).trim();
+                        String value = line.substring(sign + 1).trim();
+                        if (key.isEmpty()) {
+                            selected = Integer.parseUnsignedInt(value);
+                            continue;
+                        }
+                        Config cfg = configs.get(configs.size() - 1);
+                        switch (key) {
+                            case "deathBox":
+                                cfg.deathBox = Integer.parseUnsignedInt(value);
+                                break;
+                            case "inventory":
+                                cfg.inventory = Kit.valueOf(value);
+                                break;
+                            case "enderMan":
+                                cfg.enderMan = Integer.parseUnsignedInt(value);
+                                break;
+                            case "arrowHelp":
+                                cfg.arrowHelp = Boolean.parseBoolean(value);
+                                break;
+                            case "specificHealthBar":
+                                cfg.specificHealthBar = Boolean.parseBoolean(value);
+                                break;
+                            case "damageInfo":
+                                cfg.damageInfo = Boolean.parseBoolean(value);
+                                break;
+                            case "selectedIsland":
+                                cfg.selectedIsland = Integer.parseInt(value);
+                                break;
+                            case "islands":
+                                cfg.islands = Arrays.stream(value.split(";"))
+                                        .map(Island::valueOf)
+                                        .collect(Collectors.toCollection(ArrayList::new));
+                                break;
+                            case "gamemode":
+                                cfg.gamemode = "1".equals(value) ? GameMode.CREATIVE : GameMode.SURVIVAL;
+                                break;
+                            case "showSettings":
+                                cfg.showSettings = Boolean.parseBoolean(value);
+                                break;
+                            case "dGodCrystals":
+                                cfg.dGodCrystals = Boolean.parseBoolean(value);
+                                break;
+                            case "dGodDragon":
+                                cfg.dGodDragon = Boolean.parseBoolean(value);
+                                break;
+                            case "dGodPlayer":
+                                cfg.dGodPlayer = Boolean.parseBoolean(value);
+                                break;
+                            case "dSeeTargetBlock":
+                                cfg.dSeeTargetBlock = Boolean.parseBoolean(value);
+                                break;
+                            case "dPrintDebugMessages":
+                                cfg.dPrintDebugMessages = Boolean.parseBoolean(value);
+                                break;
+                            default:
+                                System.out.println("WARNING: IGNORED LINE" + line);
+                                break;
+                        }
+                    }
                 }
-                return mine;
+                return mine = new BigConfig(configs, selected);
             } catch (IOException e) {
-                return new BigConfig();
+                return mine = new BigConfig();
             }
         }
     }
@@ -42,27 +116,45 @@ public class BigConfig {
         List<Config> configs = bigConfig.configs;
         if (bigConfig.selectedConfig < configs.size() && bigConfig.selectedConfig >= 0) {
             return configs.get(bigConfig.selectedConfig);
-        } else {
-            return emergency;
         }
+        throw new IllegalStateException("Send this error straight to Slackow#7890 on discord please(with everything below):\n" +
+                "" + bigConfig.selectedConfig + configs + "\n");
     }
 
-    // to prevent null pointers
-    private static final Config emergency = new Config();
-
-    static {
-        emergency.name = "emergency";
-        emergency.damageInfo = false;
-        emergency.deathBox = 0;
-        emergency.inventories = emptyList();
-        emergency.specificHealthBar = false;
-        emergency.keyBindings = emptyList();
-        emergency.selectedInv = 0;
+    @Override
+    public String toString() {
+        StringJoiner sb = new StringJoiner("\n");
+        sb.add("=" + selectedConfig);
+        for (Config cfg : configs) {
+            sb.add(";" + cfg.getName());
+            sb.add("deathBox=" + cfg.deathBox);
+            sb.add("inventory=" + cfg.inventory);
+            sb.add("enderMan=" + cfg.enderMan);
+            sb.add("arrowHelp=" + cfg.arrowHelp);
+            sb.add("specificHealthBar=" + cfg.specificHealthBar);
+            sb.add("damageInfo=" + cfg.damageInfo);
+            sb.add("selectedIsland=" + cfg.selectedIsland);
+            sb.add("islands=" + cfg.islands.stream().map(Island::toString).collect(Collectors.joining(";")));
+            sb.add("gamemode=" + cfg.gamemode.getGameModeId());
+            sb.add("showSettings=" + cfg.showSettings);
+            sb.add("dGodCrystals=" + cfg.dGodCrystals);
+            sb.add("dGodDragon=" + cfg.dGodDragon);
+            sb.add("dGodPlayer=" + cfg.dGodPlayer);
+            sb.add("dSeeTargetBlock=" + cfg.dSeeTargetBlock);
+            sb.add("dPrintDebugMessages=" + cfg.dPrintDebugMessages);
+        }
+        return sb.toString();
     }
-
 
     private BigConfig() {
         configs = new ArrayList<>();
+        configs.add(new Config());
+        selectedConfig = 0;
+    }
+
+    private BigConfig(List<Config> configs, int selectedConfig) {
+        this.configs = configs;
+        this.selectedConfig = selectedConfig;
     }
 
     public List<Config> configs;

@@ -1,5 +1,6 @@
 package com.slackow.endfight.gui.config;
 
+import com.slackow.endfight.config.BigConfig;
 import com.slackow.endfight.config.Config;
 import com.slackow.endfight.gui.core.ListGUI;
 import com.slackow.endfight.gui.core.ViewGUI;
@@ -29,12 +30,12 @@ public class ConfigGUI extends Screen {
         this.obj = obj;
     }
 
-    private static String buttonName(String prefix, boolean toggle){
+    public static String buttonName(String prefix, boolean toggle){
         return prefix + (toggle ? "on" : "off");
     }
 
-    private static final String[] deathBoxNames = {"never", "hitboxes", "always"};
-    private static final String[] enderManNames = {"off", "no agro", "on"};
+    public static final String[] deathBoxNames = {"never", "hitboxes", "always"};
+    public static final String[] enderManNames = {"off", "no agro", "on"};
 
 
     @SuppressWarnings("unchecked")
@@ -44,11 +45,10 @@ public class ConfigGUI extends Screen {
         buttons.add(new ButtonWidget(0, width / 2 - 155, height / 6 + 65, 150, 20, "Death box visibility: " + deathBoxNames[obj.deathBox]));
         buttons.add(new ButtonWidget(1, width / 2 + 5, height / 6 + 65, 150, 20, buttonName("Specific Health bar: ", obj.specificHealthBar)));
         buttons.add(new ButtonWidget(2, width / 2 - 155, height / 6 + 90, 150, 20, buttonName("Show Damage Info: ", obj.damageInfo)));
-        buttons.add(new ButtonWidget(3, width / 2 + 5, height / 6 + 90, 150, 20, "Inventories"));
+        buttons.add(new ButtonWidget(3, width / 2 + 5, height / 6 + 90, 150, 20, "Inventory"));
         buttons.add(new ButtonWidget(4, width / 2 - 155, height / 6 + 115, 150, 20, "Keybindings"));
         buttons.add(new ButtonWidget(5, width / 2 - 100, height / 6 + 150, 200, 20, I18n.translate("gui.done")));
         super.init();
-        from.init();
     }
 
     @Override
@@ -64,19 +64,10 @@ public class ConfigGUI extends Screen {
                 obj.damageInfo ^= true;
                 break;
             case 3:
-                MinecraftClient.getInstance().openScreen(new ListGUI<>(this, obj.inventories, obj.selectedInv,
-                        () -> new Kit("Default", new int[40]),
-                        (gui, inv) -> {
-                    //
-                            MinecraftClient.getInstance().openScreen(new InventoryCfgGUI(gui, inv));
-                        },
-                        (data, selected) -> {
-                            obj.inventories = data;
-                            obj.selectedInv = selected;
-                        }, "Inventories"));
+                client.openScreen(new InventoryCfgGUI(this, obj.inventory));
                 return;
             case 4:
-                MinecraftClient.getInstance().openScreen(new ListGUI<KeyBind>(this, obj.keyBindings, -1,
+                client.openScreen(new ListGUI<KeyBind>(this, obj.keyBindings, -1,
                         () -> new KeyBind("Shortcut", Keyboard.KEY_ESCAPE, ""),
                         (gui, keybind) -> {
                     //
@@ -90,7 +81,8 @@ public class ConfigGUI extends Screen {
                 });
                 return;
             case 5:
-                MinecraftClient.getInstance().openScreen(from);
+                client.openScreen(from);
+                BigConfig.getBigConfig().save();
                 return;
         }
         init();

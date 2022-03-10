@@ -8,13 +8,13 @@
     "ClientPlayNetworkHandlerMixin",
     "CommandManagerMixin",
     "CreditsScreenMixin",
+    "EndCrystalMixin",
     "EnderDragonAccessor",
     "EnderDragonEntityMixin",
-    "EntityRenderMixin",
     "HungerManagerMixin",
     "PlayerMixin",
+    "RenderCrystalMixin",
     "RenderDragonMixin",
-    "ServerPlayerMixin",
     "SettingsScreenMixin"
   ],
   "client": [
