@@ -49,7 +49,7 @@ public abstract class EnderDragonEntityMixin extends LivingEntity {
 
     @Inject(method = "method_2906", at = @At("HEAD"))
     public void setPickedTargetLastTick(CallbackInfo ci) {
-        if (this.ticksSincePickedTarget == 1) {
+        if (this.ticksSincePickedTarget == 1 && this.target != null) {
             MinecraftClient.getInstance().field_3805.sendMessage(new LiteralText("1/4"));
         }
         this.ticksSincePickedTarget = 0;
