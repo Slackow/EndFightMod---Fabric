@@ -29,35 +29,28 @@ loom {
 //	setIntermediaryUrl('https://maven.legacyfabric.net/net/fabricmc/intermediary/%1$s/intermediary-%1$s-v2.jar');
 }
 
+def lwjglVersion = System.getProperty("os.name").toLowerCase().contains("mac") ? "2.9.1" : "2.9.0"
+
 dependencies {
+	implementation 'org.apache.logging.log4j:log4j-core:2.17.0'
+	implementation 'org.apache.logging.log4j:log4j-api:2.17.0'
+
+	implementation "org.lwjgl.lwjgl:lwjgl_util:${lwjglVersion}"
+	implementation "org.lwjgl.lwjgl:lwjgl:${lwjglVersion}"
+	implementation "org.lwjgl.lwjgl:lwjgl-platform:${lwjglVersion}"
+
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-
-	// Fabric API provides hooks for events, item registration, and more. As most mods will need this, it's included by default. 
-	// If you know for a fact you don't, it's not required and can be safely removed.
-	//modImplementation ("net.legacyfabric.legacy-fabric-api:legacy-fabric-api:${fabric_version}") {
-	//	exclude module: "fabric-loader-1.8.9"
-	//}
-
-	// Hacks that make mac os work
-	if (System.getProperty("os.name").toLowerCase().contains("mac")) {
-		implementation 'org.lwjgl.lwjgl:lwjgl_util:2.9.4-nightly-20150209'
-		implementation 'org.lwjgl.lwjgl:lwjgl:2.9.4-nightly-20150209'
-		implementation 'org.lwjgl.lwjgl:lwjgl-platform:2.9.4-nightly-20150209'
-	}
 }
 
-// More hacks that make mac os work
-if (System.getProperty("os.name").toLowerCase().contains("mac")) {
-	configurations.all {
-		resolutionStrategy {
-			dependencySubstitution {
-				substitute module('org.lwjgl.lwjgl:lwjgl_util:2.9.2-nightly-201408222') with module('org.lwjgl.lwjgl:lwjgl_util:2.9.4-nightly-20150209')
-				substitute module('org.lwjgl.lwjgl:lwjgl:2.9.2-nightly-201408222') with module('org.lwjgl.lwjgl:lwjgl:2.9.4-nightly-20150209')
-			}
-			force 'org.lwjgl.lwjgl:lwjgl-platform:2.9.4-nightly-20150209'
+configurations.all {
+	resolutionStrategy {
+		dependencySubstitution {
+			substitute module('org.lwjgl.lwjgl:lwjgl_util:2.9.1-nightly-20130708-debug3') with module("org.lwjgl.lwjgl:lwjgl_util:${lwjglVersion}")
+			substitute module('org.lwjgl.lwjgl:lwjgl:2.9.1-nightly-20130708-debug3') with module("org.lwjgl.lwjgl:lwjgl:${lwjglVersion}")
 		}
+		force "org.lwjgl.lwjgl:lwjgl-platform:${lwjglVersion}"
 	}
 }
 
@@ -86,7 +79,7 @@ java {
 
 jar {
 	from("LICENSE") {
-		rename { "${it}_${project.archivesBaseName}"}
+		rename { "${it}_${project.archivesBaseName}" }
 	}
 }
 
