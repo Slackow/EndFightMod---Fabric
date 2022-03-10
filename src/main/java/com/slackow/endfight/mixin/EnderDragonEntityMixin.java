@@ -6,14 +6,19 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.boss.dragon.EnderDragonEntity;
+import net.minecraft.entity.boss.dragon.EnderDragonPart;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.vehicle.MinecartEntity;
 import net.minecraft.text.LiteralText;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -22,6 +27,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static com.slackow.endfight.config.BigConfig.getSelectedConfig;
+import java.util.Iterator;
+import java.util.List;
 import static net.minecraft.util.math.MathHelper.clamp;
 
 @Mixin(EnderDragonEntity.class)
@@ -52,6 +59,17 @@ public abstract class EnderDragonEntityMixin extends LivingEntity {
 
     int setNewTargetCounter = 0; // increment this every time you call setNewTarget
     int lastSetNewTargetCount = 0;
+    private double distanceTo(double targetX, double targetY, double targetZ) {
+        double o;
+        double p;
+        double q;
+        double r;
+        o = targetX - this.x;
+        p = targetY - this.y;
+        q = targetZ - this.z;
+        r = o * o + p * p + q * q;
+        return Math.sqrt(r);
+    }
     @Inject(method = "tickMovement", at = @At("HEAD"))
     public void onUpdates(CallbackInfo ci) {
         if (lastSetNewTargetCount != setNewTargetCounter) {
@@ -67,7 +85,7 @@ public abstract class EnderDragonEntityMixin extends LivingEntity {
             if (v > 10.0D) {
                 v = 10.0D;
             }
-            double targetY = ((Entity)(player)).boundingBox.minY + v;
+            double targetY = ((Entity)(player)).getBoundingBox().minY + v;
             if (this.distanceTo(targetX, targetY, targetZ) >= 10.0 && this.distanceTo(targetX, targetY, targetZ) <= 150.0D) {
                 System.out.println("you got the strat");
                 player.sendMessage(new LiteralText("You got the strat"));
