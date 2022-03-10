@@ -54,7 +54,7 @@ public abstract class EnderDragonEntityMixin extends LivingEntity {
             }
         }
     }
-    
+
     int setNewTargetCounter = 0; // increment this every time you call setNewTarget
     int lastSetNewTargetCount = 0;
     private double distanceTo(double targetX, double targetY, double targetZ) {
