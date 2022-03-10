@@ -2,7 +2,6 @@ package com.slackow.endfight;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import com.slackow.endfight.util.Kit;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.command.CommandException;
@@ -13,24 +12,16 @@ import net.minecraft.item.ItemStack;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.stream.Stream;
+import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 public class EndFightMod implements ModInitializer {
 
-	public static long time = System.currentTimeMillis();
-	public static boolean godMode = false;
-
-	public static void setInventory(PlayerEntity player, Kit kit) {
-		kit.contents = Stream.concat(Arrays.stream(player.inventory.main), Arrays.stream(player.inventory.armor))
-				.mapToInt(EndFightMod::itemToInt).toArray();
-	}
+	public static long time;
 
 	@Override
 	public void onInitialize() {
-		//MinecraftClient.getInstance().options.debugEnabled = true;
 
 	}
 
@@ -44,18 +35,8 @@ public class EndFightMod implements ModInitializer {
 		return new ItemStack(Item.byRawId(num & 0xFFF), num >>> 24, num >>> 12 & 0xFFF);
 	}
 
-	public static void giveInventory(PlayerEntity player, Kit kit) {
-		ItemStack[] full = Arrays.stream(kit.contents)
-				.mapToObj(EndFightMod::intToItem)
-				.toArray(ItemStack[]::new);
-		System.arraycopy(full, 0, player.inventory.main, 0, 36);
-		System.arraycopy(full, 36, player.inventory.armor, 0, 4);
-	}
-
-
-
 	public static void giveInventory(PlayerEntity player) throws CommandException {
-		Path path = getDataPath();
+		Path path = getInventoryPath();
 		if(Files.notExists(path)){
 			try {
 				Files.write(path,
@@ -67,7 +48,8 @@ public class EndFightMod implements ModInitializer {
 			}
 		}
 		try {
-			ItemStack[] full = StreamSupport.stream(new JsonParser().parse(Files.newBufferedReader(path)).getAsJsonArray().spliterator(), false)
+			String content = Files.lines(path).collect(Collectors.joining());
+			ItemStack[] full = StreamSupport.stream(new JsonParser().parse(content).getAsJsonArray().spliterator(), false)
 					.mapToInt(JsonElement::getAsInt)
 					.mapToObj(EndFightMod::intToItem).toArray(ItemStack[]::new);
 			if (full.length < 40) {
@@ -80,7 +62,7 @@ public class EndFightMod implements ModInitializer {
 		}
 	}
 
-	public static Path getDataPath() {
-		return MinecraftClient.getInstance().runDirectory.toPath().resolve("end.json");
+	public static Path getInventoryPath() {
+		return MinecraftClient.getInstance().runDirectory.toPath().resolve("inv.txt");
 	}
 }
