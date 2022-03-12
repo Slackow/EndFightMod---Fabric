@@ -20,4 +20,15 @@ public class KeyBind implements Renameable {
     public String getName() {
         return name;
     }
+
+    @Override
+    public String toString() {
+        return name + ":" + code + ":" + message;
+    }
+
+    public static KeyBind valueOf(String repr) {
+        int colon1 = repr.indexOf(':');
+        int colon2 = repr.indexOf(':', colon1 + 1);
+        return new KeyBind(repr.substring(0, colon1), Integer.parseInt(repr.substring(colon1 + 1, colon2)), repr.substring(colon2 + 1));
+    }
 }

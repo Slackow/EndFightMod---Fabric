@@ -7,7 +7,6 @@ import net.minecraft.client.render.entity.EnderCrystalEntityRenderer;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.entity.EndCrystalEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.entity.projectile.AbstractArrowEntity;
 import net.minecraft.item.BowItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Box;
@@ -16,10 +15,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.Random;
-import java.util.stream.Stream;
-
-import static com.slackow.endfight.util.DragonTargetPos.drawBox;
+import static com.slackow.endfight.util.Medium.drawBox;
 
 @Mixin(EnderCrystalEntityRenderer.class)
 public class RenderCrystalMixin {

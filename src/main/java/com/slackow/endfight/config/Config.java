@@ -26,25 +26,25 @@ public class Config implements Renameable {
     // wait multiple configs
 
     public boolean damageInfo = true;
-    public Kit inventory = new Kit("Default", new int[]{16777483, 16777473, 16777571, 16777477, 1073741842,
-                    16777584, 16777542, 16777491, 83886446, 16777274, 16777571, 16777571, 16777571, 16777571, 16777571,
-                    16777489, 402653446, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
     public boolean specificHealthBar = true;
+    public boolean showSettings = true;
+    public boolean arrowHelp = false;
     public int deathBox = 0;
     public int enderMan = 2;
+    public Kit inventory = new Kit("Default", new int[]{16777483, 16777473, 16777571, 16777477, 1073741842,
+            16777584, 16777542, 16777491, 83886446, 16777274, 16777571, 16777571, 16777571, 16777571, 16777571,
+            16777489, 402653446, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
     public List<KeyBind> keyBindings = new ArrayList<>();
-    public String name = "Default";
-    public boolean arrowHelp = false;
     public List<Island> islands = new ArrayList<>();
     public int selectedIsland = -1;
     public GameMode gamemode = GameMode.SURVIVAL;
+    public boolean dSeeTargetBlock = false;
     public boolean dGodCrystals = false;
     public boolean dGodDragon = false;
     public boolean dGodPlayer = false;
-    public boolean dSeeTargetBlock = false;
     public boolean dPrintDebugMessages = false;
-    public boolean showSettings = true;
 
+    public String name = "Default";
 
     @Override
     public void setName(String name) {

@@ -1,16 +1,14 @@
 package com.slackow.endfight.config;
 
 import com.slackow.endfight.util.Island;
+import com.slackow.endfight.util.KeyBind;
 import com.slackow.endfight.util.Kit;
 import net.minecraft.world.GameMode;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.StringJoiner;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.slackow.endfight.EndFightMod.getDataPath;
@@ -74,11 +72,24 @@ public class BigConfig {
                                 break;
                             case "islands":
                                 if (value.contains(";")) {
-                                    cfg.islands = Arrays.stream(value.split(";", 0))
+                                    cfg.islands = Arrays.stream(value.split(";"))
                                             .map(Island::valueOf)
                                             .collect(Collectors.toCollection(ArrayList::new));
-                                } else {
+                                } else if (value.isEmpty()) {
                                     cfg.islands = new ArrayList<>();
+                                } else {
+                                    cfg.islands = new ArrayList<>(Collections.singleton(Island.valueOf(value)));
+                                }
+                                break;
+                            case "keyBindings":
+                                if (value.contains(";")) {
+                                    cfg.keyBindings = Arrays.stream(value.split(";"))
+                                            .map(KeyBind::valueOf)
+                                            .collect(Collectors.toCollection(ArrayList::new));
+                                } else if (value.isEmpty()) {
+                                    cfg.keyBindings = new ArrayList<>();
+                                } else {
+                                    cfg.keyBindings = new ArrayList<>(Collections.singleton(KeyBind.valueOf(value)));
                                 }
                                 break;
                             case "gamemode":
@@ -139,6 +150,7 @@ public class BigConfig {
             sb.add("damageInfo=" + cfg.damageInfo);
             sb.add("selectedIsland=" + cfg.selectedIsland);
             sb.add("islands=" + cfg.islands.stream().map(Island::toString).collect(Collectors.joining(";")));
+            sb.add("keyBindings=" + cfg.keyBindings.stream().map(KeyBind::toString).collect(Collectors.joining(";")));
             sb.add("gamemode=" + cfg.gamemode.getGameModeId());
             sb.add("showSettings=" + cfg.showSettings);
             sb.add("dGodCrystals=" + cfg.dGodCrystals);

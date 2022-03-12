@@ -1,8 +1,7 @@
 package com.slackow.endfight.mixin;
 
-import com.google.common.collect.Lists;
 import com.slackow.endfight.EndFightMod;
-import com.slackow.endfight.util.DragonTargetPos;
+import com.slackow.endfight.util.Medium;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -118,9 +117,9 @@ public abstract class EnderDragonEntityMixin extends LivingEntity {
     @Inject(method = "tickMovement", at = @At("TAIL"))
     public void onTick(CallbackInfo ci){
         if (!world.isClient && getSelectedConfig().dSeeTargetBlock) {
-            DragonTargetPos.x = field_3742;
-            DragonTargetPos.y = field_3751;
-            DragonTargetPos.z = field_3752;
+            Medium.targetX = field_3742;
+            Medium.targetY = field_3751;
+            Medium.targetZ = field_3752;
         }
     }
 
