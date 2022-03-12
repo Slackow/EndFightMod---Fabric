@@ -42,10 +42,10 @@ public class ListGUI<T extends Renameable> extends Screen {
                 buttonMsg = "> " + buttonMsg + " <";
             }
             int textWidth = Math.max(100, textRenderer.getStringWidth(buttonMsg) + 20);
-            buttons.add(new ButtonWidget(i, width / 2 - textWidth / 2, height / 6 + 30 + i * 24 - displayed.size() * 12, textWidth, 20, buttonMsg));
+            buttons.add(new ButtonWidget(i, width / 2 - textWidth / 2, height / 6 + 80 + i * 24 - displayed.size() * 12, textWidth, 20, buttonMsg));
         }
         y = height / 6 + 30 - 24 - displayed.size() * 12;
-        int homeRow = height / 6 + 30 + displayed.size() * 12;
+        int homeRow = height / 6 + 80 + displayed.size() * 12;
         buttons.add(new ButtonWidget(5, width / 2 - 10, homeRow, 20, 20, "+"));
         ButtonWidget left = new ButtonWidget(6, width / 2 - 32, homeRow, 20, 20, "<");
         left.active = page > 0;
@@ -90,12 +90,12 @@ public class ListGUI<T extends Renameable> extends Screen {
             if (obj != null) {
                 obj.setName("");
                 data.add(obj);
-                MinecraftClient.getInstance().openScreen(new ViewGUI<>(this, obj));
+                client.openScreen(new ViewGUI<>(this, obj));
                 reinit();
             }
         } else if (button.id == 8) {
             save.accept(data, selected);
-            MinecraftClient.getInstance().openScreen(from);
+            client.openScreen(from);
         }
         super.buttonClicked(button);
     }
@@ -121,6 +121,8 @@ public class ListGUI<T extends Renameable> extends Screen {
         page = Math.min(page, (data.size() - 1) / 5);
         if (data.isEmpty()) {
             selected = -1;
+        } else {
+            selected = Math.min(selected, data.size() - 1);
         }
     }
 

@@ -82,6 +82,6 @@ public class EndFightMod implements ModInitializer {
 	}
 
 	public static Path getDataPath() {
-		return MinecraftClient.getInstance().runDirectory.toPath().resolve("end.json");
+		return MinecraftClient.getInstance().runDirectory.toPath().resolve("end.txt");
 	}
 }

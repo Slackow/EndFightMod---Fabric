@@ -28,7 +28,6 @@ public class RenameGUI<T extends Renameable> extends Screen {
         textField.setFocused(true);
         buttons.add(new ButtonWidget(0, width / 2 - 50, height / 2, 100, 20, "Done"));
         super.init();
-        from.init();
     }
 
     @Override

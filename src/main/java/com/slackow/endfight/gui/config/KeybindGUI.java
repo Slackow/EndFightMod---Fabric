@@ -25,7 +25,8 @@ public class KeybindGUI extends Screen {
     public void init() {
         textField = new TextFieldWidget(textRenderer, width / 2 - 73, height / 2 - 22, 146, 20);
         textField.setText(obj.message);
-        buttons.add((new ButtonWidget(0, width / 2 - 75, height / 2, 90, 20, choosing ? "> Key <" : ("Key: " + (obj.code == Keyboard.KEY_ESCAPE ? "None" : Keyboard.getKeyName(obj.code))))));
+        String key = (obj.code == Keyboard.KEY_ESCAPE ? "None" : Keyboard.getKeyName(obj.code));
+        buttons.add((new ButtonWidget(0, width / 2 - 75, height / 2, 90, 20, choosing ? "Key: > " + key + " <" : ("Key: " + key))));
         ButtonWidget reset = new ButtonWidget(1, width / 2 + 20, height / 2, 60, 20, "Reset");
         reset.active = obj.code != Keyboard.KEY_ESCAPE;
         buttons.add(reset);
@@ -76,7 +77,6 @@ public class KeybindGUI extends Screen {
 
     @Override
     protected void mouseReleased(int mouseX, int mouseY, int button) {
-        init();
         super.mouseReleased(mouseX, mouseY, button);
     }
 
