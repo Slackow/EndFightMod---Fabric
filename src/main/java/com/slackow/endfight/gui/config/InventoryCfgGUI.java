@@ -78,6 +78,24 @@ public class InventoryCfgGUI extends Screen {
                         y);
             }
         }
+        for (int i = 0; i < armor.length; i++) {
+            int x = width / 2 + (i - 2) * 18;
+            int y = height / 2 + 76 - 67 - 80;
+            if (armor[i] != null) {
+                // draw item
+                itemRenderer.method_5762(textRenderer,
+                        client.getTextureManager(),
+                        armor[i],
+                        x,
+                        y);
+                // draw count
+                itemRenderer.method_1549(textRenderer,
+                        client.getTextureManager(),
+                        armor[i],
+                        x,
+                        y);
+            }
+        }
         GuiLighting.disable();
 
     }

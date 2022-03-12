@@ -5,6 +5,7 @@ import com.slackow.endfight.EndFightMod;
 import com.slackow.endfight.config.BigConfig;
 import com.slackow.endfight.config.Config;
 import com.slackow.endfight.gui.config.ConfigGUI;
+import com.slackow.endfight.util.Medium;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.CommandSource;
@@ -43,12 +44,8 @@ public class ResetCommand extends EndFightCommand {
     @Override
     public void execute(CommandSource source, String[] args) throws CommandException {
         if (args.length > 0 && "options".equals(args[0])) {
-//            //noinspection unchecked
-//            CommandManager.getCommandMap().values().stream().sorted().forEachOrdered(command -> {
-//                if (command instanceof EndFightCommand) {
-//                    source.sendMessage(new LiteralText(RED + ((EndFightCommand) command).getUsageTranslationKey(source)));
-//                }
-//            });
+            Medium.commandMap.stream().sorted().forEachOrdered(command ->
+                    source.sendMessage(new LiteralText(RED + command.getUsageTranslationKey(source))));
             return;
         }
         boolean twice = args.length == 0 || !args[0].contains("o");
@@ -125,8 +122,7 @@ public class ResetCommand extends EndFightCommand {
 
                 if (cfg.showSettings) {
                     String[] islands = {"Random", "Match World"};
-                    s = "\n" +
-                            "Island Type: [" + (cfg.selectedIsland < 0 ? islands[~cfg.selectedIsland] : cfg.islands.get(cfg.selectedIsland).getName() ) + "]\n" +
+                    s = "Island Type: [" + (cfg.selectedIsland < 0 ? islands[~cfg.selectedIsland] : cfg.islands.get(cfg.selectedIsland).getName() ) + "]\n" +
                             "Endermen: [" + ConfigGUI.enderManNames[cfg.enderMan] + "]\n" +
                             buttonName("Damage Info: [", cfg.damageInfo) + "]\n" +
                             "" +
@@ -137,7 +133,12 @@ public class ResetCommand extends EndFightCommand {
                 }
 
 
-                player.sendMessage(new LiteralText("Sent to End" + s));
+                player.sendMessage(new LiteralText("Sent to End"));
+                if (!s.isEmpty()) {
+                    for (String line : s.split("\n")) {
+                        player.sendMessage(new LiteralText(line));
+                    }
+                }
                 EndFightMod.time = System.currentTimeMillis();
             }
 

@@ -7,6 +7,7 @@ import com.slackow.endfight.EndFightCommand;
 import com.slackow.endfight.EndFightMod;
 import com.slackow.endfight.commands.ResetCommand;
 import com.slackow.endfight.config.BigConfig;
+import com.slackow.endfight.util.Medium;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.CommandSource;
 import net.minecraft.entity.EndCrystalEntity;
@@ -27,7 +28,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static net.minecraft.util.Formatting.RED;
@@ -268,6 +271,10 @@ public abstract class CommandManagerMixin extends CommandRegistry {
                 }
             }
         });
+        //noinspection unchecked
+        Medium.commandMap = (List<EndFightCommand>) getCommandMap().values().stream()
+                .filter(cmd -> cmd instanceof EndFightCommand)
+                .collect(Collectors.toList());
     }
 
     private void chargeCommand(CommandSource source, String[] args) {

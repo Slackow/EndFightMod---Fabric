@@ -9,6 +9,10 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.resource.language.I18n;
 import org.lwjgl.input.Keyboard;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+
 // Options:
 // Death box visibility, (off, with hitboxes, always)
 // Health bar number, (off, on)
@@ -43,7 +47,7 @@ public class ConfigGUI extends Screen {
         buttons.add(new ButtonWidget(1, width / 2 + 5, height / 6 + 65, 150, 20, buttonName("Specific Health bar: ", obj.specificHealthBar)));
         buttons.add(new ButtonWidget(2, width / 2 - 155, height / 6 + 90, 150, 20, buttonName("Show Damage Info: ", obj.damageInfo)));
         buttons.add(new ButtonWidget(3, width / 2 + 5, height / 6 + 90, 150, 20, "Inventory..."));
-        buttons.add(new ButtonWidget(4, width / 2 - 155, height / 6 + 115, 150, 20, "Keybindings..."));
+        buttons.add(new ButtonWidget(4, width / 2 + 5, height / 6 + 115, 150, 20, "Keybindings..."));
         buttons.add(new ButtonWidget(5, width / 2 - 200, height / 6 - 2, 20, 20, "<"));
         buttons.add(new ButtonWidget(10, width / 2 - 100, height / 6 + 150, 200, 20, I18n.translate("gui.done")));
         super.init();
@@ -88,8 +92,13 @@ public class ConfigGUI extends Screen {
                             client.openScreen(new ConfigGUI(gui, obj));
                         },
                         (list, selected) -> {
-                            BigConfig.getBigConfig().configs = list;
-                            BigConfig.getBigConfig().selectedConfig = selected;
+                            if (list.isEmpty()) {
+                                BigConfig.getBigConfig().configs = new ArrayList<>(Collections.singleton(new Config()));
+                                BigConfig.getBigConfig().selectedConfig = 0;
+                            } else {
+                                BigConfig.getBigConfig().configs = list;
+                                BigConfig.getBigConfig().selectedConfig = selected;
+                            }
                         }, "Profiles"
                 ));
                 return;

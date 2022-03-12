@@ -1,13 +1,18 @@
 package com.slackow.endfight.util;
 
+import com.slackow.endfight.EndFightCommand;
 import net.minecraft.client.render.WorldRenderer;
+import net.minecraft.server.command.CommandManager;
 import net.minecraft.util.math.Box;
 import org.lwjgl.opengl.GL11;
 
-public class DragonTargetPos {
-    public static double x;
-    public static double y;
-    public static double z;
+import java.util.List;
+
+public class Medium {
+    public static double targetX;
+    public static double targetY;
+    public static double targetZ;
+    public static List<EndFightCommand> commandMap;
 
     // method_4328
     public static void drawBox(int color, Box box) {
