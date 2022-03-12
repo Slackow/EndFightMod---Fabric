@@ -17,7 +17,7 @@ import static com.slackow.endfight.EndFightMod.getDataPath;
 
 public class BigConfig {
 
-    private static BigConfig mine;
+    private static BigConfig bigConfig;
 
     public void save() {
         try {
@@ -28,8 +28,8 @@ public class BigConfig {
     }
 
     public static BigConfig getBigConfig() {
-        if (mine != null) {
-            return mine;
+        if (bigConfig != null) {
+            return bigConfig;
         } else {
             try {
                 Path dataPath = getDataPath();
@@ -73,9 +73,13 @@ public class BigConfig {
                                 cfg.selectedIsland = Integer.parseInt(value);
                                 break;
                             case "islands":
-                                cfg.islands = Arrays.stream(value.split(";"))
-                                        .map(Island::valueOf)
-                                        .collect(Collectors.toCollection(ArrayList::new));
+                                if (value.contains(";")) {
+                                    cfg.islands = Arrays.stream(value.split(";", 0))
+                                            .map(Island::valueOf)
+                                            .collect(Collectors.toCollection(ArrayList::new));
+                                } else {
+                                    cfg.islands = new ArrayList<>();
+                                }
                                 break;
                             case "gamemode":
                                 cfg.gamemode = "1".equals(value) ? GameMode.CREATIVE : GameMode.SURVIVAL;
@@ -104,9 +108,9 @@ public class BigConfig {
                         }
                     }
                 }
-                return mine = new BigConfig(configs, selected);
+                return bigConfig = new BigConfig(configs, selected);
             } catch (IOException e) {
-                return mine = new BigConfig();
+                return bigConfig = new BigConfig();
             }
         }
     }

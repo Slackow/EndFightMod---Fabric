@@ -98,9 +98,9 @@ public class InventoryCfgGUI extends Screen {
                     ServerPlayerEntity player = server.getPlayerManager().getPlayer(MinecraftClient.getInstance().getSession().getUsername());
                     if (player != null) {
                         EndFightMod.giveInventory(player, obj);
+                        client.openScreen(null);
                     }
                 }
-                client.openScreen(null);
                 break;
             case 2:
                 client.openScreen(from);

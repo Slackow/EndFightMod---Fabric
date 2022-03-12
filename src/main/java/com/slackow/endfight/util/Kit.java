@@ -1,6 +1,7 @@
 package com.slackow.endfight.util;
 
 import java.util.Arrays;
+import java.util.stream.Collectors;
 
 public class Kit implements Renameable{
     public int[] contents;
@@ -23,13 +24,13 @@ public class Kit implements Renameable{
 
     @Override
     public String toString() {
-        return name + Arrays.toString(contents);
+        return name + ";" + Arrays.stream(contents).mapToObj(Integer::toString).collect(Collectors.joining(","));
     }
 
     public static Kit valueOf(String repr) {
-        int index = repr.lastIndexOf('[');
+        int index = repr.indexOf(';');
         return new Kit(repr.substring(0, index),
-                Arrays.stream(repr.substring(index + 1, repr.length() - 1).split(","))
+                Arrays.stream(repr.substring(index + 1).split(","))
                         .mapToInt(Integer::parseUnsignedInt).toArray());
     }
 }
