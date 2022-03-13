@@ -34,25 +34,19 @@ public class ViewGUI<T extends Renameable> extends Screen {
         edit.active = !isNew;
         remove.active = !isNew;
         super.init();
-        from.init();
     }
 
     @Override
     protected void buttonClicked(ButtonWidget button) {
         switch (button.id) {
-            case 0:
-                from.select(obj);
-                init();
-                break;
             case 1:
-                // EDIT BUTTON?!?!?
                 from.getEditObj().accept(this, obj);
                 break;
             case 2:
-                MinecraftClient.getInstance().openScreen(new RenameGUI<>(this, obj));
+                client.openScreen(new RenameGUI<>(this, obj));
                 break;
             case 3:
-                MinecraftClient.getInstance().openScreen(new RemoveGUI<>(this));
+                client.openScreen(new RemoveGUI<>(this));
                 break;
             case 4:
                 if (obj.getName().isEmpty()) {

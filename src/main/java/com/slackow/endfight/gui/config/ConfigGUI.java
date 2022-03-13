@@ -64,6 +64,7 @@ public class ConfigGUI extends Screen {
                 break;
             case 1:
                 obj.specificHealthBar ^= true;
+                button.message = buttonName("Specific Health bar: ", obj.specificHealthBar);
                 break;
             case 2:
                 obj.damageInfo ^= true;
@@ -111,7 +112,7 @@ public class ConfigGUI extends Screen {
                 BigConfig.save();
                 return;
         }
-        init();
+        BigConfig.save();
     }
 
     @Override
