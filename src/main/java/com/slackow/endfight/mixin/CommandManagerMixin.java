@@ -1,8 +1,5 @@
 package com.slackow.endfight.mixin;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonPrimitive;
 import com.slackow.endfight.EndFightCommand;
 import com.slackow.endfight.EndFightMod;
 import com.slackow.endfight.commands.ResetCommand;
@@ -24,16 +21,14 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static net.minecraft.util.Formatting.RED;
+import static net.minecraft.util.math.MathHelper.clamp;
 
 @Mixin(CommandManager.class)
 public abstract class CommandManagerMixin extends CommandRegistry {
@@ -55,20 +50,56 @@ public abstract class CommandManagerMixin extends CommandRegistry {
             @Override
             public void execute(CommandSource source, String[] args) {
                 if (source instanceof PlayerEntity) {
-                    boolean god = BigConfig.getSelectedConfig().dGodPlayer ^= true;
-                    source.sendMessage(new LiteralText((god) ? "God Mode Enabled" :
-                            "God Mode Disabled"));
-                    PlayerEntity player = (PlayerEntity) source;
-                    player.setHealth(20f);
-                    player.extinguish();
-                    if (god) {
-                        player.addStatusEffect(new StatusEffectInstance(11, 100000, 255, true));
+                    if (args.length <= 0) {
+                        boolean god = BigConfig.getSelectedConfig().dGodPlayer ^= true;
+                        source.sendMessage(new LiteralText((god) ? "God Mode Enabled" :
+                                "God Mode Disabled"));
+                        PlayerEntity player = (PlayerEntity) source;
+                        player.setHealth(20f);
+                        player.extinguish();
+                        if (god) {
+                            player.addStatusEffect(new StatusEffectInstance(11, 100000, 255, true));
+                        } else {
+                            player.clearStatusEffects();
+                        }
+                        player.getHungerManager().add(20, 1);
+                        player.getHungerManager().add(1, -8); // -16
                     } else {
-                        player.clearStatusEffects();
+                        switch (args[0]) {
+                            case "crystal": {
+                                boolean god = BigConfig.getSelectedConfig().dGodCrystals ^= true;
+                                source.sendMessage(new LiteralText((god) ? "Crystal God Mode Enabled" :
+                                        "Crystal God Mode Disabled"));
+                                break;
+                            }
+                            case "dragon": {
+                                boolean god = BigConfig.getSelectedConfig().dGodDragon ^= true;
+                                source.sendMessage(new LiteralText((god) ? "Dragon God Mode Enabled" :
+                                        "Dragon God Mode Disabled"));
+                                break;
+                            }
+                            default: {
+                                source.sendMessage(new LiteralText("Unrecognized Subcommand"));
+                                break;
+                            }
+                        }
                     }
-                    player.getHungerManager().add(20, 1);
-                    player.getHungerManager().add(1, -8); // -16
                 }
+            }
+
+            @Override
+            public List<String> method_3276(CommandSource source, String[] args) {
+                if (args.length == 1) {
+                    if (args[0].isEmpty()) {
+                        return Arrays.asList("crystal", "dragon");
+                    }
+                    if ("crystal".startsWith(args[0])) {
+                        return Collections.singletonList("crystal");
+                    } else if ("dragon".startsWith(args[0])) {
+                        return Collections.singletonList("dragon");
+                    }
+                }
+                return Collections.emptyList();
             }
         });
         // heal
@@ -119,6 +150,29 @@ public abstract class CommandManagerMixin extends CommandRegistry {
                     source.sendMessage(new LiteralText(RED + "No End Crystals Found"));
                 } else {
                     source.sendMessage(new LiteralText("Killed " + count + " End Crystals"));
+                }
+            }
+        });
+        // killdragon
+        registerCommand(new EndFightCommand() {
+            @Override
+            public String getCommandName() {
+                return "killdragon";
+            }
+
+            @Override
+            public String getUsageTranslationKey(CommandSource source) {
+                return "/killdragon";
+            }
+
+            @Override
+            public void execute(CommandSource source, String[] args) {
+                Optional<EnderDragonEntity> dragon = getDragon(source.getWorld());
+                if (dragon.isPresent()) {
+                    dragon.get().remove();
+                    source.sendMessage(new LiteralText("Killed dragon"));
+                } else  {
+                    source.sendMessage(new LiteralText(RED + "No dragon found"));
                 }
             }
         });
@@ -189,12 +243,12 @@ public abstract class CommandManagerMixin extends CommandRegistry {
 
             @Override
             public String getUsageTranslationKey(CommandSource source) {
-                return "/charge [health]";
+                return "/charge";
             }
 
             @Override
             public void execute(CommandSource source, String[] args) {
-                chargeCommand(source, args);
+                chargeCommand(source);
             }
         });
         // roll
@@ -228,7 +282,7 @@ public abstract class CommandManagerMixin extends CommandRegistry {
 
             @Override
             public String getUsageTranslationKey(CommandSource source) {
-                return "/goodcharge [distance. height] [health]";
+                return "/goodcharge [distance, height]";
             }
 
             @Override
@@ -260,11 +314,7 @@ public abstract class CommandManagerMixin extends CommandRegistry {
                         entityDragon.velocityY = 0;
                         entityDragon.velocityZ = 0;
                         entityDragon.setForwardSpeed(0);
-                        if ((args.length & 1) == 0) {
-                            chargeCommand(source, new String[0]);
-                        } else if (args.length > 0) {
-                            chargeCommand(source, new String[]{args[args.length - 1]});
-                        }
+                        chargeCommand(source);
                     } else {
                         source.sendMessage(new LiteralText(RED + "No Dragon Found"));
                     }
@@ -278,10 +328,7 @@ public abstract class CommandManagerMixin extends CommandRegistry {
                 .collect(Collectors.toList());
     }
 
-    private void chargeCommand(CommandSource source, String[] args) {
-        if (args.length > 0) {
-            dragonHealth(source, args);
-        }
+    private void chargeCommand(CommandSource source) {
 
         if (source instanceof PlayerEntity) {
             Optional<EnderDragonEntity> dragon = getDragon(source.getWorld());
@@ -290,7 +337,7 @@ public abstract class CommandManagerMixin extends CommandRegistry {
                 ((EnderDragonAccessor) entityDragon).setTarget((Entity) source);
 
                 source.sendMessage(new LiteralText("Forced Dragon Charge"));
-            } else if (args.length == 0) {
+            } else {
                 source.sendMessage(new LiteralText(RED + "No Dragon Found"));
             }
         }
@@ -300,7 +347,7 @@ public abstract class CommandManagerMixin extends CommandRegistry {
         Optional<EnderDragonEntity> dragon = getDragon(source.getWorld());
         if (dragon.isPresent() && args.length > 0) {
             try {
-                dragon.get().setHealth(Math.min(200, Math.max(Float.parseFloat(args[0]), 0)));
+                dragon.get().setHealth(clamp(Float.parseFloat(args[0]), 0, 200));
             } catch (NumberFormatException e) {
                 source.sendMessage(new LiteralText(RED + "Not a valid health"));
             }
