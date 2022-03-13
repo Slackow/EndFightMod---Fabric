@@ -28,8 +28,8 @@ public class KeybindGUI extends Screen {
         textField = new TextFieldWidget(textRenderer, width / 2 - 73, height / 2 - 22, 146, 20);
         textField.setMaxLength(512);
         textField.setText(obj.message);
-        String key = (obj.code == Keyboard.KEY_ESCAPE ? "None" : Keyboard.getKeyName(obj.code));
-        keyButton = new ButtonWidget(0, width / 2 - 75, height / 2, 90, 20, choosing ? "Key: > " + key + " <" : ("Key: " + key));
+        keyButton = new ButtonWidget(0, width / 2 - 75, height / 2, 90, 20, "");
+        updateKeyButton();
         buttons.add(keyButton);
         reset = new ButtonWidget(1, width / 2 + 20, height / 2, 60, 20, "Reset");
         reset.active = obj.code != Keyboard.KEY_ESCAPE;
@@ -55,10 +55,15 @@ public class KeybindGUI extends Screen {
         if (choosing){
             obj.code = code;
             choosing = false;
-            init();
+            updateKeyButton();
         } else {
             super.keyPressed(character, code);
         }
+    }
+
+    private void updateKeyButton() {
+        String key = (obj.code == Keyboard.KEY_ESCAPE ? "None" : Keyboard.getKeyName(obj.code));
+        keyButton.message = choosing ? "Key: > " + key + " <" : ("Key: " + key);
     }
 
     @Override
@@ -71,8 +76,7 @@ public class KeybindGUI extends Screen {
             obj.code = Keyboard.KEY_ESCAPE;
         }
         if (choosing || button.id == 1) {
-            String key = (obj.code == Keyboard.KEY_ESCAPE ? "None" : Keyboard.getKeyName(obj.code));
-            keyButton.message = choosing ? "Key: > " + key + " <" : ("Key: " + key);
+            updateKeyButton();
             reset.active = obj.code != Keyboard.KEY_ESCAPE;
         }
         super.buttonClicked(button);

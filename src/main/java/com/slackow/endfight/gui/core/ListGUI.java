@@ -112,10 +112,6 @@ public class ListGUI<T extends Renameable> extends Screen {
         super.tick();
     }
 
-    void select(T obj) {
-        selected = data.indexOf(obj);
-    }
-
     public void remove(T obj) {
         data.remove(obj);
         page = Math.min(page, (data.size() - 1) / 5);
