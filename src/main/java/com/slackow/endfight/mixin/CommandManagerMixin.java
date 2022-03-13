@@ -274,6 +274,7 @@ public abstract class CommandManagerMixin extends CommandRegistry {
         //noinspection unchecked
         Medium.commandMap = (List<EndFightCommand>) getCommandMap().values().stream()
                 .filter(cmd -> cmd instanceof EndFightCommand)
+                .sorted()
                 .collect(Collectors.toList());
     }
 

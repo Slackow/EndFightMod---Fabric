@@ -17,13 +17,20 @@ public class BigConfig {
 
     private static BigConfig bigConfig;
 
-    public void save() {
+    private void saveThis() {
         try {
             Files.write(getDataPath(), Arrays.asList(toString().split("\n")));
         } catch (IOException e) {
             throw new RuntimeException("Unable to save configs", e);
         }
     }
+
+    public static void save() {
+        if (bigConfig != null) {
+            bigConfig.saveThis();
+        }
+    }
+
 
     public static BigConfig getBigConfig() {
         if (bigConfig != null) {
@@ -129,37 +136,38 @@ public class BigConfig {
     public static Config getSelectedConfig() {
         BigConfig bigConfig = getBigConfig();
         List<Config> configs = bigConfig.configs;
-        if (bigConfig.selectedConfig < configs.size() && bigConfig.selectedConfig >= 0) {
-            return configs.get(bigConfig.selectedConfig);
+        int selectedConfig = bigConfig.selectedConfig;
+        if (selectedConfig < configs.size() && selectedConfig >= 0) {
+            return configs.get(selectedConfig);
         }
         throw new IllegalStateException("Send this error straight to Slackow#7890 on discord please(with everything below):\n" +
-                "" + bigConfig.selectedConfig + configs + "\n");
+                "" + selectedConfig + configs + "\n");
     }
 
     @Override
     public String toString() {
-        StringJoiner sb = new StringJoiner("\n");
-        sb.add("=" + selectedConfig);
+        StringJoiner sj = new StringJoiner("\n");
+        sj.add("=" + selectedConfig);
         for (Config cfg : configs) {
-            sb.add(";" + cfg.getName());
-            sb.add("deathBox=" + cfg.deathBox);
-            sb.add("inventory=" + cfg.inventory);
-            sb.add("enderMan=" + cfg.enderMan);
-            sb.add("arrowHelp=" + cfg.arrowHelp);
-            sb.add("specificHealthBar=" + cfg.specificHealthBar);
-            sb.add("damageInfo=" + cfg.damageInfo);
-            sb.add("selectedIsland=" + cfg.selectedIsland);
-            sb.add("islands=" + cfg.islands.stream().map(Island::toString).collect(Collectors.joining(";")));
-            sb.add("keyBindings=" + cfg.keyBindings.stream().map(KeyBind::toString).collect(Collectors.joining(";")));
-            sb.add("gamemode=" + cfg.gamemode.getGameModeId());
-            sb.add("showSettings=" + cfg.showSettings);
-            sb.add("dGodCrystals=" + cfg.dGodCrystals);
-            sb.add("dGodDragon=" + cfg.dGodDragon);
-            sb.add("dGodPlayer=" + cfg.dGodPlayer);
-            sb.add("dSeeTargetBlock=" + cfg.dSeeTargetBlock);
-            sb.add("dPrintDebugMessages=" + cfg.dPrintDebugMessages);
+            sj.add(";" + cfg.getName());
+            sj.add("deathBox=" + cfg.deathBox);
+            sj.add("inventory=" + cfg.inventory);
+            sj.add("enderMan=" + cfg.enderMan);
+            sj.add("arrowHelp=" + cfg.arrowHelp);
+            sj.add("specificHealthBar=" + cfg.specificHealthBar);
+            sj.add("damageInfo=" + cfg.damageInfo);
+            sj.add("selectedIsland=" + cfg.selectedIsland);
+            sj.add("islands=" + cfg.islands.stream().map(Island::toString).collect(Collectors.joining(";")));
+            sj.add("keyBindings=" + cfg.keyBindings.stream().map(KeyBind::toString).collect(Collectors.joining(";")));
+            sj.add("gamemode=" + cfg.gamemode.getGameModeId());
+            sj.add("showSettings=" + cfg.showSettings);
+            sj.add("dGodCrystals=" + cfg.dGodCrystals);
+            sj.add("dGodDragon=" + cfg.dGodDragon);
+            sj.add("dGodPlayer=" + cfg.dGodPlayer);
+            sj.add("dSeeTargetBlock=" + cfg.dSeeTargetBlock);
+            sj.add("dPrintDebugMessages=" + cfg.dPrintDebugMessages);
         }
-        return sb.toString();
+        return sj.toString();
     }
 
     private BigConfig() {

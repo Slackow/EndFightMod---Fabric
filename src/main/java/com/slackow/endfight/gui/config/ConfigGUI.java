@@ -10,7 +10,6 @@ import net.minecraft.client.resource.language.I18n;
 import org.lwjgl.input.Keyboard;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 
 // Options:
@@ -48,7 +47,11 @@ public class ConfigGUI extends Screen {
         buttons.add(new ButtonWidget(2, width / 2 - 155, height / 6 + 90, 150, 20, buttonName("Show Damage Info: ", obj.damageInfo)));
         buttons.add(new ButtonWidget(3, width / 2 + 5, height / 6 + 90, 150, 20, "Inventory..."));
         buttons.add(new ButtonWidget(4, width / 2 + 5, height / 6 + 115, 150, 20, "Keybindings..."));
-        buttons.add(new ButtonWidget(5, width / 2 - 200, height / 6 - 2, 20, 20, "<"));
+
+
+
+
+        buttons.add(new ButtonWidget(-1, width / 2 - 200, height / 6 - 2, 20, 20, "<"));
         buttons.add(new ButtonWidget(10, width / 2 - 100, height / 6 + 150, 200, 20, I18n.translate("gui.done")));
         super.init();
     }
@@ -82,7 +85,7 @@ public class ConfigGUI extends Screen {
                     }
                 });
                 return;
-            case 5:
+            case -1:
                 client.openScreen(new ListGUI<>(from,
                         BigConfig.getBigConfig().configs,
                         BigConfig.getBigConfig().selectedConfig,
@@ -99,12 +102,13 @@ public class ConfigGUI extends Screen {
                                 BigConfig.getBigConfig().configs = list;
                                 BigConfig.getBigConfig().selectedConfig = selected;
                             }
+                            BigConfig.save();
                         }, "Profiles"
                 ));
                 return;
             case 10:
                 client.openScreen(from);
-                BigConfig.getBigConfig().save();
+                BigConfig.save();
                 return;
         }
         init();

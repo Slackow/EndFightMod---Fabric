@@ -15,10 +15,8 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.server.world.ServerWorldManager;
 import net.minecraft.text.LiteralText;
 import net.minecraft.world.GameMode;
-import net.minecraft.world.MultiServerWorld;
 import net.minecraft.world.level.LevelInfo;
 import net.minecraft.world.level.LevelProperties;
-import net.minecraft.world.level.ReadOnlyLevelProperties;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -38,13 +36,13 @@ public class ResetCommand extends EndFightCommand {
 
     @Override
     public String getUsageTranslationKey(CommandSource source) {
-        return "/reset [out] | /reset options";
+        return "/reset [out|options]";
     }
 
     @Override
     public void execute(CommandSource source, String[] args) throws CommandException {
         if (args.length > 0 && "options".equals(args[0])) {
-            Medium.commandMap.stream().sorted().forEachOrdered(command ->
+            Medium.commandMap.forEach(command ->
                     source.sendMessage(new LiteralText(RED + command.getUsageTranslationKey(source))));
             return;
         }
@@ -122,9 +120,10 @@ public class ResetCommand extends EndFightCommand {
 
                 if (cfg.showSettings) {
                     String[] islands = {"Random", "Match World"};
-                    s = "Island Type: [" + (cfg.selectedIsland < 0 ? islands[~cfg.selectedIsland] : cfg.islands.get(cfg.selectedIsland).getName() ) + "]\n" +
+                    s = "Selected Profile: '" + cfg.getName() + "'\n" +
+                            "Island Type: [" + (cfg.selectedIsland < 0 ? islands[~cfg.selectedIsland] : cfg.islands.get(cfg.selectedIsland).getName() ) + "]\n" +
                             "Endermen: [" + ConfigGUI.enderManNames[cfg.enderMan] + "]\n" +
-                            buttonName("Damage Info: [", cfg.damageInfo) + "]\n" +
+                            buttonName("Damage Alerts.: [", cfg.damageInfo) + "]\n" +
                             "" +
                             "" +
                             "";
