@@ -7,7 +7,7 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 
 import static net.minecraft.util.Formatting.RED;
 
-public class RemoveGUI <T extends Renameable> extends Screen {
+public class RemoveGUI<T extends Renameable> extends Screen {
 
     private final ViewGUI<T> from;
 
@@ -18,8 +18,8 @@ public class RemoveGUI <T extends Renameable> extends Screen {
     @SuppressWarnings("unchecked")
     @Override
     public void init() {
-        buttons.add(new ButtonWidget(0, width / 2 - 100, height / 2 - 10, 100, 20, "Back"));
-        buttons.add(new ButtonWidget(1, width / 2, height / 2 - 10, 100, 20, RED + "Remove"));
+        buttons.add(new ButtonWidget(0, width / 2 - 100, height / 6 + 100 - 10, 100, 20, "Back"));
+        buttons.add(new ButtonWidget(1, width / 2, height / 6 + 100 - 10, 100, 20, RED + "Remove"));
         super.init();
     }
 

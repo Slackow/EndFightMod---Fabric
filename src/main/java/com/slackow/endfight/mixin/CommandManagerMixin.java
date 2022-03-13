@@ -74,6 +74,10 @@ public abstract class CommandManagerMixin extends CommandRegistry {
                             }
                             case "dragon": {
                                 boolean god = BigConfig.getSelectedConfig().dGodDragon ^= true;
+                                if (god) {
+                                    getDragon(source.getWorld()).ifPresent(dragon ->
+                                            dragon.setHealth(dragon.getMaxHealth()));
+                                }
                                 source.sendMessage(new LiteralText((god) ? "Dragon God Mode Enabled" :
                                         "Dragon God Mode Disabled"));
                                 break;
