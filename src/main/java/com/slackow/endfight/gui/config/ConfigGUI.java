@@ -24,6 +24,9 @@ public class ConfigGUI extends Screen {
 
     private final Screen from;
     private final Config obj;
+    private static final String healthBar = "Specific Health bar: ";
+    private static final String damageAlerts = "Show Damage Alerts: ";
+    private static final String deathBox = "Death box visibility: ";
 
     public ConfigGUI(Screen from, Config obj) {
         this.from = from;
@@ -42,9 +45,11 @@ public class ConfigGUI extends Screen {
     @Override
     public void init() {
         buttons.clear();
-        buttons.add(new ButtonWidget(0, width / 2 - 155, height / 6 + 65, 150, 20, "Death box visibility: " + deathBoxNames[obj.deathBox]));
-        buttons.add(new ButtonWidget(1, width / 2 + 5, height / 6 + 65, 150, 20, buttonName("Specific Health bar: ", obj.specificHealthBar)));
-        buttons.add(new ButtonWidget(2, width / 2 - 155, height / 6 + 90, 150, 20, buttonName("Show Damage Info: ", obj.damageInfo)));
+        buttons.add(new ButtonWidget(0, width / 2 - 155, height / 6 + 65, 150, 20, deathBox + deathBoxNames[obj.deathBox]));
+        buttons.add(new ButtonWidget(1, width / 2 + 5, height / 6 + 65, 150, 20, buttonName(healthBar, obj.specificHealthBar)));
+        buttons.add(new ButtonWidget(2, width / 2 - 155, height / 6 + 90, 150, 20, buttonName(damageAlerts, obj.damageInfo)));
+
+
         buttons.add(new ButtonWidget(3, width / 2 + 5, height / 6 + 90, 150, 20, "Inventory..."));
         buttons.add(new ButtonWidget(4, width / 2 + 5, height / 6 + 115, 150, 20, "Keybindings..."));
 
@@ -64,7 +69,7 @@ public class ConfigGUI extends Screen {
                 break;
             case 1:
                 obj.specificHealthBar ^= true;
-                button.message = buttonName("Specific Health bar: ", obj.specificHealthBar);
+                button.message = buttonName(healthBar, obj.specificHealthBar);
                 break;
             case 2:
                 obj.damageInfo ^= true;

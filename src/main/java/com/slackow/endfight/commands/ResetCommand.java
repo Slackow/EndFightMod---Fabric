@@ -23,7 +23,11 @@ import org.apache.commons.lang3.ArrayUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.slackow.endfight.gui.config.ConfigGUI.buttonName;
 import static net.minecraft.util.Formatting.RED;
@@ -37,6 +41,16 @@ public class ResetCommand extends EndFightCommand {
     @Override
     public String getUsageTranslationKey(CommandSource source) {
         return "/reset [out|options]";
+    }
+
+    @Override
+    public List<String> method_3276(CommandSource source, String[] args) {
+        if (args.length == 1) {
+            return Stream.of("options", "out")
+                    .filter(option -> option.startsWith(args[0]))
+                    .collect(Collectors.toList());
+        }
+        return Collections.emptyList();
     }
 
     @Override
@@ -112,6 +126,7 @@ public class ResetCommand extends EndFightCommand {
                 server.field_3858 = ArrayUtils.add(server.field_3858, new long[100]);
                 newEnd.addListener(new ServerWorldManager(server, newEnd));
                 heal(player);
+                player.clearStatusEffects();
                 // set Gamemode
                 player.method_3170(cfg.gamemode);
                 EndFightMod.giveInventory(player, cfg.inventory);
