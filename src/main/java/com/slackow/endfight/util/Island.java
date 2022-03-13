@@ -2,7 +2,7 @@ package com.slackow.endfight.util;
 
 public class Island implements Renameable{
     private String name;
-    private final long seed;
+    private long seed;
 
     public Island(long seed) {
         this.seed = seed;
@@ -33,5 +33,9 @@ public class Island implements Renameable{
         Island island = new Island(seed);
         island.setName(s.substring(i + 1));
         return island;
+    }
+
+    public void setSeed(long seed) {
+        this.seed = seed;
     }
 }
