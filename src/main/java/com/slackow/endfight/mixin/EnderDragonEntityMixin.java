@@ -45,6 +45,9 @@ public abstract class EnderDragonEntityMixin extends LivingEntity {
             if (getSelectedConfig().damageInfo) {
                 MinecraftClient.getInstance().field_3805.sendMessage(new LiteralText("Dragon damaged by " + source.getName() + ": " + amount));
             }
+            if (getSelectedConfig().dGodDragon) {
+                setHealth(getMaxHealth() - amount);
+            }
             if (getHealth() <= 0) {
                 int seconds = (int) ((System.currentTimeMillis() - EndFightMod.time) / 1000);
                 seconds = clamp(seconds, 0, 86399);

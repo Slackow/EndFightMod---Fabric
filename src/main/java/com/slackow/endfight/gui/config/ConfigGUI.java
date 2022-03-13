@@ -66,6 +66,7 @@ public class ConfigGUI extends Screen {
         switch (button.id) {
             case 0:
                 obj.deathBox = (obj.deathBox + 1) % 3;
+                button.message = deathBox + deathBoxNames[obj.deathBox];
                 break;
             case 1:
                 obj.specificHealthBar ^= true;
@@ -73,6 +74,7 @@ public class ConfigGUI extends Screen {
                 break;
             case 2:
                 obj.damageInfo ^= true;
+                button.message = buttonName(damageAlerts, obj.damageInfo);
                 break;
             case 3:
                 client.openScreen(new InventoryCfgGUI(this, obj.inventory));
@@ -124,7 +126,7 @@ public class ConfigGUI extends Screen {
     public void render(int mouseX, int mouseY, float tickDelta) {
         renderBackground();
         drawCenteredString(textRenderer, obj.getName(), width / 2, height / 6 + 10, 0xFFFFFF);
-        drawCenteredString(textRenderer, "Config", width / 2, height / 6 - 2, 0xFFFFFF);
+        drawCenteredString(textRenderer, "Profile", width / 2, height / 6 - 2, 0xFFFFFF);
         super.render(mouseX, mouseY, tickDelta);
     }
 }
