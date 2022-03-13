@@ -1,5 +1,6 @@
 package com.slackow.endfight.gui.config;
 
+import com.slackow.endfight.config.BigConfig;
 import com.slackow.endfight.gui.core.ViewGUI;
 import com.slackow.endfight.util.KeyBind;
 import net.minecraft.client.MinecraftClient;
@@ -8,6 +9,9 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.resource.language.I18n;
 import org.lwjgl.input.Keyboard;
+
+import static net.minecraft.util.Formatting.RESET;
+import static net.minecraft.util.Formatting.YELLOW;
 
 public class KeybindGUI extends Screen {
     private final ViewGUI<KeyBind> from;
@@ -31,7 +35,7 @@ public class KeybindGUI extends Screen {
         keyButton = new ButtonWidget(0, width / 2 - 75, height / 2, 90, 20, "");
         updateKeyButton();
         buttons.add(keyButton);
-        reset = new ButtonWidget(1, width / 2 + 20, height / 2, 60, 20, "Reset");
+        reset = new ButtonWidget(1, width / 2 + 20, height / 2, 55, 20, "Reset");
         reset.active = obj.code != Keyboard.KEY_ESCAPE;
         buttons.add(reset);
         buttons.add(new ButtonWidget(2, width / 2 - 75 , height / 2 + 22, 150, 20, I18n.translate("gui.done")));
@@ -44,6 +48,8 @@ public class KeybindGUI extends Screen {
         renderBackground();
         drawCenteredString(textRenderer, "Keybind", width / 2, height / 6 - 2, 0xFFFFFF);
         drawCenteredString(textRenderer, obj.getName(), width / 2, height / 6 + 10, 0xFFFFFF);
+        drawCenteredString(textRenderer, "Key: ", width / 2 - 90, height / 2 + 6, 0xFFFFFF);
+        drawCenteredString(textRenderer, "Command: ", width / 2 - 102, height / 2 + 6 - 20, 0xFFFFFF);
         textField.render();
         super.render(mouseX, mouseY, tickDelta);
     }
@@ -56,6 +62,7 @@ public class KeybindGUI extends Screen {
             obj.code = code;
             choosing = false;
             updateKeyButton();
+            BigConfig.save();
         } else {
             super.keyPressed(character, code);
         }
@@ -63,7 +70,7 @@ public class KeybindGUI extends Screen {
 
     private void updateKeyButton() {
         String key = (obj.code == Keyboard.KEY_ESCAPE ? "None" : Keyboard.getKeyName(obj.code));
-        keyButton.message = choosing ? "Key: > " + key + " <" : ("Key: " + key);
+        keyButton.message = choosing ? "> " + YELLOW + key + RESET + " <" : key;
     }
 
     @Override

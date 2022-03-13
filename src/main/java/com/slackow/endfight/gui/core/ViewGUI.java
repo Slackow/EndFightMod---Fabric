@@ -24,13 +24,13 @@ public class ViewGUI<T extends Renameable> extends Screen {
     @Override
     public void init() {
         this.buttons.clear();
-        ButtonWidget edit = new ButtonWidget(1, width / 2 - 100, height / 2 - 30, 200, 20, "Edit");
+        ButtonWidget edit = new ButtonWidget(1, width / 2 - 100, height / 6 + 100 - 30, 200, 20, "Edit");
         this.buttons.add(edit);
         isNew = obj.getName().isEmpty();
-        this.buttons.add(new ButtonWidget(2, width / 2 - 100, height / 2 - 10, 100, 20 , isNew ? "Name" : "Rename"));
-        ButtonWidget remove = new ButtonWidget(3, width / 2, height / 2 - 10, 100, 20, RED + "Remove");
+        this.buttons.add(new ButtonWidget(2, width / 2 - 100, height / 6 + 100 - 10, 100, 20 , isNew ? "Name" : "Rename"));
+        ButtonWidget remove = new ButtonWidget(3, width / 2, height / 6 + 100 - 10, 100, 20, RED + "Remove");
         this.buttons.add(remove);
-        this.buttons.add(new ButtonWidget(4, width / 2 - 100, height / 2 + 10, 200, 20, isNew ? "Cancel" : I18n.translate("gui.done")));
+        this.buttons.add(new ButtonWidget(4, width / 2 - 100, height / 6 + 100 + 10, 200, 20, isNew ? "Cancel" : I18n.translate("gui.done")));
         edit.active = !isNew;
         remove.active = !isNew;
         super.init();
@@ -67,9 +67,9 @@ public class ViewGUI<T extends Renameable> extends Screen {
 
         renderBackground();
         if (isNew) {
-            drawCenteredString(textRenderer, "Please name this new " + from.title.substring(0, from.title.length() - 1), width / 2, height / 2 - 80, 0xFFFFFF);
+            drawCenteredString(textRenderer, "Please name this new " + from.title.substring(0, from.title.length() - 1), width / 2, height / 6 + 100 - 80, 0xFFFFFF);
         } else {
-            drawCenteredString(textRenderer, obj.getName(), width / 2, height / 2 - 80, 0xFFFFFF);
+            drawCenteredString(textRenderer, obj.getName(), width / 2, height / 6 + 100 - 80, 0xFFFFFF);
         }
 
         super.render(mouseX, mouseY, tickDelta);
