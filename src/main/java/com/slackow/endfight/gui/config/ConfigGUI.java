@@ -27,6 +27,7 @@ public class ConfigGUI extends Screen {
     private static final String healthBar = "Specific Health bar: ";
     private static final String damageAlerts = "Show Damage Alerts: ";
     private static final String deathBox = "Death box visibility: ";
+    private static final String island = ": ";
 
     public ConfigGUI(Screen from, Config obj) {
         this.from = from;
@@ -39,19 +40,23 @@ public class ConfigGUI extends Screen {
 
     public static final String[] deathBoxNames = {"never", "hitboxes", "always"};
     public static final String[] enderManNames = {"off", "no agro", "on"};
+    public static final String[] islandNames = {"random", "match world"};
 
 
     @SuppressWarnings("unchecked")
     @Override
     public void init() {
         buttons.clear();
-        buttons.add(new ButtonWidget(0, width / 2 - 155, height / 6 + 65, 150, 20, deathBox + deathBoxNames[obj.deathBox]));
-        buttons.add(new ButtonWidget(1, width / 2 + 5, height / 6 + 65, 150, 20, buttonName(healthBar, obj.specificHealthBar)));
-        buttons.add(new ButtonWidget(2, width / 2 - 155, height / 6 + 90, 150, 20, buttonName(damageAlerts, obj.damageInfo)));
+        buttons.add(new ButtonWidget(0, width / 2 - 155, height / 6 + 65 - 25, 150, 20, deathBox + deathBoxNames[obj.deathBox]));
+        buttons.add(new ButtonWidget(1, width / 2 + 5, height / 6 + 65 - 25, 150, 20, buttonName(healthBar, obj.specificHealthBar)));
+        buttons.add(new ButtonWidget(2, width / 2 - 155, height / 6 + 90 - 25, 150, 20, buttonName(damageAlerts, obj.damageInfo)));
 
 
-        buttons.add(new ButtonWidget(3, width / 2 + 5, height / 6 + 90, 150, 20, "Inventory..."));
-        buttons.add(new ButtonWidget(4, width / 2 + 5, height / 6 + 115, 150, 20, "Keybindings..."));
+        buttons.add(new ButtonWidget(3, width / 2 + 5, height / 6 + 90 - 25, 150, 20, "Inventory..."));
+        buttons.add(new ButtonWidget(4, width / 2 + 5, height / 6 + 115 - 25, 150, 20, "Keybindings..."));
+        buttons.add(new ButtonWidget(5, width / 2 + 5, height / 6 + 115, 75, 20, "Islands..."));
+        buttons.add(new ButtonWidget(6, width / 2 + 80, height / 6 + 115 , 75, 20,
+                island + (obj.selectedIsland > 0 ? obj.islands.get(obj.selectedIsland).getName() : islandNames[~obj.selectedIsland])));
 
 
 

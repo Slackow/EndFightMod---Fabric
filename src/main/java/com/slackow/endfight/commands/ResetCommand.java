@@ -30,7 +30,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.slackow.endfight.gui.config.ConfigGUI.buttonName;
+import static com.slackow.endfight.gui.config.ConfigGUI.islandNames;
 import static net.minecraft.util.Formatting.RED;
+import static net.minecraft.util.Formatting.YELLOW;
 
 public class ResetCommand extends EndFightCommand {
     @Override
@@ -134,11 +136,10 @@ public class ResetCommand extends EndFightCommand {
                 String s;
 
                 if (cfg.showSettings) {
-                    String[] islands = {"Random", "Match World"};
-                    s = "Selected Profile: '" + cfg.getName() + "'\n" +
-                            "Island Type: [" + (cfg.selectedIsland < 0 ? islands[~cfg.selectedIsland] : cfg.islands.get(cfg.selectedIsland).getName() ) + "]\n" +
-                            "Endermen: [" + ConfigGUI.enderManNames[cfg.enderMan] + "]\n" +
-                            buttonName("Damage Alerts.: [", cfg.damageInfo) + "]\n" +
+                    s = "\nSelected Profile: " + YELLOW + "'" + cfg.getName() + "'\n" +
+                            "Island Type: " + YELLOW + "[" + (cfg.selectedIsland < 0 ? islandNames[~cfg.selectedIsland] : cfg.islands.get(cfg.selectedIsland).getName() ) + "]\n" +
+                            "Endermen: " + YELLOW + "[" + ConfigGUI.enderManNames[cfg.enderMan] + "]\n" +
+                            buttonName("Damage Alerts: " + YELLOW + "[", cfg.damageInfo) + "]\n" +
                             "" +
                             "" +
                             "";
