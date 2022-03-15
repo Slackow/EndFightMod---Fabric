@@ -103,7 +103,9 @@ public class ListGUI<T extends Renameable> extends Screen {
     }
 
     private void reinit() {
-        init(this.client, this.width, this.height);
+        ListGUI<T> screen = new ListGUI<>(from, data, selected, getNewItem, editObj, save, title);
+        screen.page = page;
+        client.openScreen(screen);
     }
 
     private int tick = 0;

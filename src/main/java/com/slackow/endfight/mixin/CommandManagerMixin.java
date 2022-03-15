@@ -44,7 +44,7 @@ public abstract class CommandManagerMixin extends CommandRegistry {
 
             @Override
             public String getUsageTranslationKey(CommandSource source) {
-                return "/god";
+                return "/god [crystal|dragon]";
             }
 
             @Override

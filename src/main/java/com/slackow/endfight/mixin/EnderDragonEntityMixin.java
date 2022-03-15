@@ -1,11 +1,13 @@
 package com.slackow.endfight.mixin;
 
 import com.slackow.endfight.EndFightMod;
+import com.slackow.endfight.config.BigConfig;
 import com.slackow.endfight.util.Medium;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.boss.dragon.EnderDragonEntity;
+import net.minecraft.entity.boss.dragon.EnderDragonPart;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.LiteralText;
@@ -34,6 +36,7 @@ public abstract class EnderDragonEntityMixin extends LivingEntity {
     @Shadow public double field_3752;
 
     @Shadow private Entity target;
+    private int bedDamaged = 0;
 
     public EnderDragonEntityMixin(World world) {
         super(world);
@@ -75,26 +78,38 @@ public abstract class EnderDragonEntityMixin extends LivingEntity {
 
     @Inject(method = "tickMovement", at = @At("HEAD"))
     public void onUpdates(CallbackInfo ci) {
-        if (lastSetNewTargetCount != setNewTargetCounter) {
-            lastSetNewTargetCount = setNewTargetCounter;
-            //noinspection unchecked
-            List<PlayerEntity> list = this.world.playerEntities;
-            PlayerEntity player = list.get(0);
-            double targetX = player.x;
-            double targetZ = player.z;
-            double s = targetX - this.x;
-            double t = targetZ - this.z;
-            double u = Math.sqrt(s * s + t * t);
-            double v = 0.4000000059604645D + u / 80.0D - 1.0D;
-            if (v > 10.0D) {
-                v = 10.0D;
+        if (!world.isClient && getSelectedConfig().chaosTech > 0) {
+            if (lastSetNewTargetCount != setNewTargetCounter) {
+                lastSetNewTargetCount = setNewTargetCounter;
+                //noinspection unchecked
+                List<PlayerEntity> list = this.world.playerEntities;
+                PlayerEntity player = list.get(0);
+                double targetX = player.x;
+                double targetZ = player.z;
+                double s = targetX - this.x;
+                double t = targetZ - this.z;
+                double u = Math.sqrt(s * s + t * t);
+                double v = 0.4000000059604645D + u / 80.0D - 1.0D;
+                if (v > 10.0D) {
+                    v = 10.0D;
+                }
+                double targetY = player.boundingBox.minY + v;
+                double dist = this.myDistanceTo(targetX, targetY, targetZ);
+                if (dist >= 10.0 && dist <= 150.0D && (getSelectedConfig().chaosTech == 1 || bedDamaged > 0)) {
+                    // System.out.println("you got the strat");
+                    player.sendMessage(new LiteralText("You got Chaos Tech"));
+                }
             }
-            double targetY = player.boundingBox.minY + v;
-            double dist = this.myDistanceTo(targetX, targetY, targetZ);
-            if (dist >= 10.0 && dist <= 150.0D) {
-                System.out.println("you got the strat");
-                player.sendMessage(new LiteralText("You got the strat"));
+            if (bedDamaged > 0) {
+                bedDamaged--;
             }
+        }
+    }
+
+    @Inject(method = "setAngry", at = @At("HEAD"))
+    private void setAngry(EnderDragonPart source, DamageSource angry, float par3, CallbackInfoReturnable<Boolean> cir) {
+        if (angry.isExplosive()) {
+            bedDamaged = 20;
         }
     }
 
@@ -102,7 +117,7 @@ public abstract class EnderDragonEntityMixin extends LivingEntity {
 
     @Inject(method = "method_2906", at = @At("TAIL"))
     public void newTarget(CallbackInfo ci){
-        if (!world.isClient) {
+        if (!world.isClient && getSelectedConfig().dPrintDebugMessages) {
             setNewTargetCounter++;
             int seconds = (int) ((System.currentTimeMillis() - EndFightMod.time) / 1000);
             seconds = clamp(seconds, 0, 186399);

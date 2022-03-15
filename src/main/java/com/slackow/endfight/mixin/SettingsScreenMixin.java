@@ -33,7 +33,7 @@ public class SettingsScreenMixin extends Screen {
     @Inject(method = "buttonClicked", at = @At("TAIL"))
     private void buttonClicked(ButtonWidget par1, CallbackInfo ci) {
         if (par1.id == 6_22_2019) {
-            client.openScreen(new ConfigGUI(this, BigConfig.getSelectedConfig()));
+            client.openScreen(new ConfigGUI(this, BigConfig.getSelectedConfig(), false));
         }
     }
 }

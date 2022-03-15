@@ -110,6 +110,7 @@ public class InventoryCfgGUI extends Screen {
                 if (thePlayer != null) {
                     EndFightMod.setInventory(thePlayer, obj);
                     client.openScreen(new InventoryCfgGUI(from, obj));
+                    BigConfig.save();
                 }
                 break;
             case 1:
