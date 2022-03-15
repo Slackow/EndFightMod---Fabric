@@ -13,7 +13,7 @@ import static net.minecraft.util.Formatting.RED;
 public class ViewGUI<T extends Renameable> extends Screen {
     final ListGUI<T> from;
     private final T obj;
-    private boolean isNew;
+    protected boolean isNew;
 
     public ViewGUI(ListGUI<T> from, T obj) {
         this.from = from;
@@ -52,7 +52,7 @@ public class ViewGUI<T extends Renameable> extends Screen {
                 if (obj.getName().isEmpty()) {
                     remove();
                 }
-                MinecraftClient.getInstance().openScreen(from);
+                client.openScreen(from);
                 break;
         }
         super.buttonClicked(button);
@@ -73,5 +73,9 @@ public class ViewGUI<T extends Renameable> extends Screen {
         }
 
         super.render(mouseX, mouseY, tickDelta);
+    }
+
+    public void save() {
+        from.save();
     }
 }

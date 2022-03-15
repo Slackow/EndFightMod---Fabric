@@ -120,6 +120,9 @@ public class BigConfig {
                             case "dPrintDebugMessages":
                                 cfg.dPrintDebugMessages = Boolean.parseBoolean(value);
                                 break;
+                            case "chaosTech":
+                                cfg.chaosTech = Integer.parseUnsignedInt(value);
+                                break;
                             default:
                                 System.out.println("WARNING: IGNORED LINE" + line);
                                 break;
@@ -161,6 +164,7 @@ public class BigConfig {
             sj.add("keyBindings=" + cfg.keyBindings.stream().map(KeyBind::toString).collect(Collectors.joining(";")));
             sj.add("gamemode=" + cfg.gamemode.getGameModeId());
             sj.add("showSettings=" + cfg.showSettings);
+            sj.add("chaosTech=" + cfg.chaosTech);
             sj.add("dGodCrystals=" + cfg.dGodCrystals);
             sj.add("dGodDragon=" + cfg.dGodDragon);
             sj.add("dGodPlayer=" + cfg.dGodPlayer);
