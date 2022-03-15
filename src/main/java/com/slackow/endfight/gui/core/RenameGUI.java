@@ -50,7 +50,8 @@ public class RenameGUI<T extends Renameable> extends Screen {
         if (cached != null && !cached.trim().isEmpty()) {
             obj.setName(cached.trim());
         }
-        MinecraftClient.getInstance().openScreen(from);
+        from.save();
+        client.openScreen(from);
         super.buttonClicked(button);
     }
 

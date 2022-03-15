@@ -50,21 +50,21 @@ public class ConfigGUI extends Screen {
     @Override
     public void init() {
         buttons.clear();
-        buttons.add(new ButtonWidget(0, width / 2 - 155, height / 6 + 65 - 25, 150, 20, deathBox + deathBoxNames[obj.deathBox]));
-        buttons.add(new ButtonWidget(1, width / 2 - 155, height / 6 + 115 - 25, 150, 20, buttonName(healthBar, obj.specificHealthBar)));
-        buttons.add(new ButtonWidget(2, width / 2 - 155, height / 6 + 90 - 25, 150, 20, buttonName(damageAlerts, obj.damageInfo)));
+        buttons.add(new ButtonWidget(0, width / 2 - 75, height / 6 + 65 - 25, 150, 20, deathBox + deathBoxNames[obj.deathBox]));
+        buttons.add(new ButtonWidget(1, width / 2 - 75, height / 6 + 115 - 25, 150, 20, buttonName(healthBar, obj.specificHealthBar)));
+        buttons.add(new ButtonWidget(2, width / 2 - 75, height / 6 + 90 - 25, 150, 20, buttonName(damageAlerts, obj.damageInfo)));
 
 
-        buttons.add(new ButtonWidget(3, width / 2 + 5, height / 6 + 90 - 50, 150, 20, "Inventory..."));
-        buttons.add(new ButtonWidget(4, width / 2 + 5, height / 6 + 115 - 50, 150, 20, "Keybindings..."));
-        buttons.add(new ButtonWidget(5, width / 2 + 5, height / 6 + 115 - 25, 75, 20, "Islands..."));
-        buttons.add(new ButtonWidget(6, width / 2 + 80, height / 6 + 115 - 25, 75, 20,
+        buttons.add(new ButtonWidget(3, width / 2 + 80, height / 6 + 90 - 50, 150, 20, "Inventory..."));
+        buttons.add(new ButtonWidget(4, width / 2 + 80, height / 6 + 115 - 50, 150, 20, "Keybindings..."));
+        buttons.add(new ButtonWidget(5, width / 2 + 80, height / 6 + 115 - 25, 75, 20, "Islands..."));
+        buttons.add(new ButtonWidget(6, width / 2 + 155, height / 6 + 115 - 25, 75, 20,
                 island + obj.selectedIslandName()));
 
 
 
 
-        buttons.add(new ButtonWidget(-1, width / 2 - 200, height / 6 - 2, 20, 20, "<"));
+        buttons.add(new ButtonWidget(-1, width / 2 - 155, height / 6 - 2, 20, 20, "<"));
         buttons.add(new ButtonWidget(10, width / 2 - 100, height / 6 + 150, 200, 20, I18n.translate("gui.done")));
         super.init();
     }
@@ -138,8 +138,7 @@ public class ConfigGUI extends Screen {
                                 BigConfig.getBigConfig().selectedConfig = selected;
                             }
                             BigConfig.save();
-                        }, "Profiles"
-                ));
+                        }, "Profiles"));
                 return;
             case 10:
                 BigConfig.save();

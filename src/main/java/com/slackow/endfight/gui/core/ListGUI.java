@@ -1,7 +1,6 @@
 package com.slackow.endfight.gui.core;
 
 import com.slackow.endfight.util.Renameable;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.resource.language.I18n;
@@ -74,7 +73,7 @@ public class ListGUI<T extends Renameable> extends Screen {
         if (button.id >= 0 && button.id < 5) {
             int index = button.id + page * 5;
             if (!isSelectable() || index == selected) {
-                MinecraftClient.getInstance().openScreen(new ViewGUI<>(this, data.get(index)));
+                client.openScreen(new ViewGUI<>(this, data.get(index)));
             } else {
                 selected = index;
                 reinit();
@@ -90,11 +89,14 @@ public class ListGUI<T extends Renameable> extends Screen {
             if (obj != null) {
                 obj.setName("");
                 data.add(obj);
+                if (isSelectable()) {
+                    selected = data.size() - 1;
+                }
                 client.openScreen(new ViewGUI<>(this, obj));
                 reinit();
             }
         } else if (button.id == 8) {
-            save.accept(data, selected);
+            save();
             client.openScreen(from);
         }
         super.buttonClicked(button);
@@ -112,6 +114,10 @@ public class ListGUI<T extends Renameable> extends Screen {
         super.tick();
     }
 
+    public void save() {
+        save.accept(data, selected);
+    }
+
     public void remove(T obj) {
         data.remove(obj);
         page = Math.min(page, (data.size() - 1) / 5);
@@ -120,6 +126,7 @@ public class ListGUI<T extends Renameable> extends Screen {
         } else {
             selected = Math.min(selected, data.size() - 1);
         }
+        save();
     }
 
 

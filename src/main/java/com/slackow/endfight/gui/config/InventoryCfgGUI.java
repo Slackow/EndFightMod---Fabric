@@ -1,6 +1,7 @@
 package com.slackow.endfight.gui.config;
 
 import com.slackow.endfight.EndFightMod;
+import com.slackow.endfight.config.BigConfig;
 import com.slackow.endfight.util.Kit;
 import net.minecraft.class_481;
 import net.minecraft.client.MinecraftClient;
@@ -51,7 +52,7 @@ public class InventoryCfgGUI extends Screen {
     public void render(int mouseX, int mouseY, float tickDelta) {
         renderBackground();
         drawCenteredString(textRenderer, "Inventory", width / 2, height / 6 - 2, 0xFFFFFF);
-        drawCenteredString(textRenderer, obj.getName(), width / 2, height / 6 + 10, 0xFFFFFF);
+        drawCenteredString(textRenderer, BigConfig.getSelectedConfig().getName(), width / 2, height / 6 + 10, 0xFFFFFF);
         super.render(mouseX, mouseY, tickDelta);
         client.getTextureManager().bindTexture(INVENTORY_TEXTURE);
         int var4 = (this.width - this.backgroundWidth) / 2;

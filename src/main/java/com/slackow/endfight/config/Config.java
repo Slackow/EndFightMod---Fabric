@@ -33,7 +33,7 @@ public class Config implements Renameable {
     public boolean arrowHelp = false;
     public int deathBox = 0;
     public int enderMan = 2;
-    public Kit inventory = new Kit("Default", new int[]{16777483, 16777473, 16777571, 16777477, 1073741842,
+    public Kit inventory = new Kit(new int[]{16777483, 16777473, 16777571, 16777477, 1073741842,
             16777584, 16777542, 16777491, 83886446, 16777274, 16777571, 16777571, 16777571, 16777571, 16777571,
             16777489, 402653446, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
     public List<KeyBind> keyBindings = new ArrayList<>();
@@ -45,6 +45,7 @@ public class Config implements Renameable {
     public boolean dGodDragon = false;
     public boolean dGodPlayer = false;
     public boolean dPrintDebugMessages = false;
+    public int chaosTech = 0;
 
     public String name = "Default";
 
