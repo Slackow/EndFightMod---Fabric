@@ -5,12 +5,11 @@
 
 package com.slackow.endfight.util;
 
-import java.util.List;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.Block;
 import net.minecraft.block.Material;
-import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.EndCrystalEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
@@ -20,15 +19,17 @@ import net.minecraft.entity.projectile.Projectile;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.packet.s2c.play.GameStateChangeS2CPacket;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
+import java.util.List;
+
+@SuppressWarnings("ALL")
 public class FakeArrow extends Entity implements Projectile {
+    private final float upward;
     private int blockX = -1;
     private int blockY = -1;
     private int blockZ = -1;
@@ -43,8 +44,11 @@ public class FakeArrow extends Entity implements Projectile {
     private double damage = 2.0D;
     private int punch;
 
-    public FakeArrow(World world, LivingEntity livingEntity, float f) {
+    private boolean hitCrystal = false;
+
+    public FakeArrow(World world, LivingEntity livingEntity, float f, float upward) {
         super(world);
+        this.upward = upward;
         this.renderDistanceMultiplier = 10.0D;
         this.owner = livingEntity;
         if (livingEntity instanceof PlayerEntity) {
@@ -74,7 +78,7 @@ public class FakeArrow extends Entity implements Projectile {
         y /= (double)var9;
         z /= (double)var9;
         x += this.random.nextGaussian() * (double)(this.random.nextBoolean() ? -1 : 1) * 0.007499999832361937D * (double)divergence;
-        y += 0.8 * (double)(this.random.nextBoolean() ? -1 : 1) * 0.007499999832361937D * (double)divergence;
+        y += upward * 0.007499999832361937D;
         z += this.random.nextGaussian() * (double)(this.random.nextBoolean() ? -1 : 1) * 0.007499999832361937D * (double)divergence;
         x *= (double)speed;
         y *= (double)speed;
@@ -207,6 +211,9 @@ public class FakeArrow extends Entity implements Projectile {
                     if (this.isOnFire() && !(var4.entity instanceof EndermanEntity)) {
                         var4.entity.setOnFireFor(5);
                     }
+                    if (var4.entity instanceof EndCrystalEntity) {
+                        hitCrystal = true;
+                    }
 
                     this.velocityX *= -0.10000000149011612D;
                     this.velocityY *= -0.10000000149011612D;
@@ -288,6 +295,10 @@ public class FakeArrow extends Entity implements Projectile {
             this.updatePosition(this.x, this.y, this.z);
             this.checkBlockCollision();
         }
+    }
+
+    public boolean hasHitCrystal(){
+        return hitCrystal;
     }
 
     public void writeCustomDataToTag(CompoundTag tag) {

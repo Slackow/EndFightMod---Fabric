@@ -5,6 +5,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.resource.language.I18n;
+import net.minecraft.server.MinecraftServer;
 
 public class IslandGUI extends Screen {
     private final Screen from;
@@ -50,9 +51,19 @@ public class IslandGUI extends Screen {
     @Override
     protected void buttonClicked(ButtonWidget button) {
         if (button.id == 1) {
-            obj.setSeed(client.world.getSeed());
-            textField.setText(obj.getSeed() + "");
+            MinecraftServer server = MinecraftServer.getServer();
+            if (server != null) {
+                obj.setSeed(server.getWorld(0).getSeed());
+                textField.setText(obj.getSeed() + "");
+            }
         } else {
+            long seed;
+            try {
+                seed = Long.parseLong(textField.getText().trim());
+            } catch (NumberFormatException e) {
+                seed = textField.getText().hashCode();
+            }
+            obj.setSeed(seed);
             client.openScreen(from);
         }
         super.buttonClicked(button);
