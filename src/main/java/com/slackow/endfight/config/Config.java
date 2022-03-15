@@ -9,6 +9,8 @@ import net.minecraft.world.GameMode;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.slackow.endfight.gui.config.ConfigGUI.islandNames;
+
 public class Config implements Renameable {
 
     // Options:
@@ -36,7 +38,7 @@ public class Config implements Renameable {
             16777489, 402653446, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
     public List<KeyBind> keyBindings = new ArrayList<>();
     public List<Island> islands = new ArrayList<>();
-    public int selectedIsland = -1;
+    public int selectedIsland = -2;
     public GameMode gamemode = GameMode.SURVIVAL;
     public boolean dSeeTargetBlock = false;
     public boolean dGodCrystals = false;
@@ -45,6 +47,10 @@ public class Config implements Renameable {
     public boolean dPrintDebugMessages = false;
 
     public String name = "Default";
+
+    public String selectedIslandName() {
+        return selectedIsland >= 0 ? "'" + islands.get(selectedIsland).getName() + "'" : islandNames[~selectedIsland];
+    }
 
     @Override
     public void setName(String name) {

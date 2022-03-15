@@ -28,10 +28,15 @@ public class RenderCrystalMixin {
             if (itemStack != null && itemStack.getItem() instanceof BowItem) {
 
                 if (client.field_3805.method_3192() > 0) {
-                    FakeArrow arrow = new FakeArrow(client.world, inv.player, 2f);
+                    FakeArrow arrow = new FakeArrow(client.world, inv.player, 2f, 0.8f);
+                    FakeArrow arrow2 = new FakeArrow(client.world, inv.player, 2f, -0.8f);
                     double prevDist;
                     double dist = Double.MAX_VALUE;
                     double loops = 10000;
+
+                    double prevDist2;
+                    double dist2 = Double.MAX_VALUE;
+
 
                     double dx;
                     double dy;
@@ -40,21 +45,39 @@ public class RenderCrystalMixin {
                     do {
                         prevDist = dist;
                         dx = d.x - arrow.x;
-                        dy = d.y - arrow.y;
+                        dy = d.y + d.height * 0.5 - arrow.y;
                         dz = d.z - arrow.z;
-                        dist = (dx * dx)*4 + (dy * dy) + (dz * dz)*4;
+                        dist = (dx * dx)*2 + (dy * dy) + (dz * dz)*2;
+
                         arrow.tick();
                         loops--;
                     } while (prevDist > dist && loops > 0);
-                    int p = Math.min(255, (int) (prevDist * (8.0)));
+                    do {
+                        prevDist2 = dist2;
+                        dx = d.x - arrow2.x;
+                        dy = d.y + d.height * 0.5 - arrow2.y;
+                        dz = d.z - arrow2.z;
+                        dist2 = (dx * dx)*2 + (dy * dy) + (dz * dz)*2;
+
+                        arrow2.tick();
+                        loops--;
+                    } while (prevDist2 > dist2 && loops > 0);
+                    int p = Math.min(255, (int) (((arrow.hasHitCrystal() ? 0 : prevDist) + (arrow2.hasHitCrystal() ? 0 : prevDist2)) * (16.0)));
                     int color = ((p) << 16) | ((255 - p) << 8);
                     Box box = Box.of(e - bound, f, g - bound, e + bound, f + (double)d.height, g + bound);
                     drawBox(color, box);
-                    double x = arrow.x + e - d.x;
-                    double y = arrow.y + f - d.y;
-                    double z = arrow.z + g - d.z;
-                    Box arrowBox = Box.of(x, y, z, x, y, z).expand(0.5, 0.5, 0.5);
-                    drawBox(0x0000FF, arrowBox);
+
+
+//                    double x = arrow.x + e - d.x;
+//                    double y = arrow.y + f - d.y;
+//                    double z = arrow.z + g - d.z;
+//                    Box arrowBox = Box.of(x, y, z, x, y, z).expand(0.5, 0.5, 0.5);
+//                    drawBox(0x0000FF, arrowBox);
+//                    x = arrow2.x + e - d.x;
+//                    y = arrow2.y + f - d.y;
+//                    z = arrow2.z + g - d.z;
+//                    arrowBox = Box.of(x, y, z, x, y, z).expand(0.5, 0.5, 0.5);
+//                    drawBox(0x0000FF, arrowBox);
                 }
             }
         }

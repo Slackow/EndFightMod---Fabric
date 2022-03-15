@@ -9,6 +9,7 @@ import com.slackow.endfight.util.Medium;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.CommandSource;
+import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
@@ -30,7 +31,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.slackow.endfight.gui.config.ConfigGUI.buttonName;
-import static com.slackow.endfight.gui.config.ConfigGUI.islandNames;
 import static net.minecraft.util.Formatting.RED;
 import static net.minecraft.util.Formatting.YELLOW;
 
@@ -110,9 +110,9 @@ public class ResetCommand extends EndFightCommand {
                         oldInfo.getGeneratorType());
                 long seed;
                 Config cfg = BigConfig.getSelectedConfig();
-                if (cfg.selectedIsland == -1) {
+                if (cfg.selectedIsland == -2) {
                     seed = new Random().nextLong();
-                } else if (cfg.selectedIsland == -2) {
+                } else if (cfg.selectedIsland == -1) {
                     seed = overWorld.getSeed();
                 } else {
                     seed = cfg.islands.get(cfg.selectedIsland).getSeed();
@@ -129,6 +129,9 @@ public class ResetCommand extends EndFightCommand {
                 newEnd.addListener(new ServerWorldManager(server, newEnd));
                 heal(player);
                 player.clearStatusEffects();
+                if (cfg.dGodPlayer) {
+                    player.addStatusEffect(new StatusEffectInstance(11, 100000, 255, true));
+                }
                 // set Gamemode
                 player.method_3170(cfg.gamemode);
                 EndFightMod.giveInventory(player, cfg.inventory);
@@ -137,7 +140,7 @@ public class ResetCommand extends EndFightCommand {
 
                 if (cfg.showSettings) {
                     s = "\nSelected Profile: " + YELLOW + "'" + cfg.getName() + "'\n" +
-                            "Island Type: " + YELLOW + "[" + (cfg.selectedIsland < 0 ? islandNames[~cfg.selectedIsland] : cfg.islands.get(cfg.selectedIsland).getName() ) + "]\n" +
+                            "Island Type: " + YELLOW + "[" + (cfg.selectedIslandName()) + "]\n" +
                             "Endermen: " + YELLOW + "[" + ConfigGUI.enderManNames[cfg.enderMan] + "]\n" +
                             buttonName("Damage Alerts: " + YELLOW + "[", cfg.damageInfo) + "]\n" +
                             "" +

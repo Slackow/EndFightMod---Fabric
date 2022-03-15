@@ -84,10 +84,11 @@ public abstract class CommandManagerMixin extends CommandRegistry {
                             }
                             default: {
                                 source.sendMessage(new LiteralText("Unrecognized Subcommand"));
-                                break;
+                                return;
                             }
                         }
                     }
+                    BigConfig.save();
                 }
             }
 

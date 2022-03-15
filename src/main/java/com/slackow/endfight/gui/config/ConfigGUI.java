@@ -3,10 +3,13 @@ package com.slackow.endfight.gui.config;
 import com.slackow.endfight.config.BigConfig;
 import com.slackow.endfight.config.Config;
 import com.slackow.endfight.gui.core.ListGUI;
+import com.slackow.endfight.util.Island;
 import com.slackow.endfight.util.KeyBind;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.resource.language.I18n;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.server.MinecraftServer;
 import org.lwjgl.input.Keyboard;
 
 import java.util.ArrayList;
@@ -27,7 +30,7 @@ public class ConfigGUI extends Screen {
     private static final String healthBar = "Specific Health bar: ";
     private static final String damageAlerts = "Show Damage Alerts: ";
     private static final String deathBox = "Death box visibility: ";
-    private static final String island = ": ";
+    private static final String island = "";
 
     public ConfigGUI(Screen from, Config obj) {
         this.from = from;
@@ -40,7 +43,7 @@ public class ConfigGUI extends Screen {
 
     public static final String[] deathBoxNames = {"never", "hitboxes", "always"};
     public static final String[] enderManNames = {"off", "no agro", "on"};
-    public static final String[] islandNames = {"random", "match world"};
+    public static final String[] islandNames = {"Match World", "Random"};
 
 
     @SuppressWarnings("unchecked")
@@ -48,15 +51,15 @@ public class ConfigGUI extends Screen {
     public void init() {
         buttons.clear();
         buttons.add(new ButtonWidget(0, width / 2 - 155, height / 6 + 65 - 25, 150, 20, deathBox + deathBoxNames[obj.deathBox]));
-        buttons.add(new ButtonWidget(1, width / 2 + 5, height / 6 + 65 - 25, 150, 20, buttonName(healthBar, obj.specificHealthBar)));
+        buttons.add(new ButtonWidget(1, width / 2 - 155, height / 6 + 115 - 25, 150, 20, buttonName(healthBar, obj.specificHealthBar)));
         buttons.add(new ButtonWidget(2, width / 2 - 155, height / 6 + 90 - 25, 150, 20, buttonName(damageAlerts, obj.damageInfo)));
 
 
-        buttons.add(new ButtonWidget(3, width / 2 + 5, height / 6 + 90 - 25, 150, 20, "Inventory..."));
-        buttons.add(new ButtonWidget(4, width / 2 + 5, height / 6 + 115 - 25, 150, 20, "Keybindings..."));
-        buttons.add(new ButtonWidget(5, width / 2 + 5, height / 6 + 115, 75, 20, "Islands..."));
-        buttons.add(new ButtonWidget(6, width / 2 + 80, height / 6 + 115 , 75, 20,
-                island + (obj.selectedIsland > 0 ? obj.islands.get(obj.selectedIsland).getName() : islandNames[~obj.selectedIsland])));
+        buttons.add(new ButtonWidget(3, width / 2 + 5, height / 6 + 90 - 50, 150, 20, "Inventory..."));
+        buttons.add(new ButtonWidget(4, width / 2 + 5, height / 6 + 115 - 50, 150, 20, "Keybindings..."));
+        buttons.add(new ButtonWidget(5, width / 2 + 5, height / 6 + 115 - 25, 75, 20, "Islands..."));
+        buttons.add(new ButtonWidget(6, width / 2 + 80, height / 6 + 115 - 25, 75, 20,
+                island + obj.selectedIslandName()));
 
 
 
@@ -87,24 +90,43 @@ public class ConfigGUI extends Screen {
             case 4:
                 client.openScreen(new ListGUI<KeyBind>(this, obj.keyBindings, -1,
                         () -> new KeyBind("Shortcut", Keyboard.KEY_ESCAPE, ""),
-                        (gui, keybind) -> {
-                    //
+                        (gui, keybind) -> { //
                             client.openScreen(new KeybindGUI(gui, keybind));
                         },
-                        (data, selected) -> obj.keyBindings = data, "Keybindings") {
+                        (data, selected) -> {
+                            obj.keyBindings = data;
+                            BigConfig.save();
+                        }, "Keybindings") {
                     @Override
                     public boolean isSelectable() {
                         return false;
                     }
                 });
                 return;
+            case 5:
+                client.openScreen(new ListGUI<>(this, obj.islands, obj.selectedIsland, () -> {
+                    MinecraftServer server = MinecraftServer.getServer();
+                    Island a = new Island(server != null ? server.getWorld(1).getSeed() : 0);
+                    a.setName("");
+                    return a;
+                }, (gui, obj) -> { //
+                    client.openScreen(new IslandGUI(gui, obj));
+                }, (data, selected) -> {
+                    obj.islands = data;
+                    obj.selectedIsland = selected;
+                    BigConfig.save();
+                }, "Islands"));
+                return;
+            case 6:
+                obj.selectedIsland = (obj.selectedIsland + 3) % (obj.islands.size() + 2) - 2;
+                button.message = island + obj.selectedIslandName();
+                break;
             case -1:
                 client.openScreen(new ListGUI<>(from,
                         BigConfig.getBigConfig().configs,
                         BigConfig.getBigConfig().selectedConfig,
                         Config::new,
-                        (gui, obj) -> {
-                    //
+                        (gui, obj) -> { //
                             client.openScreen(new ConfigGUI(gui, obj));
                         },
                         (list, selected) -> {
@@ -120,8 +142,8 @@ public class ConfigGUI extends Screen {
                 ));
                 return;
             case 10:
-                client.openScreen(from);
                 BigConfig.save();
+                client.openScreen(from);
                 return;
         }
         BigConfig.save();
