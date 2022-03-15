@@ -23,6 +23,11 @@ public class RenderDragonMixin {
             double dy = f - d.y;
             double dz = g - d.z;
             drawBox(0xff0000, d.partHead.boundingBox.expand(1.0D, 1.0D, 1.0D).offset(dx, dy, dz));
+        }
+        if (getSelectedConfig().dSeeTargetBlock) {
+            double dx = e - d.x;
+            double dy = f - d.y;
+            double dz = g - d.z;
             drawBox(0x00ff00, Box.of(targetX, targetY, targetZ, targetX, targetY, targetZ)
                     .expand(0.5, 0.5, 0.5).offset(dx, dy, dz));
         }
