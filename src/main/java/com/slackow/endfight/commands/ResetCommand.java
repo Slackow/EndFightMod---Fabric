@@ -15,6 +15,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.server.world.ServerWorldManager;
 import net.minecraft.text.LiteralText;
+import net.minecraft.util.Formatting;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.level.LevelInfo;
 import net.minecraft.world.level.LevelProperties;
@@ -30,9 +31,7 @@ import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.slackow.endfight.gui.config.ConfigGUI.buttonName;
-import static net.minecraft.util.Formatting.RED;
-import static net.minecraft.util.Formatting.YELLOW;
+import static net.minecraft.util.Formatting.*;
 
 public class ResetCommand extends EndFightCommand {
     @Override
@@ -136,30 +135,33 @@ public class ResetCommand extends EndFightCommand {
                 player.method_3170(cfg.gamemode);
                 EndFightMod.giveInventory(player, cfg.inventory);
                 player.teleportToDimension(1);
-                String s;
 
                 if (cfg.showSettings) {
-                    s = "\nSelected Profile: " + YELLOW + "'" + cfg.getName() + "'\n" +
-                            "Island Type: " + YELLOW + "[" + (cfg.selectedIslandName()) + "]\n" +
-                            "Endermen: " + YELLOW + "[" + ConfigGUI.enderManNames[cfg.enderMan] + "]\n" +
-                            buttonName("Damage Alerts: " + YELLOW + "[", cfg.damageInfo) + "]\n" +
-                            "" +
-                            "" +
-                            "";
-                } else {
-                    s = "";
+                    Formatting[] three = {RED, YELLOW, GREEN};
+                    player.sendMessage(txt(""));
+                    player.sendMessage(txt("Selected Profile: " + YELLOW + "'" + cfg.getName() + YELLOW + "'"));
+                    player.sendMessage(txt("Island Type: " + three[Math.max(0, -cfg.selectedIsland)] + "[" + (cfg.selectedIslandName()) + "]"));
+                    player.sendMessage(txt("Endermen: " + three[cfg.enderMan] + "[" + ConfigGUI.enderManNames[cfg.enderMan] + "]"));
+                    if (cfg.dGodPlayer) {
+                        player.sendMessage(txt(RED + "You are in god mode"));
+                    }
+                    if (cfg.dGodDragon) {
+                        player.sendMessage(txt(RED + "The dragon is in god mode"));
+                    }
+                    if (cfg.dGodCrystals) {
+                        player.sendMessage(txt(RED + "The crystals are in god mode"));
+                    }
                 }
 
 
                 player.sendMessage(new LiteralText("Sent to End"));
-                if (!s.isEmpty()) {
-                    for (String line : s.split("\n")) {
-                        player.sendMessage(new LiteralText(line));
-                    }
-                }
                 EndFightMod.time = System.currentTimeMillis();
             }
 
         }
+    }
+
+    private static LiteralText txt(String s) {
+        return new LiteralText(s);
     }
 }

@@ -12,6 +12,7 @@
     "EnderDragonAccessor",
     "EnderDragonEntityMixin",
     "EndermanMixin",
+    "EntityRendererDispatcherMixin",
     "HostileEntityMixin",
     "HungerManagerMixin",
     "KeyBindingMixin",

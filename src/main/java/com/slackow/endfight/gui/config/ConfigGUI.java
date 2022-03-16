@@ -120,7 +120,7 @@ public class ConfigGUI extends Screen {
                 return;
             case 5:
                 client.openScreen(new ListGUI<KeyBind>(this, obj.keyBindings, -1,
-                        () -> new KeyBind("Shortcut", Keyboard.KEY_ESCAPE, ""),
+                        () -> new KeyBind("", Keyboard.KEY_ESCAPE, ""),
                         (gui, keybind) -> { //
                             client.openScreen(new KeybindGUI(gui, keybind));
                         },
