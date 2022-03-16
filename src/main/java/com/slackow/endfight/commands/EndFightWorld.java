@@ -1,5 +1,6 @@
 package com.slackow.endfight.commands;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.profiler.Profiler;
@@ -8,6 +9,7 @@ import net.minecraft.world.SaveHandler;
 import net.minecraft.world.level.LevelInfo;
 import net.minecraft.world.level.LevelProperties;
 import net.minecraft.world.level.ReadOnlyLevelProperties;
+import org.lwjgl.input.Keyboard;
 
 public class EndFightWorld extends MultiServerWorld {
 
@@ -23,6 +25,7 @@ public class EndFightWorld extends MultiServerWorld {
 
     @Override
     public long getSeed() {
+
         return seed;
     }
 }

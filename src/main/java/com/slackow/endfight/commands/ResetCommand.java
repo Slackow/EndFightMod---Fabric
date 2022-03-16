@@ -6,6 +6,7 @@ import com.slackow.endfight.config.BigConfig;
 import com.slackow.endfight.config.Config;
 import com.slackow.endfight.gui.config.ConfigGUI;
 import com.slackow.endfight.util.Medium;
+import net.minecraft.block.EndPortalBlock;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.CommandSource;
@@ -18,6 +19,7 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.level.LevelInfo.GameMode;
+import net.minecraft.world.level.LevelProperties;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -109,9 +111,13 @@ public class ResetCommand extends EndFightCommand {
 
 
 
-                ServerWorld newEnd = new EndFightWorld(seed, server, overWorld.getSaveHandler(), 1, overWorld, server.profiler);
+                ServerWorld newEnd = (ServerWorld) new EndFightWorld(seed, server, overWorld.getSaveHandler(), 1, overWorld, server.profiler).getWorld();
                 // copy difficulty
-                newEnd.getLevelProperties().setDifficulty(overWorld.getGlobalDifficulty());
+                LevelProperties levelProperties = newEnd.getLevelProperties();
+                levelProperties.setLevelName(overWorld.getLevelProperties().getLevelName());
+                levelProperties.setDifficulty(overWorld.getGlobalDifficulty());
+                levelProperties.setGamemode(cfg.gamemode);
+                levelProperties.setHardcore(false);
 
                 server.worlds = ArrayUtils.add(server.worlds, newEnd);
                 server.field_3858 = ArrayUtils.add(server.field_3858, new long[100]);

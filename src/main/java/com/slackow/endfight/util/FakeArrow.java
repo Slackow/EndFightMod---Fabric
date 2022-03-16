@@ -107,7 +107,7 @@ public class FakeArrow extends Entity implements Projectile {
         this.velocityX = (double)(-MathHelper.sin(this.yaw / 180.0F * 3.1415927F) * MathHelper.cos(this.pitch / 180.0F * 3.1415927F));
         this.velocityZ = (double)(MathHelper.cos(this.yaw / 180.0F * 3.1415927F) * MathHelper.cos(this.pitch / 180.0F * 3.1415927F));
         this.velocityY = (double)(-MathHelper.sin(this.pitch / 180.0F * 3.1415927F));
-        this.setVelocity(this.velocityX, this.velocityY, this.velocityZ, f * 1.5F, 1.0F);
+        this.setVelocity(this.velocityX, this.velocityY, this.velocityZ, f * 1.5F, 0.0F);
     }
 
     protected void initDataTracker() {
@@ -120,7 +120,7 @@ public class FakeArrow extends Entity implements Projectile {
         y /= (double)f;
         z /= (double)f;
         x += this.random.nextGaussian() * (double)(this.random.nextBoolean() ? -1 : 1) * 0.007499999832361937D * (double)divergence;
-        y += this.random.nextGaussian() * (double)(this.random.nextBoolean() ? -1 : 1) * 0.007499999832361937D * (double)divergence;
+        y += upward * 0.007499999832361937D * (double)divergence;
         z += this.random.nextGaussian() * (double)(this.random.nextBoolean() ? -1 : 1) * 0.007499999832361937D * (double)divergence;
         x *= (double)speed;
         y *= (double)speed;
