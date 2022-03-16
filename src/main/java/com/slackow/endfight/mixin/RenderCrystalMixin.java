@@ -21,7 +21,7 @@ import static com.slackow.endfight.util.Medium.drawBox;
 public class RenderCrystalMixin {
     @Inject(method = "render(Lnet/minecraft/entity/EndCrystalEntity;DDDFF)V", at = @At("TAIL"))
     private void render(EndCrystalEntity d, double e, double f, double g, float h, float par6, CallbackInfo ci) {
-        if (!EntityRenderDispatcher.field_5192 && BigConfig.getSelectedConfig().arrowHelp) {
+        if (BigConfig.getSelectedConfig().arrowHelp) {
             MinecraftClient client = MinecraftClient.getInstance();
             PlayerInventory inv = client.field_3805.inventory;
             ItemStack itemStack = inv.main[inv.selectedSlot];
@@ -81,16 +81,5 @@ public class RenderCrystalMixin {
                 }
             }
         }
-    }
-
-    private double range(double delta, double range) {
-        if (Math.abs(delta) < range) {
-            return 0;
-        }
-        return delta > 0 ? delta - range : delta + range;
-    }
-
-    private double r(double x) {
-        return Math.rint(x * 100) / 100.0;
     }
 }

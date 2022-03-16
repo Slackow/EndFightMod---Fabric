@@ -3,6 +3,8 @@ package com.slackow.endfight.config;
 import com.slackow.endfight.util.Island;
 import com.slackow.endfight.util.KeyBind;
 import com.slackow.endfight.util.Kit;
+import net.minecraft.util.crash.CrashException;
+import net.minecraft.util.crash.CrashReport;
 import net.minecraft.world.GameMode;
 
 import java.io.IOException;
@@ -143,8 +145,8 @@ public class BigConfig {
         if (selectedConfig < configs.size() && selectedConfig >= 0) {
             return configs.get(selectedConfig);
         }
-        throw new IllegalStateException("Send this error straight to Slackow#7890 on discord please(with everything below):\n" +
-                "" + selectedConfig + configs + "\n");
+        throw new CrashException(CrashReport.create(null, "Send this error straight to Slackow#7890 on discord please(with everything below):\n" +
+                "" + selectedConfig + configs + "\n"));
     }
 
     @Override

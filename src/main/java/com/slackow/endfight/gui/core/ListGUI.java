@@ -93,7 +93,6 @@ public class ListGUI<T extends Renameable> extends Screen {
                     selected = data.size() - 1;
                 }
                 client.openScreen(new ViewGUI<>(this, obj));
-                reinit();
             }
         } else if (button.id == 8) {
             save();
