@@ -3,10 +3,10 @@ package com.slackow.endfight.gui.config;
 import com.slackow.endfight.EndFightMod;
 import com.slackow.endfight.config.BigConfig;
 import com.slackow.endfight.util.Kit;
-import net.minecraft.class_481;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.GuiLighting;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.item.ItemStack;
@@ -35,7 +35,6 @@ public class InventoryCfgGUI extends Screen {
     private final ItemStack[] items;
     private final ItemStack[] armor;
 
-    @SuppressWarnings("unchecked")
     @Override
     public void init() {
         buttons.add(new ButtonWidget(0, width / 2 - 100, height / 6 + 150, 100, 20, "Set Current"));
@@ -67,14 +66,12 @@ public class InventoryCfgGUI extends Screen {
             int y = height / 6 + 100 + (i / 9) * 18 + (i < 9 ? 76 : 0) - 67;
             if (items[i] != null) {
                 // draw item
-                itemRenderer.method_5762(textRenderer,
-                        client.getTextureManager(),
+                itemRenderer.renderItem(
                         items[i],
                         x,
                         y);
                 // draw count
                 itemRenderer.method_1549(textRenderer,
-                        client.getTextureManager(),
                         items[i],
                         x,
                         y);
@@ -85,14 +82,12 @@ public class InventoryCfgGUI extends Screen {
             int y = height / 6 + 100 + 76 - 67 - 80;
             if (armor[i] != null) {
                 // draw item
-                itemRenderer.method_5762(textRenderer,
-                        client.getTextureManager(),
+                itemRenderer.renderItem(
                         armor[i],
                         x,
                         y);
                 // draw count
                 itemRenderer.method_1549(textRenderer,
-                        client.getTextureManager(),
                         armor[i],
                         x,
                         y);
@@ -106,7 +101,7 @@ public class InventoryCfgGUI extends Screen {
     protected void buttonClicked(ButtonWidget button) {
         switch (button.id) {
             case 0:
-                class_481 thePlayer = MinecraftClient.getInstance().field_3805;
+                ClientPlayerEntity thePlayer = MinecraftClient.getInstance().player;
                 if (thePlayer != null) {
                     EndFightMod.setInventory(thePlayer, obj);
                     client.openScreen(new InventoryCfgGUI(from, obj));

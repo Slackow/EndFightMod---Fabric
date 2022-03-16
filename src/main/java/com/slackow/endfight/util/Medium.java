@@ -19,6 +19,7 @@ public class Medium {
     public static double targetY;
     public static double targetZ;
     public static List<EndFightCommand> commandMap;
+    public static boolean hitboxes = false;
 
     // method_4328
     // I didn't know where else to place this method it doesn't really fit here
@@ -28,7 +29,7 @@ public class Medium {
         GL11.glDisable(2896);
         GL11.glDisable(2884);
         GL11.glDisable(3042);
-        WorldRenderer.method_6886(box, color);
+        //TODO IMPLEMENT FROM 1.7.10 WorldRenderer.method_6886(box, color);
         GL11.glEnable(3553);
         GL11.glEnable(2896);
         GL11.glEnable(2884);

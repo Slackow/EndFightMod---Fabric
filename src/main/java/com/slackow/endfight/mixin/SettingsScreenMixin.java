@@ -19,14 +19,10 @@ import java.util.function.Predicate;
 
 @Mixin(SettingsScreen.class)
 public class SettingsScreenMixin extends Screen {
-    @Shadow @Final private Screen parent;
 
-    @Shadow @Final private GameOptions options;
-
-    @SuppressWarnings("unchecked")
     @Inject(method = "init", at = @At("TAIL"))
     private void init(CallbackInfo ci){
-        buttons.removeIf((Predicate<ButtonWidget>) button -> button.id == 107);
+        buttons.removeIf(button -> button.id == 107);
         buttons.add(new ButtonWidget(6_22_2019, width / 2 + 5, height / 6 + 72 - 6, 150, 20, "End Fight Settings..."));
     }
 

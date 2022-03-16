@@ -13,7 +13,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class ClientPlayNetworkHandlerMixin {
     @Inject(method = "onGameJoin", at = @At("TAIL"))
     private void onJoin(GameJoinS2CPacket par1, CallbackInfo ci){
-
-        MinecraftClient.getInstance().field_3805.sendMessage(new LiteralText("End Fight Mod Enabled"));
+        MinecraftClient.getInstance().player.sendMessage(new LiteralText("End Fight Mod Enabled"));
     }
 }

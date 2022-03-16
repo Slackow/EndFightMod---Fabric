@@ -31,8 +31,6 @@ public abstract class EndCrystalMixin extends Entity {
     private void damage(DamageSource amount, float par2, CallbackInfoReturnable<Boolean> cir){
         if (cir.getReturnValue()) {
             if (!world.isClient && BigConfig.getSelectedConfig().dGodCrystals) {
-
-                //noinspection unchecked
                 List<PlayerEntity> list = this.world.playerEntities;
                 PlayerEntity player = list.get(0);
                 player.sendMessage(new LiteralText("§" + (state = (char) ('c' + '4' - state)) + "*BOOM*"));

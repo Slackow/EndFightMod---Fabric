@@ -1,7 +1,6 @@
 package com.slackow.endfight.mixin;
 
 import com.slackow.endfight.EndFightMod;
-import com.slackow.endfight.config.BigConfig;
 import com.slackow.endfight.util.Medium;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
@@ -46,7 +45,7 @@ public abstract class EnderDragonEntityMixin extends LivingEntity {
     public void onDamage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
         if (cir.getReturnValue()) {
             if (getSelectedConfig().damageInfo) {
-                MinecraftClient.getInstance().field_3805.sendMessage(new LiteralText("Dragon damaged by " + source.getName() + ": " + amount));
+                MinecraftClient.getInstance().player.sendMessage(new LiteralText("Dragon damaged by " + source.getName() + ": " + amount));
             }
             if (getSelectedConfig().dGodDragon) {
                 setHealth(getMaxHealth() - amount);
@@ -54,7 +53,7 @@ public abstract class EnderDragonEntityMixin extends LivingEntity {
             if (getHealth() <= 0) {
                 int seconds = (int) ((System.currentTimeMillis() - EndFightMod.time) / 1000);
                 seconds = clamp(seconds, 0, 86399);
-                MinecraftClient.getInstance().field_3805.sendMessage(
+                MinecraftClient.getInstance().player.sendMessage(
                         new LiteralText("Dragon Killed in about " + LocalTime.ofSecondOfDay(seconds)
                                 .format(DateTimeFormatter.ofPattern("mm:ss")) + " [RTA]"));
                 EndFightMod.time = System.currentTimeMillis();
@@ -81,7 +80,6 @@ public abstract class EnderDragonEntityMixin extends LivingEntity {
         if (!world.isClient && getSelectedConfig().chaosTech > 0) {
             if (lastSetNewTargetCount != setNewTargetCounter) {
                 lastSetNewTargetCount = setNewTargetCounter;
-                //noinspection unchecked
                 List<PlayerEntity> list = this.world.playerEntities;
                 PlayerEntity player = list.get(0);
                 double targetX = player.x;
@@ -93,7 +91,7 @@ public abstract class EnderDragonEntityMixin extends LivingEntity {
                 if (v > 10.0D) {
                     v = 10.0D;
                 }
-                double targetY = player.boundingBox.minY + v;
+                double targetY = player.getBoundingBox().minY + v;
                 double dist = this.myDistanceTo(targetX, targetY, targetZ);
                 if (dist >= 10.0 && dist <= 150.0D && (getSelectedConfig().chaosTech == 1 || bedDamaged > 0)) {
                     // System.out.println("you got the strat");
@@ -122,7 +120,7 @@ public abstract class EnderDragonEntityMixin extends LivingEntity {
             int seconds = (int) ((System.currentTimeMillis() - EndFightMod.time) / 1000);
             seconds = clamp(seconds, 0, 186399);
             String format = LocalTime.ofSecondOfDay(seconds).format(DateTimeFormatter.ofPattern("h:mm:ss"));
-            MinecraftClient.getInstance().field_3805.sendMessage(new LiteralText("\u00A7" + (6 + ((a++) & 3)) +
+            MinecraftClient.getInstance().player.sendMessage(new LiteralText("\u00A7" + (6 + ((a++) & 3)) +
                     "Rolled 50/50 at " + format + " targeted (" + (target != null ? "player" : "block") + ")"));
 //            System.out.println("------------------");
 //            System.out.println(setNewTargetCounter);

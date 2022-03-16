@@ -15,7 +15,6 @@ public class RemoveGUI<T extends Renameable> extends Screen {
         this.from = from;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void init() {
         buttons.add(new ButtonWidget(0, width / 2 - 100, height / 6 + 100 - 10, 100, 20, "Back"));

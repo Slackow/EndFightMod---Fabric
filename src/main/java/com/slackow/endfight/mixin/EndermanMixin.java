@@ -20,7 +20,7 @@ public abstract class EndermanMixin extends HostileEntity {
     public Vec3d isStaring(Vec3d value) {
         if (BigConfig.getSelectedConfig().enderMan == 1) {
             // Replace player direction with looking straight down
-            return Vec3d.of(0, -1, 0);
+            return new Vec3d(0, -1, 0);
         } else {
             return value;
         }

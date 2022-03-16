@@ -30,7 +30,6 @@ public class ListGUI<T extends Renameable> extends Screen {
         this.save = save;
         this.title = title;
     }
-    @SuppressWarnings("unchecked")
     public void init() {
         this.buttons.clear();
         boolean hasPages = data.size() > 5;

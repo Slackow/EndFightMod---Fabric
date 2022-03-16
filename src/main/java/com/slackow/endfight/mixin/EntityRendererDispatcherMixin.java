@@ -9,23 +9,27 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.BowItem;
 import net.minecraft.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-import static net.minecraft.client.render.entity.EntityRenderDispatcher.field_5192;
-
 @Mixin(EntityRenderDispatcher.class)
-public class EntityRendererDispatcherMixin {
+public abstract class EntityRendererDispatcherMixin {
+    @Shadow private boolean renderHitboxes;
+
     @Redirect(method = "method_6913", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;isInvisible()Z"))
     private boolean render(Entity d){
-        if (field_5192 && d instanceof EndCrystalEntity && BigConfig.getSelectedConfig().arrowHelp) {
+        if (renderHitboxes && d instanceof EndCrystalEntity && BigConfig.getSelectedConfig().arrowHelp) {
             MinecraftClient client = MinecraftClient.getInstance();
-            PlayerInventory inv = client.field_3805.inventory;
+            PlayerInventory inv = client.player.inventory;
             ItemStack itemStack = inv.main[inv.selectedSlot];
-            if (itemStack.getItem() instanceof BowItem && client.field_3805.method_3192() > 0) {
+            if (itemStack.getItem() instanceof BowItem && client.player.method_3192() > 0) {
                 return true;
             }
         }
         return d.isInvisible();
     }
+    @Accessor("renderHitboxes")
+    public abstract boolean renderHitboxes();
 }

@@ -26,10 +26,9 @@ public class KeybindGUI extends Screen {
         this.obj = obj;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void init() {
-        textField = new TextFieldWidget(textRenderer, width / 2 - 73, height / 2 - 22, 146, 20);
+        textField = new TextFieldWidget(-1, textRenderer, width / 2 - 73, height / 2 - 22, 146, 20);
         textField.setMaxLength(512);
         textField.setText(obj.message);
         keyButton = new ButtonWidget(0, width / 2 - 75, height / 2, 90, 20, "");

@@ -5,7 +5,7 @@ import com.slackow.endfight.util.KeyBind;
 import com.slackow.endfight.util.Kit;
 import net.minecraft.util.crash.CrashException;
 import net.minecraft.util.crash.CrashReport;
-import net.minecraft.world.GameMode;
+import net.minecraft.world.level.LevelInfo.GameMode;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -164,7 +164,7 @@ public class BigConfig {
             sj.add("selectedIsland=" + cfg.selectedIsland);
             sj.add("islands=" + cfg.islands.stream().map(Island::toString).collect(Collectors.joining(";")));
             sj.add("keyBindings=" + cfg.keyBindings.stream().map(KeyBind::toString).collect(Collectors.joining(";")));
-            sj.add("gamemode=" + cfg.gamemode.getGameModeId());
+            sj.add("gamemode=" + cfg.gamemode.getId());
             sj.add("showSettings=" + cfg.showSettings);
             sj.add("chaosTech=" + cfg.chaosTech);
             sj.add("dGodCrystals=" + cfg.dGodCrystals);

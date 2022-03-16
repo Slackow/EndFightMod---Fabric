@@ -5,6 +5,7 @@ import com.slackow.endfight.EndFightMod;
 import com.slackow.endfight.commands.ResetCommand;
 import com.slackow.endfight.config.BigConfig;
 import com.slackow.endfight.util.Medium;
+import net.minecraft.command.Command;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.CommandSource;
 import net.minecraft.entity.EndCrystalEntity;
@@ -15,16 +16,14 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.CommandRegistry;
 import net.minecraft.text.LiteralText;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static net.minecraft.util.Formatting.RED;
@@ -58,7 +57,7 @@ public abstract class CommandManagerMixin extends CommandRegistry {
                         player.setHealth(20f);
                         player.extinguish();
                         if (god) {
-                            player.addStatusEffect(new StatusEffectInstance(11, 100000, 255, true));
+                            player.addStatusEffect(new StatusEffectInstance(11, 100000, 255, true, false));
                         } else {
                             player.clearStatusEffects();
                         }
@@ -93,7 +92,7 @@ public abstract class CommandManagerMixin extends CommandRegistry {
             }
 
             @Override
-            public List<String> method_3276(CommandSource source, String[] args) {
+            public List<String> getAutoCompleteHints(CommandSource source, String[] args, BlockPos pos) {
                 if (args.length == 1) {
                     if (args[0].isEmpty()) {
                         return Arrays.asList("crystal", "dragon");
@@ -326,10 +325,10 @@ public abstract class CommandManagerMixin extends CommandRegistry {
                 }
             }
         });
-        //noinspection unchecked
-        Medium.commandMap = (List<EndFightCommand>) getCommandMap().values().stream()
+        Medium.commandMap = getCommandMap().values().stream()
                 .filter(cmd -> cmd instanceof EndFightCommand)
-                .sorted()
+                .map(EndFightCommand.class::cast)
+                .sorted(Comparator.comparing(Command::getCommandName))
                 .collect(Collectors.toList());
     }
 

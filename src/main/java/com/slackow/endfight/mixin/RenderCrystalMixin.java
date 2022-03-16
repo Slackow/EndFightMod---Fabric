@@ -4,7 +4,6 @@ import com.slackow.endfight.config.BigConfig;
 import com.slackow.endfight.util.FakeArrow;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.entity.EnderCrystalEntityRenderer;
-import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.entity.EndCrystalEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.BowItem;
@@ -23,11 +22,11 @@ public class RenderCrystalMixin {
     private void render(EndCrystalEntity d, double e, double f, double g, float h, float par6, CallbackInfo ci) {
         if (BigConfig.getSelectedConfig().arrowHelp) {
             MinecraftClient client = MinecraftClient.getInstance();
-            PlayerInventory inv = client.field_3805.inventory;
+            PlayerInventory inv = client.player.inventory;
             ItemStack itemStack = inv.main[inv.selectedSlot];
             if (itemStack != null && itemStack.getItem() instanceof BowItem) {
 
-                if (client.field_3805.method_3192() > 0) {
+                if (client.player.method_3192() > 0) {
                     FakeArrow arrow = new FakeArrow(client.world, inv.player, 2f, 0.8f);
                     FakeArrow arrow2 = new FakeArrow(client.world, inv.player, 2f, -0.8f);
                     double prevDist;
@@ -64,7 +63,7 @@ public class RenderCrystalMixin {
                     } while (prevDist2 > dist2 && loops > 0);
                     int p = Math.min(255, (int) (((arrow.hasHitCrystal() ? 0 : prevDist) + (arrow2.hasHitCrystal() ? 0 : prevDist2)) * (16.0)));
                     int color = ((p) << 16) | ((255 - p) << 8);
-                    Box box = Box.of(e - bound, f, g - bound, e + bound, f + (double)d.height, g + bound);
+                    Box box = new Box(e - bound, f, g - bound, e + bound, f + (double)d.height, g + bound);
                     drawBox(color, box);
 
 

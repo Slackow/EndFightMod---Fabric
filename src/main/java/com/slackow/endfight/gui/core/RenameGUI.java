@@ -17,10 +17,9 @@ public class RenameGUI<T extends Renameable> extends Screen {
         this.obj = obj;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void init() {
-        textField = new TextFieldWidget(textRenderer, width / 2 - 48, height / 2 - 22, 96, 20);
+        textField = new TextFieldWidget(-1, textRenderer, width / 2 - 48, height / 2 - 22, 96, 20);
         if (cached == null) {
             cached = obj.getName();
         }

@@ -4,7 +4,7 @@ import com.slackow.endfight.util.Island;
 import com.slackow.endfight.util.KeyBind;
 import com.slackow.endfight.util.Kit;
 import com.slackow.endfight.util.Renameable;
-import net.minecraft.world.GameMode;
+import net.minecraft.world.level.LevelInfo.GameMode;
 
 import java.util.ArrayList;
 import java.util.List;

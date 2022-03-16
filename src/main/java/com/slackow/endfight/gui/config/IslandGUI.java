@@ -17,10 +17,9 @@ public class IslandGUI extends Screen {
         this.obj = obj;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void init() {
-        textField = new TextFieldWidget(textRenderer, width / 2 - 73, height / 2 - 22, 146, 20);
+        textField = new TextFieldWidget(0, textRenderer, width / 2 - 73, height / 2 - 22, 146, 20);
         textField.setText(obj.getSeed() + "");
         buttons.add(new ButtonWidget(1, width / 2 - 75 , height / 2, 150, 20, "Copy Current"));
         buttons.add(new ButtonWidget(2, width / 2 - 75 , height / 2 + 22, 150, 20, I18n.translate("gui.done")));

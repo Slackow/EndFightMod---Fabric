@@ -9,13 +9,13 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.GameMode;
+import net.minecraft.world.level.LevelInfo.GameMode;
 import org.lwjgl.input.Keyboard;
 
 import java.util.ArrayList;
 import java.util.Collections;
 
-import static net.minecraft.util.Formatting.*;
+import static net.minecraft.util.Formatting.GRAY;
 
 // Options:
 // Death box visibility, (off, with hitboxes, always)
@@ -65,13 +65,12 @@ public class ConfigGUI extends Screen {
     };
 
 
-    @SuppressWarnings("unchecked")
     @Override
     public void init() {
         buttons.clear();
 
         if (advanced) {
-            buttons.add(new ButtonWidget(9, width / 2 - 155, height / 6 + 65 - 25, 150, 20, gamemode + obj.gamemode.getGameModeName()));
+            buttons.add(new ButtonWidget(9, width / 2 - 155, height / 6 + 65 - 25, 150, 20, gamemode + obj.gamemode.getName()));
             buttons.add(new ButtonWidget(10, width / 2 - 155, height / 6 + 65, 150, 20, buttonName(seeTargetBlock, obj.dSeeTargetBlock)));
             buttons.add(new ButtonWidget(11, width / 2 + 5, height / 6 + 65 - 25, 150, 20, chaosTech + chaosTechNames[obj.chaosTech]));
             buttons.add(new ButtonWidget(12, width / 2 + 5, height / 6 + 65, 150, 20, buttonName(showSettings, obj.showSettings)));
@@ -161,7 +160,7 @@ public class ConfigGUI extends Screen {
                 break;
             case 9:
                 obj.gamemode = obj.gamemode == GameMode.SURVIVAL ? GameMode.CREATIVE : GameMode.SURVIVAL;
-                button.message = gamemode + obj.gamemode.getGameModeName();
+                button.message = gamemode + obj.gamemode.getName();
                 break;
             case 10:
                 obj.dSeeTargetBlock ^= true;

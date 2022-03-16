@@ -16,9 +16,8 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.server.world.ServerWorldManager;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.Formatting;
-import net.minecraft.world.GameMode;
-import net.minecraft.world.level.LevelInfo;
-import net.minecraft.world.level.LevelProperties;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.level.LevelInfo.GameMode;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -45,7 +44,7 @@ public class ResetCommand extends EndFightCommand {
     }
 
     @Override
-    public List<String> method_3276(CommandSource source, String[] args) {
+    public List<String> getAutoCompleteHints(CommandSource source, String[] args, BlockPos pos) {
         if (args.length == 1) {
             return Stream.of("options", "out")
                     .filter(option -> option.startsWith(args[0]))
@@ -65,20 +64,17 @@ public class ResetCommand extends EndFightCommand {
         if (source instanceof PlayerEntity) {
             PlayerEntity player = (PlayerEntity) source;
             MinecraftServer server = MinecraftServer.getServer();
-            for (Object objP : server.getPlayerManager().players) {
-                if (objP instanceof PlayerEntity) {
-                    PlayerEntity p = (PlayerEntity) objP;
-                    if (p.dimension == 1) {
-                        Arrays.fill(p.inventory.main, null);
-                        Arrays.fill(p.inventory.armor, null);
-                        // set creative mode
-                        p.method_3170(GameMode.CREATIVE);
-                        if (!twice) {
-                            p.teleportToDimension(1);
-                        }
-                        p.teleportToDimension(0);
-
+            for (PlayerEntity p : server.getPlayerManager().getPlayers()) {
+                if (p.dimension == 1) {
+                    Arrays.fill(p.inventory.main, null);
+                    Arrays.fill(p.inventory.armor, null);
+                    // set creative mode
+                    p.setGameMode(GameMode.CREATIVE);
+                    if (!twice) {
+                        p.teleportToDimension(1);
                     }
+                    p.teleportToDimension(0);
+
                 }
             }
             File dim1 = new File(MinecraftClient.getInstance().runDirectory, "saves/" + server.getLevelName() + "/DIM1");
@@ -101,12 +97,6 @@ public class ResetCommand extends EndFightCommand {
             }
             if (twice || !endExists){
                 ServerWorld overWorld = server.worlds[0];
-                LevelProperties oldInfo = overWorld.getLevelProperties();
-                LevelInfo levelInfo = new LevelInfo(oldInfo.getSeed(),
-                        oldInfo.method_233(),
-                        oldInfo.hasStructures(),
-                        oldInfo.isHardcore(),
-                        oldInfo.getGeneratorType());
                 long seed;
                 Config cfg = BigConfig.getSelectedConfig();
                 if (cfg.selectedIsland == -2) {
@@ -119,9 +109,9 @@ public class ResetCommand extends EndFightCommand {
 
 
 
-                ServerWorld newEnd = new EndFightWorld(seed, server, overWorld.getSaveHandler(), server.getLevelName(), 1, levelInfo, overWorld, server.profiler);
+                ServerWorld newEnd = new EndFightWorld(seed, server, overWorld.getSaveHandler(), 1, overWorld, server.profiler);
                 // copy difficulty
-                newEnd.field_7173 = overWorld.field_7173;
+                newEnd.getLevelProperties().setDifficulty(overWorld.getGlobalDifficulty());
 
                 server.worlds = ArrayUtils.add(server.worlds, newEnd);
                 server.field_3858 = ArrayUtils.add(server.field_3858, new long[100]);
@@ -129,10 +119,10 @@ public class ResetCommand extends EndFightCommand {
                 heal(player);
                 player.clearStatusEffects();
                 if (cfg.dGodPlayer) {
-                    player.addStatusEffect(new StatusEffectInstance(11, 100000, 255, true));
+                    player.addStatusEffect(new StatusEffectInstance(11, 100000, 255, true, false));
                 }
                 // set Gamemode
-                player.method_3170(cfg.gamemode);
+                player.setGameMode(cfg.gamemode);
                 EndFightMod.giveInventory(player, cfg.inventory);
                 player.teleportToDimension(1);
 

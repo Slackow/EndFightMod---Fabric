@@ -12,8 +12,8 @@ import net.minecraft.world.level.ReadOnlyLevelProperties;
 public class EndFightWorld extends MultiServerWorld {
 
     private static long seed;
-    public EndFightWorld(long seed, MinecraftServer server, SaveHandler saveHandler, String levelName, int i, LevelInfo levelInfo, ServerWorld overWorld, Profiler profiler) {
-        super(g(server, seed), saveHandler, levelName, i, levelInfo, overWorld, profiler);
+    public EndFightWorld(long seed, MinecraftServer server, SaveHandler saveHandler, int i, ServerWorld overWorld, Profiler profiler) {
+        super(g(server, seed), saveHandler, i, overWorld, profiler);
     }
     // awesome hack to run code before super
     private static MinecraftServer g(MinecraftServer server, long seed) {

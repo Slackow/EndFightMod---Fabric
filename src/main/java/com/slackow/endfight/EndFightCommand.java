@@ -18,11 +18,4 @@ public abstract class EndFightCommand extends AbstractCommand {
         return 0;
     }
 
-    @Override
-    public int compareTo(@NotNull Object o) {
-        if (o instanceof EndFightCommand) {
-            return getCommandName().compareTo(((EndFightCommand) o).getCommandName());
-        }
-        return 1;
-    }
 }

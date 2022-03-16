@@ -17,7 +17,6 @@ public class ViewGUI<T extends Renameable> extends Screen {
         this.obj = obj;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void init() {
         this.buttons.clear();
