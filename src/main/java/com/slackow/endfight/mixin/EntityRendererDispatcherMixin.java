@@ -28,7 +28,7 @@ public abstract class EntityRendererDispatcherMixin {
             MinecraftClient client = MinecraftClient.getInstance();
             PlayerInventory inv = client.player.inventory;
             ItemStack itemStack = inv.main[inv.selectedSlot];
-            if (itemStack.getItem() instanceof BowItem && client.player.method_3192() > 0) {
+            if (itemStack != null && itemStack.getItem() instanceof BowItem && client.player.method_3192() > 0) {
                 return true;
             }
         }
