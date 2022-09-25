@@ -1,4 +1,4 @@
-# EndFightMod---Fabric
+# EndFightMod - Fabric (Versions 1.7.10 and 1.8.9)
 
 This mod is tailored to practicing end fights and portions of end fights easily.
 
