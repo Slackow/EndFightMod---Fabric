@@ -4,7 +4,8 @@ This mod is tailored to practicing end fights and portions of end fights easily.
 
 Depends on Legacy Fabric.
 
-Full Tutorial Video: https://youtu.be/fX-jUoXJsw4
+Full Tutorial Video: [Here](https://youtu.be/fX-jUoXJsw4)
+Latest Version: [Here](https://github.com/Slackow/EndFightMod---Fabric/releases/latest)
 
 List of commands:
 - `/reset options` will show you a list of all commands in game
