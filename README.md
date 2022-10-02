@@ -33,6 +33,6 @@ List of options:
 - See how much damage you dealt to the dragon each time
 - Toggle enderman on/no agro/off
 - Also includes a "macro" system that lets you run any command (even vanilla) on keybinds
-- Also includes a system to let you change between randomly generated end islands vs a specific one, or the one in the world you are playing on.
+- Also includes a system tailored to `SSG` that lets you set a specific seed for the End Island, by default all islands are random.
 - Also includes a profile system, allowing you to change between inventories and different settings easily.
 
