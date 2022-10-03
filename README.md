@@ -8,7 +8,7 @@ Depends on Legacy Fabric.
 
 # Latest Version → [Here](https://github.com/Slackow/EndFightMod---Fabric/releases/latest)
 
-List of commands:
+## List of commands:
 - `/reset options` will show you a list of all commands in game
 - `/reset` will take you into the end with your set inventory
 - `/reset out` will allow you to exit the end back into the overworld
@@ -24,15 +24,15 @@ List of commands:
 - `/killcrystals` kills all crystals
 - `/roll` acts as if the dragon took a hit, (rolls a 1/4 chance of it charging you)
 
-List of options:
+## List of options:
 
-- Arrow help (crystals will display if your arrows will hit or not, it's a bit rough but mostly works)
-- Death box visibility (Shows the range in which you have to be in for the dragon to yeet/damage you, helping you learn to dodge)
-- Fully Customizable Inventory on end load
+- **Arrow help** (crystals will display if your arrows will hit or not, it's a bit rough but mostly works)
+- **Death box visibility** (Shows the range in which you have to be in for the dragon to yeet/damage you, helping you learn to dodge)
+- **Customizable Inventory** on end load
 - Healthbar shows dragon health as a number
 - See how much damage you dealt to the dragon each time
 - Toggle enderman on/no agro/off
-- Also includes a "macro" system that lets you run any command (even vanilla) on keybinds
+- **"Command Macros"**: Run any command, vanilla or end fight with a keybind. You can add a keybind to do `/reset`
 - Also includes a system tailored to `SSG` that lets you set a specific seed for the End Island, by default all islands are random.
 - Also includes a profile system, allowing you to change between inventories and different settings easily.
 
