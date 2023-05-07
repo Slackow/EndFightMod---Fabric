@@ -30,10 +30,13 @@
   ],
 
   "depends": {
-    "fabricloader": ">=0.9.0",
+    "fabricloader": ">=0.14.14",
     "minecraft": ["1.7.10"]
   },
   "suggests": {
-    "flamingo": "*"
+    "speedrunigt": "11.4"
+  },
+  "breaks": {
+    "speedrunigt": "!=11.4"
   }
 }
