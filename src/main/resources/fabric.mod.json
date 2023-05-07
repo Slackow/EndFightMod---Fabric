@@ -20,6 +20,9 @@
   "entrypoints": {
     "main": [
       "com.slackow.endfight.EndFightMod"
+    ],
+    "speedrunigt": [
+      "com.slackow.endfight.speedrunigt.EndFightCategory"
     ]
   },
   "mixins": [

@@ -2,8 +2,14 @@ package com.slackow.endfight;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import com.redlimerl.speedrunigt.SpeedRunIGT;
+import com.redlimerl.speedrunigt.api.SpeedRunIGTApi;
+import com.redlimerl.speedrunigt.option.SpeedRunOption;
+import com.redlimerl.speedrunigt.timer.category.RunCategory;
+import com.slackow.endfight.speedrunigt.EndFightCategory;
 import com.slackow.endfight.util.Kit;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.command.CommandException;
 import net.minecraft.entity.player.PlayerEntity;
@@ -18,9 +24,13 @@ import java.util.Collections;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import static com.redlimerl.speedrunigt.option.SpeedRunOptions.TIMER_CATEGORY;
+import static com.slackow.endfight.speedrunigt.EndFightCategory.END_FIGHT_CATEGORY;
+
 public class EndFightMod implements ModInitializer {
 
 	public static long time = System.currentTimeMillis();
+	public static boolean SRIGT_LOADED = false;
 
 	public static void setInventory(PlayerEntity player, Kit kit) {
 		kit.contents = Stream.concat(Arrays.stream(player.inventory.main), Arrays.stream(player.inventory.armor))
@@ -30,7 +40,10 @@ public class EndFightMod implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		//MinecraftClient.getInstance().options.debugEnabled = true;
-
+		SRIGT_LOADED = FabricLoader.getInstance().isModLoaded("speedrunigt");
+		if (SRIGT_LOADED) {
+			SpeedRunOption.setOption(TIMER_CATEGORY, END_FIGHT_CATEGORY);
+		}
 	}
 
 	public static int itemToInt(ItemStack item) {

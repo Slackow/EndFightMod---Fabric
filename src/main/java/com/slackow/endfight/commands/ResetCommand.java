@@ -1,5 +1,7 @@
 package com.slackow.endfight.commands;
 
+import com.redlimerl.speedrunigt.timer.InGameTimer;
+import com.redlimerl.speedrunigt.timer.TimerStatus;
 import com.slackow.endfight.EndFightCommand;
 import com.slackow.endfight.EndFightMod;
 import com.slackow.endfight.config.BigConfig;
@@ -31,6 +33,7 @@ import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.slackow.endfight.speedrunigt.EndFightCategory.END_FIGHT_CATEGORY;
 import static net.minecraft.util.Formatting.*;
 
 public class ResetCommand extends EndFightCommand {
@@ -156,6 +159,14 @@ public class ResetCommand extends EndFightCommand {
 
                 player.sendMessage(new LiteralText("Sent to End"));
                 EndFightMod.time = System.currentTimeMillis();
+                if (EndFightMod.SRIGT_LOADED) {
+                    if (InGameTimer.getInstance().getCategory() == END_FIGHT_CATEGORY) {
+                        InGameTimer.reset();
+                        InGameTimer.getInstance().setCategory(END_FIGHT_CATEGORY, false);
+                        InGameTimer.getInstance().setStatus(TimerStatus.RUNNING);
+                        InGameTimer.getInstance().setStartTime(EndFightMod.time);
+                    }
+                }
             }
 
         }

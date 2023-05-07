@@ -1,7 +1,6 @@
 package com.slackow.endfight.mixin;
 
 import com.slackow.endfight.EndFightMod;
-import com.slackow.endfight.config.BigConfig;
 import com.slackow.endfight.util.Medium;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
@@ -14,6 +13,7 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -58,6 +58,9 @@ public abstract class EnderDragonEntityMixin extends LivingEntity {
                         new LiteralText("Dragon Killed in about " + LocalTime.ofSecondOfDay(seconds)
                                 .format(DateTimeFormatter.ofPattern("mm:ss")) + " [RTA]"));
                 EndFightMod.time = System.currentTimeMillis();
+                if (EndFightMod.SRIGT_LOADED) {
+                    Medium.completeTimerIfEndFight();
+                }
             }
         }
     }

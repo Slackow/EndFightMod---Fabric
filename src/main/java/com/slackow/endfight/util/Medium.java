@@ -1,12 +1,18 @@
 package com.slackow.endfight.util;
 
+import com.redlimerl.speedrunigt.timer.InGameTimer;
 import com.slackow.endfight.EndFightCommand;
+import com.slackow.endfight.EndFightMod;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.server.command.CommandManager;
+import net.minecraft.text.LiteralText;
 import net.minecraft.util.math.Box;
 import org.lwjgl.opengl.GL11;
 
 import java.util.List;
+
+import static com.slackow.endfight.speedrunigt.EndFightCategory.END_FIGHT_CATEGORY;
 
 /**
  * A Hacky way of transferring data between client and server, don't depend on anything useful actually being here
@@ -19,6 +25,7 @@ public class Medium {
     public static double targetY;
     public static double targetZ;
     public static List<EndFightCommand> commandMap;
+    private static boolean switched = false;
 
     // method_4328
     // I didn't know where else to place this method it doesn't really fit here
@@ -34,5 +41,28 @@ public class Medium {
         GL11.glEnable(2884);
         GL11.glDisable(3042);
         GL11.glDepthMask(true);
+    }
+
+
+    /**
+     * I Need to make one of these methods anytime I use SRIGT classes inside a mixin, or you et an error. :/
+     */
+    public static void completeTimerIfEndFight() {
+        if (InGameTimer.getInstance().getCategory() == END_FIGHT_CATEGORY) {
+            InGameTimer.complete(EndFightMod.time, false);
+        }
+    }
+
+
+    public static void onGameJoinIGT() {
+        if (!switched) {
+            switched = true;
+            InGameTimer.getInstance().setCategory(END_FIGHT_CATEGORY, false);
+        }
+        if (InGameTimer.getInstance().getCategory() == END_FIGHT_CATEGORY) {
+            MinecraftClient.getInstance().field_3805.sendMessage(new LiteralText("Loaded End Fight Category w/ SpeedrunIGT"));
+        } else {
+            MinecraftClient.getInstance().field_3805.sendMessage(new LiteralText("Warning: End Fight Category disabled in SpeedrunIGT"));
+        }
     }
 }
