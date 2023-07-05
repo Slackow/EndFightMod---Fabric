@@ -48,7 +48,7 @@ public class EndFightMod implements ModInitializer {
 
 	public static int itemToInt(ItemStack item) {
 		if (item == null) return 0;
-		return item.count << 24 | item.getMeta() << 12 | Item.getRawId(item.getItem());
+		return item.count << 24 | item.getData() << 12 | Item.getRawId(item.getItem());
 	}
 	public static ItemStack intToItem(int num) {
 		if (num == 0) return null;

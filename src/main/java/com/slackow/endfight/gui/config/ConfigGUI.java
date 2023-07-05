@@ -116,13 +116,13 @@ public class ConfigGUI extends Screen {
                 button.message = buttonName(arrowHelp, obj.arrowHelp);
                 break;
             case 4:
-                client.openScreen(new InventoryCfgGUI(this, obj.inventory));
+                client.setScreen(new InventoryCfgGUI(this, obj.inventory));
                 return;
             case 5:
-                client.openScreen(new ListGUI<KeyBind>(this, obj.keyBindings, -1,
+                client.setScreen(new ListGUI<KeyBind>(this, obj.keyBindings, -1,
                         () -> new KeyBind("", Keyboard.KEY_ESCAPE, ""),
                         (gui, keybind) -> { //
-                            client.openScreen(new KeybindGUI(gui, keybind));
+                            client.setScreen(new KeybindGUI(gui, keybind));
                         },
                         (data, selected) -> {
                             obj.keyBindings = data;
@@ -135,7 +135,7 @@ public class ConfigGUI extends Screen {
                 });
                 return;
             case 6:
-                client.openScreen(new ListGUI<>(this, obj.islands, obj.selectedIsland, () -> {
+                client.setScreen(new ListGUI<>(this, obj.islands, obj.selectedIsland, () -> {
                     MinecraftServer server = MinecraftServer.getServer();
                     if (server.worlds.length < 3) {
                         server = null;
@@ -144,7 +144,7 @@ public class ConfigGUI extends Screen {
                     a.setName("");
                     return a;
                 }, (gui, obj) -> { //
-                    client.openScreen(new IslandGUI(gui, obj));
+                    client.setScreen(new IslandGUI(gui, obj));
                 }, (data, selected) -> {
                     obj.islands = data;
                     obj.selectedIsland = selected;
@@ -180,12 +180,12 @@ public class ConfigGUI extends Screen {
                 button.message = buttonName(printDebugMessages, obj.dPrintDebugMessages);
                 break;
             case -1:
-                client.openScreen(new ListGUI<>(from,
+                client.setScreen(new ListGUI<>(from,
                         BigConfig.getBigConfig().configs,
                         BigConfig.getBigConfig().selectedConfig,
                         Config::new,
                         (gui, obj) -> { //
-                            client.openScreen(new ConfigGUI(gui, obj, false));
+                            client.setScreen(new ConfigGUI(gui, obj, false));
                         },
                         (list, selected) -> {
                             if (list.isEmpty()) {
@@ -199,11 +199,11 @@ public class ConfigGUI extends Screen {
                         }, "Profiles"));
                 return;
             case -2:
-                client.openScreen(new ConfigGUI(from, obj, !advanced));
+                client.setScreen(new ConfigGUI(from, obj, !advanced));
                 return;
             case 15:
                 BigConfig.save();
-                client.openScreen(from);
+                client.setScreen(from);
                 return;
         }
         BigConfig.save();

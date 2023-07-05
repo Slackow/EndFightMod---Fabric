@@ -4,8 +4,8 @@ package com.slackow.endfight.mixin;
 import com.redlimerl.speedrunigt.timer.InGameTimer;
 import com.redlimerl.speedrunigt.timer.TimerStatus;
 import com.redlimerl.speedrunigt.timer.category.RunCategory;
-import net.minecraft.class_481;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.entity.player.ControllablePlayerEntity;
 import net.minecraft.text.LiteralText;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
@@ -27,7 +27,7 @@ public abstract class InGameTimerMixin {
     public void setCategory(RunCategory category, boolean canSendPacket, CallbackInfo ci){
         if (category == END_FIGHT_CATEGORY) {
             setStatus(TimerStatus.NONE);
-            class_481 player = MinecraftClient.getInstance().field_3805;
+            ControllablePlayerEntity player = MinecraftClient.getInstance().field_3805;
             // canSendPacket only true if done through GUI
             if (player != null && canSendPacket) {
                 player.sendMessage(new LiteralText("Timer will start on execution of /reset"));

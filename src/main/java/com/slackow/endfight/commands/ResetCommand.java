@@ -106,7 +106,7 @@ public class ResetCommand extends EndFightCommand {
                 ServerWorld overWorld = server.worlds[0];
                 LevelProperties oldInfo = overWorld.getLevelProperties();
                 LevelInfo levelInfo = new LevelInfo(oldInfo.getSeed(),
-                        oldInfo.method_233(),
+                        oldInfo.getGamemode(),
                         oldInfo.hasStructures(),
                         oldInfo.isHardcore(),
                         oldInfo.getGeneratorType());

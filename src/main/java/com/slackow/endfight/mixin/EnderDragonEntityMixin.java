@@ -120,8 +120,8 @@ public abstract class EnderDragonEntityMixin extends LivingEntity {
 
     @Inject(method = "method_2906", at = @At("TAIL"))
     public void newTarget(CallbackInfo ci){
+        setNewTargetCounter++;
         if (!world.isClient && getSelectedConfig().dPrintDebugMessages) {
-            setNewTargetCounter++;
             int seconds = (int) ((System.currentTimeMillis() - EndFightMod.time) / 1000);
             seconds = clamp(seconds, 0, 186399);
             String format = LocalTime.ofSecondOfDay(seconds).format(DateTimeFormatter.ofPattern("h:mm:ss"));

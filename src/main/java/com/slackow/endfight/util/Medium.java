@@ -5,6 +5,7 @@ import com.slackow.endfight.EndFightCommand;
 import com.slackow.endfight.EndFightMod;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.WorldRenderer;
+import net.minecraft.entity.player.ControllablePlayerEntity;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.math.Box;
@@ -48,21 +49,25 @@ public class Medium {
      * I Need to make one of these methods anytime I use SRIGT classes inside a mixin, or you et an error. :/
      */
     public static void completeTimerIfEndFight() {
-        if (InGameTimer.getInstance().getCategory() == END_FIGHT_CATEGORY) {
-            InGameTimer.complete(EndFightMod.time, false);
+        InGameTimer timer = InGameTimer.getInstance();
+        if (timer.getCategory() == END_FIGHT_CATEGORY && timer.isPlaying()) {
+            InGameTimer.complete();
         }
     }
 
 
     public static void onGameJoinIGT() {
+        InGameTimer timer = InGameTimer.getInstance();
+        ControllablePlayerEntity player = MinecraftClient.getInstance().field_3805;
+
         if (!switched) {
             switched = true;
-            InGameTimer.getInstance().setCategory(END_FIGHT_CATEGORY, false);
+            timer.setCategory(END_FIGHT_CATEGORY, false);
         }
-        if (InGameTimer.getInstance().getCategory() == END_FIGHT_CATEGORY) {
-            MinecraftClient.getInstance().field_3805.sendMessage(new LiteralText("Loaded End Fight Category w/ SpeedrunIGT"));
+        if (timer.getCategory() == END_FIGHT_CATEGORY) {
+            player.sendMessage(new LiteralText("Loaded End Fight Category w/ SpeedrunIGT"));
         } else {
-            MinecraftClient.getInstance().field_3805.sendMessage(new LiteralText("Warning: End Fight Category disabled in SpeedrunIGT"));
+            player.sendMessage(new LiteralText("Warning: End Fight Category disabled in SpeedrunIGT"));
         }
     }
 }

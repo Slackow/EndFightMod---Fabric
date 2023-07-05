@@ -64,7 +64,7 @@ public class IslandGUI extends Screen {
                 seed = textField.getText().hashCode();
             }
             obj.setSeed(seed);
-            client.openScreen(from);
+            client.setScreen(from);
         }
         super.buttonClicked(button);
     }

@@ -12,17 +12,17 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-import static net.minecraft.client.render.entity.EntityRenderDispatcher.field_5192;
+import static net.minecraft.client.render.entity.EntityRenderDispatcher.renderHitboxes;
 
 @Mixin(EntityRenderDispatcher.class)
 public class EntityRendererDispatcherMixin {
     @Redirect(method = "method_6913", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;isInvisible()Z"))
     private boolean render(Entity d){
-        if (field_5192 && d instanceof EndCrystalEntity && BigConfig.getSelectedConfig().arrowHelp) {
+        if (renderHitboxes && d instanceof EndCrystalEntity && BigConfig.getSelectedConfig().arrowHelp) {
             MinecraftClient client = MinecraftClient.getInstance();
             PlayerInventory inv = client.field_3805.inventory;
             ItemStack itemStack = inv.main[inv.selectedSlot];
-            if (itemStack != null && itemStack.getItem() instanceof BowItem && client.field_3805.method_3192() > 0) {
+            if (itemStack != null && itemStack.getItem() instanceof BowItem && client.field_3805.getItemUseTicks() > 0) {
                 return true;
             }
         }

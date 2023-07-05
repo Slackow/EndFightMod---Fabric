@@ -8,7 +8,7 @@ package com.slackow.endfight.util;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.Block;
-import net.minecraft.block.Material;
+import net.minecraft.block.material.Material;
 import net.minecraft.entity.EndCrystalEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -18,8 +18,8 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.Projectile;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.util.hit.HitResult;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -123,10 +123,10 @@ public class FakeArrow extends Entity implements Projectile {
             this.prevPitch = this.pitch = (float)(Math.atan2(this.velocityY, (double)var1) * 180.0D / 3.1415927410125732D);
         }
 
-        Block var16 = this.world.method_3774(this.blockX, this.blockY, this.blockZ);
+        Block var16 = this.world.getBlock(this.blockX, this.blockY, this.blockZ);
         if (var16.getMaterial() != Material.AIR) {
-            var16.method_425(this.world, this.blockX, this.blockY, this.blockZ);
-            Box var2 = var16.method_454(this.world, this.blockX, this.blockY, this.blockZ);
+            var16.onRender(this.world, this.blockX, this.blockY, this.blockZ);
+            Box var2 = var16.getBoundingBox(this.world, this.blockX, this.blockY, this.blockZ);
             if (var2 != null && var2.contains(Vec3d.of(this.x, this.y, this.z))) {
                 this.inGround = true;
             }
@@ -156,7 +156,7 @@ public class FakeArrow extends Entity implements Projectile {
             ++this.field_4022;
             Vec3d var17 = Vec3d.of(this.x, this.y, this.z);
             Vec3d var3 = Vec3d.of(this.x + this.velocityX, this.y + this.velocityY, this.z + this.velocityZ);
-            HitResult var4 = this.world.rayTrace(var17, var3, false, true, false);
+            BlockHitResult var4 = this.world.rayTrace(var17, var3, false, true, false);
             var17 = Vec3d.of(this.x, this.y, this.z);
             var3 = Vec3d.of(this.x + this.velocityX, this.y + this.velocityY, this.z + this.velocityZ);
             if (var4 != null) {
@@ -174,7 +174,7 @@ public class FakeArrow extends Entity implements Projectile {
                 if (var10.collides() && (var10 != this.owner || this.field_4022 >= 5)) {
                     var11 = 0.3F;
                     Box var12 = var10.boundingBox.expand((double)var11, (double)var11, (double)var11);
-                    HitResult var13 = var12.method_585(var17, var3);
+                    BlockHitResult var13 = var12.method_585(var17, var3);
                     if (var13 != null) {
                         double var14 = var17.distanceTo(var13.pos);
                         if (var14 < var7 || var7 == 0.0D) {
@@ -186,7 +186,7 @@ public class FakeArrow extends Entity implements Projectile {
             }
 
             if (var5 != null) {
-                var4 = new HitResult(var5);
+                var4 = new BlockHitResult(var5);
             }
 
             if (var4 != null && var4.entity instanceof PlayerEntity) {
@@ -225,7 +225,7 @@ public class FakeArrow extends Entity implements Projectile {
                     this.blockX = var4.x;
                     this.blockY = var4.y;
                     this.blockZ = var4.z;
-                    this.block = this.world.method_3774(this.blockX, this.blockY, this.blockZ);
+                    this.block = this.world.getBlock(this.blockX, this.blockY, this.blockZ);
                     this.blockData = this.world.getBlockData(this.blockX, this.blockY, this.blockZ);
                     this.velocityX = (double)((float)(var4.pos.x - this.x));
                     this.velocityY = (double)((float)(var4.pos.y - this.y));
@@ -239,14 +239,14 @@ public class FakeArrow extends Entity implements Projectile {
                     this.shake = 7;
                     this.setCritical(false);
                     if (this.block.getMaterial() != Material.AIR) {
-                        this.block.method_416(this.world, this.blockX, this.blockY, this.blockZ, this);
+                        this.block.onEntityCollision(this.world, this.blockX, this.blockY, this.blockZ, this);
                     }
                 }
             }
 
             if (this.isCritical()) {
                 for(var9 = 0; var9 < 4; ++var9) {
-                    this.world.method_3621("crit", this.x + this.velocityX * (double)var9 / 4.0D, this.y + this.velocityY * (double)var9 / 4.0D, this.z + this.velocityZ * (double)var9 / 4.0D, -this.velocityX, -this.velocityY + 0.2D, -this.velocityZ);
+                    this.world.spawnParticle("crit", this.x + this.velocityX * (double)var9 / 4.0D, this.y + this.velocityY * (double)var9 / 4.0D, this.z + this.velocityZ * (double)var9 / 4.0D, -this.velocityX, -this.velocityY + 0.2D, -this.velocityZ);
                 }
             }
 
@@ -278,7 +278,7 @@ public class FakeArrow extends Entity implements Projectile {
             if (this.isTouchingWater()) {
                 for(int var25 = 0; var25 < 4; ++var25) {
                     var26 = 0.25F;
-                    this.world.method_3621("bubble", this.x - this.velocityX * (double)var26, this.y - this.velocityY * (double)var26, this.z - this.velocityZ * (double)var26, this.velocityX, this.velocityY, this.velocityZ);
+                    this.world.spawnParticle("bubble", this.x - this.velocityX * (double)var26, this.y - this.velocityY * (double)var26, this.z - this.velocityZ * (double)var26, this.velocityX, this.velocityY, this.velocityZ);
                 }
 
                 var23 = 0.8F;
@@ -301,7 +301,7 @@ public class FakeArrow extends Entity implements Projectile {
         return hitCrystal;
     }
 
-    public void writeCustomDataToTag(CompoundTag tag) {
+    public void writeCustomDataToNbt(NbtCompound tag) {
         tag.putShort("xTile", (short)this.blockX);
         tag.putShort("yTile", (short)this.blockY);
         tag.putShort("zTile", (short)this.blockZ);
@@ -314,7 +314,7 @@ public class FakeArrow extends Entity implements Projectile {
         tag.putDouble("damage", this.damage);
     }
 
-    public void readCustomDataFromTag(CompoundTag tag) {
+    public void readCustomDataFromNbt(NbtCompound tag) {
         this.blockX = tag.getShort("xTile");
         this.blockY = tag.getShort("yTile");
         this.blockZ = tag.getShort("zTile");

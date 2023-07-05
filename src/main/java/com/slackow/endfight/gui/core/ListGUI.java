@@ -73,7 +73,7 @@ public class ListGUI<T extends Renameable> extends Screen {
         if (button.id >= 0 && button.id < 5) {
             int index = button.id + page * 5;
             if (!isSelectable() || index == selected) {
-                client.openScreen(new ViewGUI<>(this, data.get(index)));
+                client.setScreen(new ViewGUI<>(this, data.get(index)));
             } else {
                 selected = index;
                 reinit();
@@ -92,11 +92,11 @@ public class ListGUI<T extends Renameable> extends Screen {
                 if (isSelectable()) {
                     selected = data.size() - 1;
                 }
-                client.openScreen(new ViewGUI<>(this, obj));
+                client.setScreen(new ViewGUI<>(this, obj));
             }
         } else if (button.id == 8) {
             save();
-            client.openScreen(from);
+            client.setScreen(from);
         }
         super.buttonClicked(button);
     }
@@ -104,7 +104,7 @@ public class ListGUI<T extends Renameable> extends Screen {
     private void reinit() {
         ListGUI<T> screen = new ListGUI<>(from, data, selected, getNewItem, editObj, save, title);
         screen.page = page;
-        client.openScreen(screen);
+        client.setScreen(screen);
     }
 
     private int tick = 0;

@@ -7,7 +7,7 @@ import com.slackow.endfight.gui.core.ListGUI;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.SettingsScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.options.GameOptions;
+import net.minecraft.client.option.GameOptions;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -33,7 +33,7 @@ public class SettingsScreenMixin extends Screen {
     @Inject(method = "buttonClicked", at = @At("TAIL"))
     private void buttonClicked(ButtonWidget par1, CallbackInfo ci) {
         if (par1.id == 6_22_2019) {
-            client.openScreen(new ConfigGUI(this, BigConfig.getSelectedConfig(), false));
+            client.setScreen(new ConfigGUI(this, BigConfig.getSelectedConfig(), false));
         }
     }
 }

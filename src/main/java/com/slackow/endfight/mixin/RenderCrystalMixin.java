@@ -27,7 +27,7 @@ public class RenderCrystalMixin {
             ItemStack itemStack = inv.main[inv.selectedSlot];
             if (itemStack != null && itemStack.getItem() instanceof BowItem) {
 
-                if (client.field_3805.method_3192() > 0) {
+                if (client.field_3805.getItemUseTicks() > 0) {
                     FakeArrow arrow = new FakeArrow(client.world, inv.player, 2f, 0.8f);
                     FakeArrow arrow2 = new FakeArrow(client.world, inv.player, 2f, -0.8f);
                     double prevDist;
