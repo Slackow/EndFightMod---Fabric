@@ -57,6 +57,9 @@ public abstract class EnderDragonEntityMixin extends LivingEntity {
                         new LiteralText("Dragon Killed in about " + LocalTime.ofSecondOfDay(seconds)
                                 .format(DateTimeFormatter.ofPattern("mm:ss")) + " [RTA]"));
                 EndFightMod.time = System.currentTimeMillis();
+                if (EndFightMod.SRIGT_LOADED) {
+                    Medium.completeTimerIfEndFight();
+                }
             }
         }
     }

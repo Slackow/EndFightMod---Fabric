@@ -39,16 +39,16 @@ public class ViewGUI<T extends Renameable> extends Screen {
                 from.getEditObj().accept(this, obj);
                 break;
             case 2:
-                client.openScreen(new RenameGUI<>(this, obj));
+                client.setScreen(new RenameGUI<>(this, obj));
                 break;
             case 3:
-                client.openScreen(new RemoveGUI<>(this));
+                client.setScreen(new RemoveGUI<>(this));
                 break;
             case 4:
                 if (obj.getName().isEmpty()) {
                     remove();
                 }
-                client.openScreen(from);
+                client.setScreen(from);
                 break;
         }
         super.buttonClicked(button);

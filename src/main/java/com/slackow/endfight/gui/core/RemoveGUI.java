@@ -26,9 +26,9 @@ public class RemoveGUI<T extends Renameable> extends Screen {
     protected void buttonClicked(ButtonWidget button) {
         if (button.id == 1) {
             from.remove();
-            MinecraftClient.getInstance().openScreen(from.from);
+            MinecraftClient.getInstance().setScreen(from.from);
         } else {
-            MinecraftClient.getInstance().openScreen(from);
+            MinecraftClient.getInstance().setScreen(from);
         }
     }
 

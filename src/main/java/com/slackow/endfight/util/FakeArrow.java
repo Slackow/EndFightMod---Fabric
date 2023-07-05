@@ -10,7 +10,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Material;
+import net.minecraft.block.material.Material;
 import net.minecraft.client.particle.ParticleType;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EndCrystalEntity;
@@ -22,11 +22,10 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.Projectile;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.packet.s2c.play.GameStateChangeS2CPacket;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
@@ -200,7 +199,7 @@ public class FakeArrow extends Entity implements Projectile {
             ++this.field_4022;
             Vec3d vec3d = new Vec3d(this.x, this.y, this.z);
             Vec3d vec3d2 = new Vec3d(this.x + this.velocityX, this.y + this.velocityY, this.z + this.velocityZ);
-            HitResult hitResult = this.world.rayTrace(vec3d, vec3d2, false, true, false);
+            BlockHitResult hitResult = this.world.rayTrace(vec3d, vec3d2, false, true, false);
             vec3d = new Vec3d(this.x, this.y, this.z);
             vec3d2 = new Vec3d(this.x + this.velocityX, this.y + this.velocityY, this.z + this.velocityZ);
             if (hitResult != null) {
@@ -208,7 +207,7 @@ public class FakeArrow extends Entity implements Projectile {
             }
 
             Entity entity = null;
-            List<Entity> list = this.world.getEntitiesIn(this, this.getBoundingBox().incrementAll(this.velocityX, this.velocityY, this.velocityZ).expand(1.0D, 1.0D, 1.0D));
+            List<Entity> list = this.world.getEntitiesIn(this, this.getBoundingBox().stretch(this.velocityX, this.velocityY, this.velocityZ).expand(1.0D, 1.0D, 1.0D));
             double d = 0.0D;
 
             int n;
@@ -218,7 +217,7 @@ public class FakeArrow extends Entity implements Projectile {
                 if (entity2.collides() && (entity2 != this.field_4026 || this.field_4022 >= 5)) {
                     q = 0.3F;
                     Box box2 = entity2.getBoundingBox().expand((double)q, (double)q, (double)q);
-                    HitResult hitResult2 = box2.method_585(vec3d, vec3d2);
+                    BlockHitResult hitResult2 = box2.method_585(vec3d, vec3d2);
                     if (hitResult2 != null) {
                         double e = vec3d.squaredDistanceTo(hitResult2.pos);
                         if (e < d || d == 0.0D) {
@@ -230,11 +229,11 @@ public class FakeArrow extends Entity implements Projectile {
             }
 
             if (entity != null) {
-                hitResult = new HitResult(entity);
+                hitResult = new BlockHitResult(entity);
             }
 
-            if (hitResult != null && hitResult.entitiy != null && hitResult.entitiy instanceof PlayerEntity) {
-                PlayerEntity playerEntity = (PlayerEntity)hitResult.entitiy;
+            if (hitResult != null && hitResult.entity != null && hitResult.entity instanceof PlayerEntity) {
+                PlayerEntity playerEntity = (PlayerEntity)hitResult.entity;
                 if (playerEntity.abilities.invulnerable || this.field_4026 instanceof PlayerEntity && !((PlayerEntity)this.field_4026).shouldDamagePlayer(playerEntity)) {
                     hitResult = null;
                 }
@@ -243,7 +242,7 @@ public class FakeArrow extends Entity implements Projectile {
             float o;
             float l;
             if (hitResult != null) {
-                if (hitResult.entitiy != null) {
+                if (hitResult.entity != null) {
                     o = MathHelper.sqrt(this.velocityX * this.velocityX + this.velocityY * this.velocityY + this.velocityZ * this.velocityZ);
                     int k = MathHelper.ceil((double)o * this.damage);
                     if (this.method_3227()) {
@@ -252,11 +251,11 @@ public class FakeArrow extends Entity implements Projectile {
 
 
 
-                    if (this.isOnFire() && !(hitResult.entitiy instanceof EndermanEntity)) {
-                        hitResult.entitiy.setOnFireFor(5);
+                    if (this.isOnFire() && !(hitResult.entity instanceof EndermanEntity)) {
+                        hitResult.entity.setOnFireFor(5);
                     }
 
-                    if (hitResult.entitiy instanceof EndCrystalEntity) {
+                    if (hitResult.entity instanceof EndCrystalEntity) {
                         hitCrystal = true;
                     }
 
@@ -346,7 +345,7 @@ public class FakeArrow extends Entity implements Projectile {
         }
     }
 
-    public void writeCustomDataToTag(CompoundTag tag) {
+    public void writeCustomDataToNbt(NbtCompound tag) {
         tag.putShort("xTile", (short)this.blockX);
         tag.putShort("yTile", (short)this.blockY);
         tag.putShort("zTile", (short)this.blockZ);
@@ -360,7 +359,7 @@ public class FakeArrow extends Entity implements Projectile {
         tag.putDouble("damage", this.damage);
     }
 
-    public void readCustomDataFromTag(CompoundTag tag) {
+    public void readCustomDataFromNbt(NbtCompound tag) {
         this.blockX = tag.getShort("xTile");
         this.blockY = tag.getShort("yTile");
         this.blockZ = tag.getShort("zTile");

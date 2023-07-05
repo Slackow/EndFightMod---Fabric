@@ -1,9 +1,7 @@
 package com.slackow.endfight.mixin;
 
-import com.slackow.endfight.util.Medium;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.entity.EnderDragonEntityRenderer;
-import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.entity.boss.dragon.EnderDragonEntity;
 import net.minecraft.util.math.Box;
 import org.spongepowered.asm.mixin.Mixin;
@@ -20,7 +18,7 @@ public class RenderDragonMixin {
     @Inject(method = "render(Lnet/minecraft/entity/boss/dragon/EnderDragonEntity;DDDFF)V", at = @At("TAIL"))
     private void render(EnderDragonEntity d, double e, double f, double g, float h, float par6, CallbackInfo ci) {
         int a = getSelectedConfig().deathBox;
-        if (a != 0 && (a == 2 || MinecraftClient.getInstance().getEntityRenderManager().method_10203())) {
+        if (a != 0 && (a == 2 || MinecraftClient.getInstance().getEntityRenderManager().getRenderHitboxes())) {
             double dx = e - d.x;
             double dy = f - d.y;
             double dz = g - d.z;

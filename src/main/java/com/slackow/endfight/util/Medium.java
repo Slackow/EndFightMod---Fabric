@@ -1,15 +1,21 @@
 package com.slackow.endfight.util;
 
 import com.mojang.blaze3d.platform.GLX;
+import com.redlimerl.speedrunigt.timer.InGameTimer;
 import com.slackow.endfight.EndFightCommand;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.GlAllocationUtils;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.text.LiteralText;
 import net.minecraft.util.math.Box;
 import org.lwjgl.opengl.GL11;
 
 import java.nio.*;
 import java.util.List;
+
+import static com.slackow.endfight.speedrunigt.EndFightCategory.END_FIGHT_CATEGORY;
 
 /**
  * A Hacky way of transferring data between client and server, don't depend on anything useful actually being here
@@ -22,6 +28,7 @@ public class Medium {
     public static double targetY;
     public static double targetZ;
     public static List<EndFightCommand> commandMap;
+    private static boolean switched = false;
 
     // method_4328
     // I didn't know where else to place this method it doesn't really fit here
@@ -387,4 +394,30 @@ public class Medium {
         }
     }
 
+
+    /**
+     * I Need to make one of these methods anytime I use SRIGT classes inside a mixin, or you et an error. :/
+     */
+    public static void completeTimerIfEndFight() {
+        InGameTimer timer = InGameTimer.getInstance();
+        if (timer.getCategory() == END_FIGHT_CATEGORY && timer.isPlaying()) {
+            InGameTimer.complete();
+        }
+    }
+
+
+    public static void onGameJoinIGT() {
+        InGameTimer timer = InGameTimer.getInstance();
+        PlayerEntity player = MinecraftClient.getInstance().player;
+
+        if (!switched) {
+            switched = true;
+            timer.setCategory(END_FIGHT_CATEGORY, false);
+        }
+        if (timer.getCategory() == END_FIGHT_CATEGORY) {
+            player.sendMessage(new LiteralText("Loaded End Fight Category w/ SpeedrunIGT"));
+        } else {
+            player.sendMessage(new LiteralText("Warning: End Fight Category disabled in SpeedrunIGT"));
+        }
+    }
 }

@@ -6,12 +6,12 @@ import com.slackow.endfight.util.Kit;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.render.GuiLighting;
+import net.minecraft.client.render.DiffuseLighting;
 import net.minecraft.client.resource.language.I18n;
+import net.minecraft.entity.player.ClientPlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import org.lwjgl.opengl.GL11;
 
@@ -59,19 +59,19 @@ public class InventoryCfgGUI extends Screen {
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         this.drawTexture(var4, var5 - 50 + 80, 0, 80, this.backgroundWidth, this.backgroundHeight - 80);
         this.drawTexture(var4, var5 - 50 + 76, 0, 0, this.backgroundWidth, 4);
-        GuiLighting.enable();
+        DiffuseLighting.enable();
         for (int i = 0; i < items.length; i++) {
 
             int x = width / 2 + (i % 9 - 4) * 18 - 8;
             int y = height / 6 + 100 + (i / 9) * 18 + (i < 9 ? 76 : 0) - 67;
             if (items[i] != null) {
                 // draw item
-                itemRenderer.renderItem(
+                itemRenderer.renderGuiItemModel(
                         items[i],
                         x,
                         y);
                 // draw count
-                itemRenderer.method_1549(textRenderer,
+                itemRenderer.renderGuiItemOverlay(textRenderer,
                         items[i],
                         x,
                         y);
@@ -82,18 +82,18 @@ public class InventoryCfgGUI extends Screen {
             int y = height / 6 + 100 + 76 - 67 - 80;
             if (armor[i] != null) {
                 // draw item
-                itemRenderer.renderItem(
+                itemRenderer.renderGuiItemModel(
                         armor[i],
                         x,
                         y);
                 // draw count
-                itemRenderer.method_1549(textRenderer,
+                itemRenderer.renderGuiItemOverlay(textRenderer,
                         armor[i],
                         x,
                         y);
             }
         }
-        GuiLighting.disable();
+        DiffuseLighting.disable();
 
     }
 
@@ -104,7 +104,7 @@ public class InventoryCfgGUI extends Screen {
                 ClientPlayerEntity thePlayer = MinecraftClient.getInstance().player;
                 if (thePlayer != null) {
                     EndFightMod.setInventory(thePlayer, obj);
-                    client.openScreen(new InventoryCfgGUI(from, obj));
+                    client.setScreen(new InventoryCfgGUI(from, obj));
                     BigConfig.save();
                 }
                 break;
@@ -114,12 +114,12 @@ public class InventoryCfgGUI extends Screen {
                     ServerPlayerEntity player = server.getPlayerManager().getPlayer(MinecraftClient.getInstance().getSession().getUsername());
                     if (player != null) {
                         EndFightMod.giveInventory(player, obj);
-                        client.openScreen(null);
+                        client.setScreen(null);
                     }
                 }
                 break;
             case 2:
-                client.openScreen(from);
+                client.setScreen(from);
                 break;
         }
     }
