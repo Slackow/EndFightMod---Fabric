@@ -20,6 +20,9 @@
   "entrypoints": {
     "main": [
       "com.slackow.endfight.EndFightMod"
+    ],
+    "speedrunigt": [
+      "com.slackow.endfight.speedrunigt.EndFightCategory"
     ]
   },
   "mixins": [
@@ -31,6 +34,6 @@
     "minecraft": ["1.8.9"]
   },
   "suggests": {
-    "flamingo": "*"
+    "speedrunigt": ">=7.0"
   }
 }

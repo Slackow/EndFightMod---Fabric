@@ -50,7 +50,7 @@ public class RenameGUI<T extends Renameable> extends Screen {
             obj.setName(cached.trim());
         }
         from.save();
-        client.openScreen(from);
+        client.setScreen(from);
         super.buttonClicked(button);
     }
 

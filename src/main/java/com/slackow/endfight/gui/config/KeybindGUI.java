@@ -76,7 +76,7 @@ public class KeybindGUI extends Screen {
     protected void buttonClicked(ButtonWidget button) {
         choosing = button.id == 0;
         if (button.id == 2) {
-            MinecraftClient.getInstance().openScreen(from);
+            MinecraftClient.getInstance().setScreen(from);
             return;
         } else if (button.id == 1) {
             obj.code = Keyboard.KEY_ESCAPE;
