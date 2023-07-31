@@ -51,7 +51,7 @@ public class Medium {
     public static void completeTimerIfEndFight() {
         InGameTimer timer = InGameTimer.getInstance();
         if (timer.getCategory() == END_FIGHT_CATEGORY && timer.isPlaying()) {
-            InGameTimer.complete();
+            InGameTimer.complete(System.currentTimeMillis() + 10000, true);
         }
     }
 
@@ -69,5 +69,9 @@ public class Medium {
         } else {
             player.sendMessage(new LiteralText("Warning: End Fight Category disabled in SpeedrunIGT"));
         }
+    }
+
+    public static long getInGameTime() {
+        return InGameTimer.getInstance().getInGameTime();
     }
 }

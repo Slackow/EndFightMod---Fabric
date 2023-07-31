@@ -1,5 +1,7 @@
 package com.slackow.endfight.mixin;
 
+import com.redlimerl.speedrunigt.SpeedRunIGT;
+import com.redlimerl.speedrunigt.timer.InGameTimer;
 import com.slackow.endfight.EndFightMod;
 import com.slackow.endfight.util.Medium;
 import net.minecraft.client.MinecraftClient;
@@ -52,15 +54,24 @@ public abstract class EnderDragonEntityMixin extends LivingEntity {
                 setHealth(getMaxHealth() - amount);
             }
             if (getHealth() <= 0) {
-                int seconds = (int) ((System.currentTimeMillis() - EndFightMod.time) / 1000);
+                int seconds;
+                String timeType;
+                if (EndFightMod.SRIGT_LOADED) {
+                    seconds = (int) (Medium.getInGameTime() / 1000);
+                    Medium.completeTimerIfEndFight();
+                    timeType = "[IGT]";
+                } else {
+                    seconds = (int) ((System.currentTimeMillis() - EndFightMod.time) / 1000);
+                    timeType = "[RTA]";
+                }
                 seconds = clamp(seconds, 0, 86399);
                 MinecraftClient.getInstance().field_3805.sendMessage(
-                        new LiteralText("Dragon Killed in about " + LocalTime.ofSecondOfDay(seconds)
-                                .format(DateTimeFormatter.ofPattern("mm:ss")) + " [RTA]"));
+                        new LiteralText("Dragon Killed in " + LocalTime.ofSecondOfDay(seconds)
+                                .format(DateTimeFormatter.ofPattern("mm:ss")) + " " + timeType));
+                MinecraftClient.getInstance().field_3805.sendMessage(
+                        new LiteralText("Total endfight time: " + LocalTime.ofSecondOfDay(seconds + 10)
+                                .format(DateTimeFormatter.ofPattern("mm:ss")) + " " + timeType));
                 EndFightMod.time = System.currentTimeMillis();
-                if (EndFightMod.SRIGT_LOADED) {
-                    Medium.completeTimerIfEndFight();
-                }
             }
         }
     }
