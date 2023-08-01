@@ -21,6 +21,7 @@
     "PlayerMixin",
     "RenderCrystalMixin",
     "RenderDragonMixin",
+    "ScreenMixin",
     "SettingsScreenMixin"
   ],
   "client": [

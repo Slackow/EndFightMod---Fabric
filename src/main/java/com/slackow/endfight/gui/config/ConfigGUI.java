@@ -1,19 +1,28 @@
 package com.slackow.endfight.gui.config;
 
+import com.slackow.endfight.EndFightMod;
 import com.slackow.endfight.config.BigConfig;
 import com.slackow.endfight.config.Config;
 import com.slackow.endfight.gui.core.ListGUI;
+import com.slackow.endfight.gui.core.TooltipRenderer;
+import com.slackow.endfight.gui.csvexporter.CSVExporterGUI;
+import com.slackow.endfight.gui.widget.TooltipButtonWidget;
 import com.slackow.endfight.util.Island;
 import com.slackow.endfight.util.KeyBind;
+import net.minecraft.client.gui.screen.FatalErrorScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.GameMode;
 import org.lwjgl.input.Keyboard;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static net.minecraft.util.Formatting.*;
 
@@ -56,15 +65,6 @@ public class ConfigGUI extends Screen {
     public static final String[] islandNames = {"Match World", "Random"};
     public static final String[] chaosTechNames = {"off", "debug", "on"};
 
-    public static final String[] tips = {
-            "Displays a box around the dragon that shows\n" +
-            "the range in which it will yeet you",
-            "Shows the exact health of the dragon in the bossbar",
-            "Shows how much damage the dragon is taking in chat",
-            ""
-    };
-
-
     @SuppressWarnings("unchecked")
     @Override
     public void init() {
@@ -72,16 +72,23 @@ public class ConfigGUI extends Screen {
 
         if (advanced) {
             buttons.add(new ButtonWidget(9, width / 2 - 155, height / 6 + 65 - 25, 150, 20, gamemode + obj.gamemode.getGameModeName()));
-            buttons.add(new ButtonWidget(10, width / 2 - 155, height / 6 + 65, 150, 20, buttonName(seeTargetBlock, obj.dSeeTargetBlock)));
-            buttons.add(new ButtonWidget(11, width / 2 + 5, height / 6 + 65 - 25, 150, 20, chaosTech + chaosTechNames[obj.chaosTech]));
+            buttons.add(new TooltipButtonWidget(10, width / 2 - 155, height / 6 + 65, 150, 20, buttonName(seeTargetBlock, obj.dSeeTargetBlock),
+                    "Shows the dragon's target block as it flies around."));
+            buttons.add(new TooltipButtonWidget(11, width / 2 + 5, height / 6 + 65 - 25, 150, 20, chaosTech + chaosTechNames[obj.chaosTech],
+                    "We don't know if this is real or not, but let's keep this here for now."));
             buttons.add(new ButtonWidget(12, width / 2 + 5, height / 6 + 65, 150, 20, buttonName(showSettings, obj.showSettings)));
-            buttons.add(new ButtonWidget(13, width / 2 - 155, height / 6 + 90, 150, 20, buttonName(printDebugMessages, obj.dPrintDebugMessages)));
-            buttons.add(new ButtonWidget(14, width / 2 + 5, height / 6 + 90, 150, 20, "\u00AF\\_(\u30C4)_/\u00AF"));
+            buttons.add(new TooltipButtonWidget(13, width / 2 - 155, height / 6 + 90, 150, 20, buttonName(printDebugMessages, obj.dPrintDebugMessages),
+                    "Show extra information in chat e.g. when dragon is rerolling."));
+            buttons.add(new ButtonWidget(14, width / 2 + 5, height / 6 + 90, 150, 20, "Export Stats..."));
         } else {
-            buttons.add(new ButtonWidget(0, width / 2 - 155, height / 6 + 65 - 25, 150, 20, deathBox + deathBoxNames[obj.deathBox]));
-            buttons.add(new ButtonWidget(1, width / 2 - 155, height / 6 + 90 - 25, 150, 20, buttonName(damageAlerts, obj.damageInfo)));
-            buttons.add(new ButtonWidget(2, width / 2 - 155, height / 6 + 115 - 25, 150, 20, buttonName(healthBar, obj.specificHealthBar)));
-            buttons.add(new ButtonWidget(3, width / 2 - 155, height / 6 + 115, 150, 20, buttonName(arrowHelp, obj.arrowHelp)));
+            buttons.add(new TooltipButtonWidget(0, width / 2 - 155, height / 6 + 65 - 25, 150, 20, deathBox + deathBoxNames[obj.deathBox],
+                    "Displays a box around the dragon's head that shows the\nrange in which it will yeet you, as well as its most vulnerable hurtbox.'"));
+            buttons.add(new TooltipButtonWidget(1, width / 2 - 155, height / 6 + 90 - 25, 150, 20, buttonName(damageAlerts, obj.damageInfo),
+                    "Shows how much damage the dragon is taking in chat."));
+            buttons.add(new TooltipButtonWidget(2, width / 2 - 155, height / 6 + 115 - 25, 150, 20, buttonName(healthBar, obj.specificHealthBar),
+                    "Shows the exact health of the dragon in the bossbar."));
+            buttons.add(new TooltipButtonWidget(3, width / 2 - 155, height / 6 + 115, 150, 20, buttonName(arrowHelp, obj.arrowHelp),
+                    "Crystals will display if your arrows will hit or not, it's a bit rough but mostly works."));
 
 
             buttons.add(new ButtonWidget(4, width / 2 + 5, height / 6 + 90 - 50, 150, 20, "Inventory..."));
@@ -179,6 +186,14 @@ public class ConfigGUI extends Screen {
                 obj.dPrintDebugMessages ^= true;
                 button.message = buttonName(printDebugMessages, obj.dPrintDebugMessages);
                 break;
+            case 14:
+                if (!EndFightMod.SRIGT_LOADED) {
+                    client.setScreen(new FatalErrorScreen("SpeedrunIGT must be loaded in order to export stats.", ""));
+                    return;
+                } else {
+                    client.setScreen(new CSVExporterGUI(from, obj));
+                    return;
+                }
             case -1:
                 client.setScreen(new ListGUI<>(from,
                         BigConfig.getBigConfig().configs,
@@ -215,5 +230,6 @@ public class ConfigGUI extends Screen {
         drawCenteredString(textRenderer, obj.getName(), width / 2, height / 6 + 10, 0xFFFFFF);
         drawCenteredString(textRenderer, "Profile", width / 2, height / 6 - 2, 0xFFFFFF);
         super.render(mouseX, mouseY, tickDelta);
+        ((TooltipRenderer)this).renderTooltipsFromButtons();
     }
 }
