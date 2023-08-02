@@ -15,6 +15,7 @@ import net.minecraft.command.CommandException;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.world.GameMode;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -31,6 +32,7 @@ public class EndFightMod implements ModInitializer {
 
 	public static long time = System.currentTimeMillis();
 	public static boolean SRIGT_LOADED = false;
+	public static int gameMode = 0;
 
 	public static void setInventory(PlayerEntity player, Kit kit) {
 		kit.contents = Stream.concat(Arrays.stream(player.inventory.main), Arrays.stream(player.inventory.armor))

@@ -17,6 +17,7 @@
     "HostileEntityMixin",
     "HungerManagerMixin",
     "InGameTimerMixin",
+    "InGameTimerUtilsMixin",
     "KeyBindingMixin",
     "PlayerMixin",
     "RenderCrystalMixin",

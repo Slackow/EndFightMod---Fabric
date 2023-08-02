@@ -79,7 +79,7 @@ public class ConfigGUI extends Screen {
             buttons.add(new ButtonWidget(12, width / 2 + 5, height / 6 + 65, 150, 20, buttonName(showSettings, obj.showSettings)));
             buttons.add(new TooltipButtonWidget(13, width / 2 - 155, height / 6 + 90, 150, 20, buttonName(printDebugMessages, obj.dPrintDebugMessages),
                     "Show extra information in chat e.g. when dragon is rerolling."));
-            buttons.add(new ButtonWidget(14, width / 2 + 5, height / 6 + 90, 150, 20, "Export Stats..."));
+            buttons.add(new ButtonWidget(14, width / 2 + 5, height / 6 + 90, 150, 20, "Export Stats as CSV..."));
         } else {
             buttons.add(new TooltipButtonWidget(0, width / 2 - 155, height / 6 + 65 - 25, 150, 20, deathBox + deathBoxNames[obj.deathBox],
                     "Displays a box around the dragon's head that shows the\nrange in which it will yeet you, as well as its most vulnerable hurtbox.'"));
@@ -191,7 +191,7 @@ public class ConfigGUI extends Screen {
                     client.setScreen(new FatalErrorScreen("SpeedrunIGT must be loaded in order to export stats.", ""));
                     return;
                 } else {
-                    client.setScreen(new CSVExporterGUI(from, obj));
+                    client.setScreen(new CSVExporterGUI(this));
                     return;
                 }
             case -1:

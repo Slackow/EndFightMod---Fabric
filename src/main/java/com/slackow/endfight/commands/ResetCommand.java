@@ -135,6 +135,7 @@ public class ResetCommand extends EndFightCommand {
                     player.addStatusEffect(new StatusEffectInstance(11, 100000, 255, true));
                 }
                 // set Gamemode
+                EndFightMod.gameMode = ((PlayerEntity) source).abilities.creativeMode ? 1 : 0;
                 player.method_3170(cfg.gamemode);
                 EndFightMod.giveInventory(player, cfg.inventory);
                 player.teleportToDimension(1);
@@ -161,6 +162,7 @@ public class ResetCommand extends EndFightCommand {
                 EndFightMod.time = System.currentTimeMillis();
                 if (EndFightMod.SRIGT_LOADED) {
                     if (InGameTimer.getInstance().getCategory() == END_FIGHT_CATEGORY) {
+                        InGameTimer.getInstance().writeRecordFile(false); // DNF
                         InGameTimer.reset();
                         InGameTimer.getInstance().setCategory(END_FIGHT_CATEGORY, false);
                         InGameTimer.getInstance().setStatus(TimerStatus.RUNNING);
