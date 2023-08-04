@@ -17,6 +17,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.GameMode;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -29,7 +30,7 @@ import static com.redlimerl.speedrunigt.option.SpeedRunOptions.TIMER_CATEGORY;
 import static com.slackow.endfight.speedrunigt.EndFightCategory.END_FIGHT_CATEGORY;
 
 public class EndFightMod implements ModInitializer {
-
+	public static final File endFightRecordsFile = FabricLoader.getInstance().getGameDir().resolve("speedrunigt/endfight-records").toFile();
 	public static long time = System.currentTimeMillis();
 	public static boolean SRIGT_LOADED = false;
 	public static int gameMode = 0;

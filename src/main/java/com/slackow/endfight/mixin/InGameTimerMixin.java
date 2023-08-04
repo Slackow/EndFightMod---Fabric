@@ -4,6 +4,8 @@ package com.slackow.endfight.mixin;
 import com.redlimerl.speedrunigt.timer.InGameTimer;
 import com.redlimerl.speedrunigt.timer.TimerStatus;
 import com.redlimerl.speedrunigt.timer.category.RunCategory;
+import com.slackow.endfight.EndFightMod;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.ControllablePlayerEntity;
 import net.minecraft.text.LiteralText;
@@ -13,7 +15,11 @@ import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.io.File;
+import java.nio.file.Path;
 
 import static com.slackow.endfight.speedrunigt.EndFightCategory.END_FIGHT_CATEGORY;
 
@@ -33,5 +39,10 @@ public abstract class InGameTimerMixin {
                 player.sendMessage(new LiteralText("Timer will start on execution of /reset"));
             }
         }
+    }
+
+    @ModifyArg(method = "writeRecordFile", at = @At(value = "INVOKE", target = "Ljava/io/File;<init>(Ljava/io/File;Ljava/lang/String;)V", ordinal = 0), index = 0)
+    private File writeToEndfightRecordsDir(File original) {
+        return EndFightMod.endFightRecordsFile;
     }
 }

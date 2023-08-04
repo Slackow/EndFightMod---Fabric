@@ -162,7 +162,9 @@ public class ResetCommand extends EndFightCommand {
                 EndFightMod.time = System.currentTimeMillis();
                 if (EndFightMod.SRIGT_LOADED) {
                     if (InGameTimer.getInstance().getCategory() == END_FIGHT_CATEGORY) {
-                        InGameTimer.getInstance().writeRecordFile(false); // DNF
+                        if (!InGameTimer.getInstance().isCompleted()) {
+                            InGameTimer.getInstance().writeRecordFile(false); // DNF
+                        }
                         InGameTimer.reset();
                         InGameTimer.getInstance().setCategory(END_FIGHT_CATEGORY, false);
                         InGameTimer.getInstance().setStatus(TimerStatus.RUNNING);

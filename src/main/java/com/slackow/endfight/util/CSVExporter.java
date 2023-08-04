@@ -1,7 +1,7 @@
 package com.slackow.endfight.util;
 
 import com.google.gson.stream.JsonReader;
-import com.redlimerl.speedrunigt.SpeedRunIGT;
+import com.slackow.endfight.EndFightMod;
 import java.io.*;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
@@ -10,14 +10,14 @@ import java.util.function.Predicate;
 
 public class CSVExporter {
     public static void exportLastXAttempts(Path exportPath, int attempts){
-        File[] recordsFiles = SpeedRunIGT.getRecordsPath().toFile().listFiles();
+        File[] recordsFiles = EndFightMod.endFightRecordsFile.listFiles();
         Arrays.sort(recordsFiles, Comparator.comparingLong(File::lastModified).reversed());
         recordsFiles = Arrays.copyOf(recordsFiles, attempts);
         writeRecordsFilesToCSV(exportPath, recordsFiles, "last-" + attempts + "-attempts-as-of-" + new SimpleDateFormat("MMddyyyyhhmmss").format(new Date()));
     }
 
     public static void exportSpecificDayAttempts(Path exportPath, String formattedDate) {
-        File[] recordsFiles = SpeedRunIGT.getRecordsPath().toFile().listFiles();
+        File[] recordsFiles = EndFightMod.endFightRecordsFile.listFiles();
         Predicate<File> filter = (file) -> {
             SimpleDateFormat dateFormat = new SimpleDateFormat("MMddyyyy");
             return dateFormat.format(new Date(file.lastModified())).equals(formattedDate);
@@ -30,7 +30,7 @@ public class CSVExporter {
     }
 
     public static void exportAllAttempts(Path exportPath) {
-        File[] recordsFiles = SpeedRunIGT.getRecordsPath().toFile().listFiles();
+        File[] recordsFiles = EndFightMod.endFightRecordsFile.listFiles();
         Arrays.sort(recordsFiles, Comparator.comparingLong(File::lastModified).reversed());
         writeRecordsFilesToCSV(exportPath, recordsFiles, "all-attempts-as-of-" + new SimpleDateFormat("MMddyyyyhhmmss").format(new Date()));
     }
