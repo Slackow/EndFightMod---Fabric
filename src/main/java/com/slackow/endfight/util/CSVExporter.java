@@ -39,13 +39,19 @@ public class CSVExporter {
         String filePath = exportPath + "\\endfights-" + suffix + ".csv";
         try (FileWriter fileWriter = new FileWriter(filePath);
              BufferedWriter bufferedWriter = new BufferedWriter(fileWriter)) {
-            bufferedWriter.write("In Game Time,Real Time\n");
+            bufferedWriter.write("In Game Time,Real Time,Loadout,Island Type\n");
+            System.out.println(recordsFiles.length);
             for (File recordsFile : recordsFiles) {
                 try (JsonReader jsonReader = new JsonReader(new FileReader(recordsFile))) {
                     jsonReader.beginObject();
+                    long finalIgt = 0;
+                    long finalRta = 0;
                     String category = null;
                     boolean isCompleted = false;
                     int currentGamemode = -1;
+                    int initialBeds = EndFightMod.initialBeds;
+                    int initialArrows = EndFightMod.initialArrows;
+                    int islandType = 0;
                     while (jsonReader.hasNext()) {
                         String name = jsonReader.nextName();
                         if (name.equals("category")) {
@@ -54,20 +60,30 @@ public class CSVExporter {
                             isCompleted = jsonReader.nextBoolean();
                         } else if (name.equals("current_gamemode")) {
                             currentGamemode = jsonReader.nextInt();
+                        } else if (name.equals("initial_beds")) {
+                            initialBeds = jsonReader.nextInt();
+                        } else if (name.equals("initial_arrows")) {
+                            initialArrows = jsonReader.nextInt();
                         } else if (name.equals("final_igt")) {
-                            if ("end_fight".equals(category) && currentGamemode == 0) {
-                                long finalIgt = jsonReader.nextLong();
-                                StringBuilder stringBuilder = new StringBuilder();
-                                stringBuilder.append(isCompleted ? finalIgt : "DNF").append("\n");
-                                bufferedWriter.write(stringBuilder.toString());
-                            } else {
-                                jsonReader.skipValue();
-                            }
+                            finalIgt = jsonReader.nextLong();
+                        } else if (name.equals("final_rta")) {
+                            finalRta = jsonReader.nextLong();
+                        } else if (name.equals("island_type")) {
+                            islandType = jsonReader.nextInt();
                         } else {
                             jsonReader.skipValue();
                         }
                     }
                     jsonReader.endObject();
+                    if ("end_fight".equals(category) && currentGamemode == 0) {
+                        StringBuilder stringBuilder = new StringBuilder();
+                        stringBuilder.append(isCompleted ? finalIgt : "DNF").append(",");
+                        stringBuilder.append(isCompleted ? finalRta : "DNF").append(",");
+                        stringBuilder.append(initialBeds).append(" Beds ").append(initialArrows).append(" Arrows").append(",");
+                        stringBuilder.append(islandType == -2 ? "Random" : "Set");
+                        stringBuilder.append("\n");
+                        bufferedWriter.write(stringBuilder.toString());
+                    }
                 }
             }
         } catch (IOException e) {

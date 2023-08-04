@@ -15,6 +15,7 @@ import net.minecraft.command.CommandException;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.world.GameMode;
 
 import java.io.File;
@@ -34,6 +35,8 @@ public class EndFightMod implements ModInitializer {
 	public static long time = System.currentTimeMillis();
 	public static boolean SRIGT_LOADED = false;
 	public static int gameMode = 0;
+	public static int initialBeds;
+	public static int initialArrows;
 
 	public static void setInventory(PlayerEntity player, Kit kit) {
 		kit.contents = Stream.concat(Arrays.stream(player.inventory.main), Arrays.stream(player.inventory.armor))
@@ -64,6 +67,8 @@ public class EndFightMod implements ModInitializer {
 				.toArray(ItemStack[]::new);
 		System.arraycopy(full, 0, player.inventory.main, 0, 36);
 		System.arraycopy(full, 36, player.inventory.armor, 0, 4);
+		initialBeds = Arrays.stream(player.inventory.main).filter(itemStack -> itemStack != null && itemStack.getItem() == Items.BED).mapToInt(itemStack -> itemStack.count).sum();
+		initialArrows = Arrays.stream(player.inventory.main).filter(itemStack -> itemStack != null && itemStack.getItem() == Items.ARROW).mapToInt(itemStack -> itemStack.count).sum();
 	}
 
 

@@ -67,6 +67,7 @@ public class ResetCommand extends EndFightCommand {
         boolean twice = args.length == 0 || !args[0].contains("o");
         if (source instanceof PlayerEntity) {
             PlayerEntity player = (PlayerEntity) source;
+            EndFightMod.gameMode = ((PlayerEntity) source).abilities.creativeMode ? 1 : 0;
             MinecraftServer server = MinecraftServer.getServer();
             for (Object objP : server.getPlayerManager().players) {
                 if (objP instanceof PlayerEntity) {
@@ -135,7 +136,6 @@ public class ResetCommand extends EndFightCommand {
                     player.addStatusEffect(new StatusEffectInstance(11, 100000, 255, true));
                 }
                 // set Gamemode
-                EndFightMod.gameMode = ((PlayerEntity) source).abilities.creativeMode ? 1 : 0;
                 player.method_3170(cfg.gamemode);
                 EndFightMod.giveInventory(player, cfg.inventory);
                 player.teleportToDimension(1);
