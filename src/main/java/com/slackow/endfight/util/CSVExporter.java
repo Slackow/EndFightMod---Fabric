@@ -2,9 +2,13 @@ package com.slackow.endfight.util;
 
 import com.google.gson.stream.JsonReader;
 import com.slackow.endfight.EndFightMod;
+import net.minecraft.util.math.MathHelper;
+
 import java.io.*;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.Predicate;
 
@@ -77,8 +81,14 @@ public class CSVExporter {
                     jsonReader.endObject();
                     if ("end_fight".equals(category) && currentGamemode == 0) {
                         StringBuilder stringBuilder = new StringBuilder();
-                        stringBuilder.append(isCompleted ? finalIgt : "DNF").append(",");
-                        stringBuilder.append(isCompleted ? finalRta : "DNF").append(",");
+                        String formattedFinalIgt = "DNF";
+                        String formattedFinalRta = "DNF";
+                        if (isCompleted) {
+                            formattedFinalIgt =  LocalTime.ofSecondOfDay(MathHelper.clamp((int)finalIgt, 0, 84599) / 1000).format(DateTimeFormatter.ofPattern("mm:ss"));
+                            formattedFinalRta =  LocalTime.ofSecondOfDay(MathHelper.clamp((int)finalRta, 0, 84599) / 1000).format(DateTimeFormatter.ofPattern("mm:ss"));
+                        }
+                        stringBuilder.append(formattedFinalIgt).append(",");
+                        stringBuilder.append(formattedFinalRta).append(",");
                         stringBuilder.append(initialBeds).append(" Beds ").append(initialArrows).append(" Arrows").append(",");
                         stringBuilder.append(islandType == -2 ? "Random" : "Set");
                         stringBuilder.append("\n");
