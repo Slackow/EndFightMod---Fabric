@@ -43,7 +43,8 @@ public class CSVExporter {
         String filePath = exportPath + "\\endfights-" + suffix + ".csv";
         try (FileWriter fileWriter = new FileWriter(filePath);
              BufferedWriter bufferedWriter = new BufferedWriter(fileWriter)) {
-            bufferedWriter.write("In Game Time,Real Time,Loadout,Island Type\n");
+            bufferedWriter.write("In Game Time,Real Time,Loadout,Island Type,Arrows Hit,Arrows Fired,Arrow Accuracy,");
+            bufferedWriter.write("Beds Used,Total Bed Damage,Crystal Damage,Arrow Damage,Melee Damage,Total Damage\n");
             System.out.println(recordsFiles.length);
             for (File recordsFile : recordsFiles) {
                 try (JsonReader jsonReader = new JsonReader(new FileReader(recordsFile))) {
@@ -56,6 +57,14 @@ public class CSVExporter {
                     int initialBeds = EndFightMod.initialBeds;
                     int initialArrows = EndFightMod.initialArrows;
                     int islandType = 0;
+                    int bedsUsed = 0;
+                    int arrowsUsed = 0;
+                    int arrowsHit = 0;
+                    double totalDamage = 0.0f;
+                    double totalCrystalDamage = 0.0f;
+                    double totalBedDamage = 0.0f;
+                    double totalArrowDamage = 0.0f;
+                    double totalMeleeDamage = 0.0f;
                     while (jsonReader.hasNext()) {
                         String name = jsonReader.nextName();
                         if (name.equals("category")) {
@@ -74,6 +83,22 @@ public class CSVExporter {
                             finalRta = jsonReader.nextLong();
                         } else if (name.equals("island_type")) {
                             islandType = jsonReader.nextInt();
+                        } else if (name.equals("beds_used")) {
+                            bedsUsed = jsonReader.nextInt();
+                        } else if (name.equals("arrows_used")) {
+                            arrowsUsed = jsonReader.nextInt();
+                        } else if (name.equals("arrows_hit")) {
+                            arrowsHit = jsonReader.nextInt();
+                        } else if (name.equals("total_damage")) {
+                            totalDamage = jsonReader.nextDouble();
+                        } else if (name.equals("total_crystal_damage")) {
+                            totalCrystalDamage = jsonReader.nextDouble();
+                        } else if (name.equals("total_bed_damage")) {
+                            totalBedDamage = jsonReader.nextDouble();
+                        } else if (name.equals("total_arrow_damage")) {
+                            totalArrowDamage = jsonReader.nextDouble();
+                        } else if (name.equals("total_melee_damage")) {
+                            totalMeleeDamage = jsonReader.nextDouble();
                         } else {
                             jsonReader.skipValue();
                         }
@@ -90,7 +115,15 @@ public class CSVExporter {
                         stringBuilder.append(formattedFinalIgt).append(",");
                         stringBuilder.append(formattedFinalRta).append(",");
                         stringBuilder.append(initialBeds).append(" Beds ").append(initialArrows).append(" Arrows").append(",");
-                        stringBuilder.append(islandType == -2 ? "Random" : "Set");
+                        stringBuilder.append(islandType == -2 ? "Random" : "Set").append(",");
+                        stringBuilder.append(arrowsHit).append(",").append(arrowsUsed).append(",");
+                        stringBuilder.append((int) (100 * (arrowsUsed == 0 ? 1 : (float) arrowsHit / arrowsUsed))).append("%,");
+                        stringBuilder.append(bedsUsed).append(",");
+                        stringBuilder.append(totalBedDamage).append(",");
+                        stringBuilder.append(totalCrystalDamage).append(",");
+                        stringBuilder.append(totalArrowDamage).append(",");
+                        stringBuilder.append(totalMeleeDamage).append(",");
+                        stringBuilder.append(totalDamage);
                         stringBuilder.append("\n");
                         bufferedWriter.write(stringBuilder.toString());
                     }

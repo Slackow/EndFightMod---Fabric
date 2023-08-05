@@ -138,6 +138,7 @@ public class ResetCommand extends EndFightCommand {
                 // set Gamemode
                 player.method_3170(cfg.gamemode);
                 EndFightMod.giveInventory(player, cfg.inventory);
+                EndFightMod.resetStats();
                 player.teleportToDimension(1);
 
                 if (cfg.showSettings) {
@@ -160,6 +161,9 @@ public class ResetCommand extends EndFightCommand {
 
                 player.sendMessage(new LiteralText("Sent to End"));
                 EndFightMod.time = System.currentTimeMillis();
+                EndFightMod.arrowsHit = 0;
+                EndFightMod.arrowsUsed = 0;
+                EndFightMod.bedsUsed = 0;
                 if (EndFightMod.SRIGT_LOADED) {
                     if (InGameTimer.getInstance().getCategory() == END_FIGHT_CATEGORY) {
                         if (!InGameTimer.getInstance().isCompleted()) {

@@ -19,5 +19,13 @@ public class InGameTimerUtilsMixin {
         instance.addProperty("island_type", BigConfig.getSelectedConfig().selectedIsland);
         instance.addProperty("initial_beds", EndFightMod.initialBeds);
         instance.addProperty("initial_arrows", EndFightMod.initialArrows);
+        instance.addProperty("beds_used", EndFightMod.bedsUsed);
+        instance.addProperty("arrows_used", EndFightMod.arrowsUsed);
+        instance.addProperty("arrows_hit", EndFightMod.arrowsHit);
+        instance.addProperty("total_damage", EndFightMod.totalDamage);
+        instance.addProperty("total_crystal_damage", EndFightMod.totalCrystalDamage);
+        instance.addProperty("total_bed_damage", EndFightMod.totalBedDamage);
+        instance.addProperty("total_arrow_damage", EndFightMod.totalArrowDamage);
+        instance.addProperty("total_melee_damage", EndFightMod.totalMeleeDamage);
     }
 }

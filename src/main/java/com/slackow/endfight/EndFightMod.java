@@ -37,6 +37,14 @@ public class EndFightMod implements ModInitializer {
 	public static int gameMode = 0;
 	public static int initialBeds;
 	public static int initialArrows;
+    public static int bedsUsed;
+	public static int arrowsUsed;
+	public static int arrowsHit;
+	public static float totalDamage;
+	public static float totalCrystalDamage;
+	public static float totalBedDamage;
+	public static float totalArrowDamage;
+	public static float totalMeleeDamage;
 
 	public static void setInventory(PlayerEntity player, Kit kit) {
 		kit.contents = Stream.concat(Arrays.stream(player.inventory.main), Arrays.stream(player.inventory.armor))
@@ -103,5 +111,10 @@ public class EndFightMod implements ModInitializer {
 
 	public static Path getDataPath() {
 		return MinecraftClient.getInstance().runDirectory.toPath().resolve("end.txt");
+	}
+
+	public static void resetStats() {
+		bedsUsed = arrowsHit = arrowsUsed = 0;
+		totalDamage = totalBedDamage = totalCrystalDamage = totalArrowDamage = totalMeleeDamage = 0.0f;
 	}
 }
