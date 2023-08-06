@@ -58,7 +58,7 @@ public abstract class EndCrystalMixin extends Entity {
 
     @Inject(method = "damage", at = @At("HEAD"))
     private void checkIfHitByArrow(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
-        if (source.name.equals("arrow")) {
+        if (source.name.equals("arrow") && !this.world.isClient) {
             EndFightMod.arrowsHit += 1;
         }
     }
