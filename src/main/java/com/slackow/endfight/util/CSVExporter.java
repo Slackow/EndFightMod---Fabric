@@ -126,16 +126,18 @@ public class CSVExporter {
                         }
                         stringBuilder.append(formattedFinalIgt).append(",");
                         stringBuilder.append(formattedFinalRta).append(",");
-                        stringBuilder.append(initialBeds).append(" Beds ").append(initialArrows).append(" Arrows").append(",");
-                        stringBuilder.append(islandType == -2 ? "Random" : "Set").append(",");
-                        stringBuilder.append(arrowsHit).append(",").append(arrowsUsed).append(",");
-                        stringBuilder.append((int) (100 * (arrowsUsed == 0 ? 1 : (float) arrowsHit / arrowsUsed))).append("%,");
-                        stringBuilder.append(bedsUsed).append(",");
-                        stringBuilder.append(totalBedDamage).append(",");
-                        stringBuilder.append(totalCrystalDamage).append(",");
-                        stringBuilder.append(totalArrowDamage).append(",");
-                        stringBuilder.append(totalMeleeDamage).append(",");
-                        stringBuilder.append(totalDamage);
+                        if (!formattedFinalIgt.equals("DNF") && !formattedFinalRta.equals("DNF")) {
+                            stringBuilder.append(initialBeds).append(" Beds ").append(initialArrows).append(" Arrows").append(",");
+                            stringBuilder.append(islandType == -2 ? "Random" : "Set").append(",");
+                            stringBuilder.append(arrowsHit).append(",").append(arrowsUsed).append(",");
+                            stringBuilder.append((int) (100 * (arrowsUsed == 0 ? 1 : (float) arrowsHit / arrowsUsed))).append("%,");
+                            stringBuilder.append(bedsUsed).append(",");
+                            stringBuilder.append(totalBedDamage).append(",");
+                            stringBuilder.append(totalCrystalDamage).append(",");
+                            stringBuilder.append(totalArrowDamage).append(",");
+                            stringBuilder.append(totalMeleeDamage).append(",");
+                            stringBuilder.append(totalDamage);
+                        }
                         stringBuilder.append("\n");
                         bufferedWriter.write(stringBuilder.toString());
                     }
