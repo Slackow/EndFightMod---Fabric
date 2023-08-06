@@ -20,7 +20,7 @@ public class BedUsedMixin {
         EndFightMod.bedsUsed += 1;
 
         // Identical to the code inside the method World::createExplosion, but we return a BedExplosion instead of an Explosion.
-        // The type is later checked by DamageSourceMixin::setExplosionType to distinguish between crystals, connected crystals, and beds.
+        // The type is later checked by DamageSourceMixin::setExplosionType to distinguish between crystals and beds.
         Explosion explosion = new BedExplosion(instance, entity, x, y, z, power);
         explosion.createFire = createFire;
         explosion.destructive = destructive;

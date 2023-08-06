@@ -21,9 +21,9 @@ import java.util.List;
 
 public class CSVExporterGUI extends Screen {
     private static final List<Pair<String, String>> modes = Arrays.asList( // (name, description) pairs
-            Pair.of("Specific Day", "(Fastest) Export endfight stats from a specific day, today by default."),
+            Pair.of("Specific Day", "Export endfight stats from a specific day, today by default."),
             Pair.of("Last # Attempts", "Export endfight stats from the last # attempts."),
-            Pair.of("Lifetime", "Export all endfight stats from your speedrunigt/records/ folder.\n" +
+            Pair.of("Lifetime", "Export all endfight stats from your .minecraft/speedrunigt/endfight-records folder.\n" +
                     "May take a while.")
     );
     private final Screen from;

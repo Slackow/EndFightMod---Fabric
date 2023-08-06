@@ -47,7 +47,7 @@ public abstract class EndCrystalMixin extends Entity {
     @Redirect(method = "damage", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;createExplosion(Lnet/minecraft/entity/Entity;DDDFZ)Lnet/minecraft/world/explosion/Explosion;"))
     private Explosion createCrystalExplosion(World instance, Entity entity, double x, double y, double z, float power, boolean destructive)  {
         // Identical to the code inside the method World::createExplosion, but we return a CrystalExplosion instead of an Explosion.
-        // The type is later checked by DamageSourceMixin::setExplosionType to distinguish between crystals, connected crystals, and beds.
+        // The type is later checked by DamageSourceMixin::setExplosionType to distinguish between crystals and beds.
         Explosion explosion = new CrystalExplosion(instance, entity, x, y, z, power);
         explosion.createFire = false;
         explosion.destructive = destructive;
