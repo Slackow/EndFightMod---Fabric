@@ -8,7 +8,10 @@ import net.minecraft.entity.EndCrystalEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.network.packet.s2c.play.ExplosionS2CPacket;
 import net.minecraft.text.LiteralText;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.explosion.Explosion;
 import org.spongepowered.asm.mixin.Mixin;
@@ -53,6 +56,14 @@ public abstract class EndCrystalMixin extends Entity {
         explosion.destructive = destructive;
         explosion.collectBlocksAndDamageEntities();
         explosion.affectWorld(true);
+        if (!destructive) {
+            explosion.affectedBlocks.clear();
+        }
+        for (Object object : instance.playerEntities) {
+            PlayerEntity playerEntity = (PlayerEntity) object;
+            if (!(playerEntity.squaredDistanceTo(x, y, z) < 4096.0)) continue;
+            ((ServerPlayerEntity)playerEntity).networkHandler.sendPacket(new ExplosionS2CPacket(x, y, z, power, explosion.affectedBlocks, (Vec3d)explosion.getAffectedPlayers().get(playerEntity)));
+        }
         return explosion;
     }
 
