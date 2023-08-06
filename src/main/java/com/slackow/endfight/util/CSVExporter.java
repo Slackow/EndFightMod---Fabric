@@ -23,14 +23,14 @@ public class CSVExporter {
     public static void exportSpecificDayAttempts(Path exportPath, String formattedDate) {
         File[] recordsFiles = EndFightMod.endFightRecordsFile.listFiles();
         Predicate<File> filter = (file) -> {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("MMddyyyy");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
             return dateFormat.format(new Date(file.lastModified())).equals(formattedDate);
         };
         recordsFiles = Arrays.stream(recordsFiles)
                 .filter(filter)
                 .sorted(Comparator.comparingLong(File::lastModified).reversed())
                 .toArray(File[]::new);
-        writeRecordsFilesToCSV(exportPath, recordsFiles, "from-specific-day-" + formattedDate);
+        writeRecordsFilesToCSV(exportPath, recordsFiles, "from-specific-day-" + formattedDate.replace("/", ""));
     }
 
     public static void exportAllAttempts(Path exportPath) {

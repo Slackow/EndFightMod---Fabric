@@ -64,7 +64,7 @@ public class CSVExporterGUI extends Screen {
                 switch (modeIndex) {
                     case 0:
                         String date;
-                        SimpleDateFormat sdf = new SimpleDateFormat("MMddyyyy");
+                        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
                         sdf.setLenient(false);
                         try {
                             sdf.parse(date = specificDate.getText());
