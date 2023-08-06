@@ -56,9 +56,16 @@ public class CSVExporter {
         try (FileWriter fileWriter = new FileWriter(filePath);
              BufferedWriter bufferedWriter = new BufferedWriter(fileWriter)) {
             bufferedWriter.write("In Game Time,Real Time,Loadout,Island Type,Arrows Hit,Arrows Fired,Arrow Accuracy,");
-            bufferedWriter.write("Beds Used,Total Bed Damage,Crystal Damage,Arrow Damage,Melee Damage,Total Damage\n");
+            bufferedWriter.write("Beds Used,Bed Damage,Crystal Damage,Arrow Damage,Melee Damage,Total Damage,");
+            bufferedWriter.write("Average (IGT), Best (IGT), Completion%\n");
             System.out.println(recordsFiles.length);
+            long bestIgt = Long.MAX_VALUE;
+            long runningIgt = 0;
+            int runCount = 0;
+            int completionCount = 0;
+            StringBuilder stringBuilder = new StringBuilder();
             for (File recordsFile : recordsFiles) {
+                ++runCount;
                 try (JsonReader jsonReader = new JsonReader(new FileReader(recordsFile))) {
                     jsonReader.beginObject();
                     long finalIgt = 0;
@@ -117,10 +124,12 @@ public class CSVExporter {
                     }
                     jsonReader.endObject();
                     if ("end_fight".equals(category) && currentGamemode == 0) {
-                        StringBuilder stringBuilder = new StringBuilder();
                         String formattedFinalIgt = "DNF";
                         String formattedFinalRta = "DNF";
                         if (isCompleted) {
+                            ++completionCount;
+                            runningIgt += finalIgt;
+                            bestIgt = Math.min(finalIgt, bestIgt);
                             formattedFinalIgt =  LocalTime.ofSecondOfDay(MathHelper.clamp((int)finalIgt, 0, 84599) / 1000).format(DateTimeFormatter.ofPattern("mm:ss"));
                             formattedFinalRta =  LocalTime.ofSecondOfDay(MathHelper.clamp((int)finalRta, 0, 84599) / 1000).format(DateTimeFormatter.ofPattern("mm:ss"));
                         }
@@ -139,10 +148,18 @@ public class CSVExporter {
                             stringBuilder.append(totalDamage);
                         }
                         stringBuilder.append("\n");
-                        bufferedWriter.write(stringBuilder.toString());
                     }
                 }
             }
+            int endOfFirstLine = stringBuilder.indexOf("\n");
+            StringBuilder stringBuilder2 = new StringBuilder();
+            String averageIgtString = LocalTime.ofSecondOfDay(MathHelper.clamp((int) ((float) runningIgt / completionCount), 0, 84599) / 1000).format(DateTimeFormatter.ofPattern("mm:ss"));
+            String bestIgtString = LocalTime.ofSecondOfDay(MathHelper.clamp((int) bestIgt, 0, 84599) / 1000).format(DateTimeFormatter.ofPattern("mm:ss"));
+            stringBuilder2.append(",").append(averageIgtString).append(",");
+            stringBuilder2.append(bestIgtString).append(",");
+            stringBuilder2.append((int) (100 * ((float) completionCount / runCount))).append("%");
+            stringBuilder.insert(endOfFirstLine, stringBuilder2);
+            bufferedWriter.write(stringBuilder.toString());
         } catch (IOException e) {
             System.out.println("Error occured writing .csv");
             e.printStackTrace();
