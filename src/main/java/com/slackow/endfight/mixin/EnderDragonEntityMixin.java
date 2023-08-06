@@ -65,27 +65,28 @@ public abstract class EnderDragonEntityMixin extends LivingEntity {
         }
         float f2 = this.getHealth();
         this.setHealth(f2 - damage);
-        // Anything outside of this if block is vanilla code from LivingEntity:applyDamage
-        if (getSelectedConfig().damageInfo) {
-            EndFightMod.totalDamage += damage;
-            String sourceName = source.name;
-            if (sourceName.equals("explosion")) {
-                String explosionType = ((IDamageSource)source).getExplosionType();
-                if (explosionType.equals("Bed Explosion")) {
-                    sourceName = explosionType;
-                    EndFightMod.totalBedDamage += damage;
-                } else if (explosionType.equals("Crystal Explosion")) {
-                    sourceName = explosionType;
-                    EndFightMod.totalCrystalDamage += damage;
-                }
-            } else if (sourceName.equals("player")) {
-                EndFightMod.totalMeleeDamage += damage;
-            } else if (sourceName.equals("arrow")) {
-                EndFightMod.totalArrowDamage += damage;
-                EndFightMod.arrowsHit += 1;
+        // Everything from here to the last 2 lines of this method is vanilla code from LivingEntity:applyDamage
+        EndFightMod.totalDamage += damage;
+        String sourceName = source.name;
+        if (sourceName.equals("explosion")) {
+            String explosionType = ((IDamageSource)source).getExplosionType();
+            if (explosionType.equals("Bed Explosion")) {
+                sourceName = explosionType;
+                EndFightMod.totalBedDamage += damage;
+            } else if (explosionType.equals("Crystal Explosion")) {
+                sourceName = explosionType;
+                EndFightMod.totalCrystalDamage += damage;
             }
+        } else if (sourceName.equals("player")) {
+            EndFightMod.totalMeleeDamage += damage;
+        } else if (sourceName.equals("arrow")) {
+            EndFightMod.totalArrowDamage += damage;
+            EndFightMod.arrowsHit += 1;
+        }
+        if (getSelectedConfig().damageInfo) {
             MinecraftClient.getInstance().field_3805.sendMessage(new LiteralText("Dragon damaged by " + sourceName + ": " + damage));
         }
+        //
         this.getDamageTracker().onDamage(source, f2, damage);
         this.setAbsorption(this.getAbsorption() - damage);
     }
