@@ -63,6 +63,7 @@ public class CSVExporter {
             long runningIgt = 0;
             int runCount = 0;
             int completionCount = 0;
+            int firstRunWasDNF = 0;
             StringBuilder stringBuilder = new StringBuilder();
             for (File recordsFile : recordsFiles) {
                 ++runCount;
@@ -127,11 +128,16 @@ public class CSVExporter {
                         String formattedFinalIgt = "DNF";
                         String formattedFinalRta = "DNF";
                         if (isCompleted) {
+                            if (firstRunWasDNF == 0) {
+                                firstRunWasDNF = -1;
+                            }
                             ++completionCount;
                             runningIgt += finalIgt;
                             bestIgt = Math.min(finalIgt, bestIgt);
-                            formattedFinalIgt =  LocalTime.ofSecondOfDay(MathHelper.clamp((int)finalIgt, 0, 84599) / 1000).format(DateTimeFormatter.ofPattern("mm:ss"));
-                            formattedFinalRta =  LocalTime.ofSecondOfDay(MathHelper.clamp((int)finalRta, 0, 84599) / 1000).format(DateTimeFormatter.ofPattern("mm:ss"));
+                            formattedFinalIgt =  LocalTime.ofSecondOfDay(MathHelper.clamp((int)finalIgt/1000, 0, 84599)).format(DateTimeFormatter.ofPattern("mm:ss"));
+                            formattedFinalRta =  LocalTime.ofSecondOfDay(MathHelper.clamp((int)finalRta/1000, 0, 84599)).format(DateTimeFormatter.ofPattern("mm:ss"));
+                        } else if (firstRunWasDNF == 0) {
+                            firstRunWasDNF = 1;
                         }
                         stringBuilder.append(formattedFinalIgt).append(",");
                         stringBuilder.append(formattedFinalRta).append(",");
@@ -153,8 +159,11 @@ public class CSVExporter {
             }
             int endOfFirstLine = stringBuilder.indexOf("\n");
             StringBuilder stringBuilder2 = new StringBuilder();
-            String averageIgtString = LocalTime.ofSecondOfDay(MathHelper.clamp((int) ((float) runningIgt / completionCount), 0, 84599) / 1000).format(DateTimeFormatter.ofPattern("mm:ss"));
-            String bestIgtString = LocalTime.ofSecondOfDay(MathHelper.clamp((int) bestIgt, 0, 84599) / 1000).format(DateTimeFormatter.ofPattern("mm:ss"));
+            String averageIgtString = LocalTime.ofSecondOfDay(MathHelper.clamp((int) ((float) runningIgt / completionCount) / 1000, 0, 84599)).format(DateTimeFormatter.ofPattern("mm:ss"));
+            String bestIgtString = LocalTime.ofSecondOfDay(MathHelper.clamp((int) bestIgt / 1000, 0, 84599)).format(DateTimeFormatter.ofPattern("mm:ss"));
+            if (firstRunWasDNF == 1) {
+                stringBuilder2.append(",,,,,,,,,,");
+            }
             stringBuilder2.append(",").append(averageIgtString).append(",");
             stringBuilder2.append(bestIgtString).append(",");
             stringBuilder2.append((int) (100 * ((float) completionCount / runCount))).append("%");
