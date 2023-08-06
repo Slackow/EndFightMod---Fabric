@@ -13,11 +13,23 @@ import java.util.*;
 import java.util.function.Predicate;
 
 public class CSVExporter {
-    public static void exportLastXAttempts(Path exportPath, int attempts){
+    public static void exportLastXAttempts(Path exportPath, int attempts) {
         File[] recordsFiles = EndFightMod.endFightRecordsFile.listFiles();
-        Arrays.sort(recordsFiles, Comparator.comparingLong(File::lastModified).reversed());
-        recordsFiles = Arrays.copyOf(recordsFiles, attempts);
-        writeRecordsFilesToCSV(exportPath, recordsFiles, "last-" + attempts + "-attempts-as-of-" + new SimpleDateFormat("MMddyyyyhhmmss").format(new Date()));
+        PriorityQueue<File> recentFiles = new PriorityQueue<>(Comparator.comparingLong(File::lastModified));
+        for (File file : recordsFiles) {
+            if (recentFiles.size() < attempts) {
+                recentFiles.offer(file);
+            } else {
+                File earliestFile = recentFiles.peek();
+                if (file.lastModified() > earliestFile.lastModified()) {
+                    recentFiles.poll();
+                    recentFiles.offer(file);
+                }
+            }
+        }
+        File[] lastXAttempts = recentFiles.toArray(new File[0]);
+        Arrays.sort(lastXAttempts, Comparator.comparing(File::lastModified).reversed());
+        writeRecordsFilesToCSV(exportPath, lastXAttempts, "last-" + attempts + "-attempts-as-of-" + new SimpleDateFormat("MMddyyyyhhmmss").format(new Date()));
     }
 
     public static void exportSpecificDayAttempts(Path exportPath, String formattedDate) {
