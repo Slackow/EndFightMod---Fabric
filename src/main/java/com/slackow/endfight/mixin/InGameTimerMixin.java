@@ -16,6 +16,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.io.File;
@@ -28,6 +29,12 @@ import static com.slackow.endfight.speedrunigt.EndFightCategory.END_FIGHT_CATEGO
 public abstract class InGameTimerMixin {
     @Shadow
     public abstract void setStatus(@NotNull TimerStatus status);
+
+    @Shadow protected abstract void updateRecordString();
+
+    @Shadow private String resultRecord;
+
+    @Shadow public abstract boolean isCompleted();
 
     @Inject(method = "setCategory", at = @At("HEAD"))
     public void setCategory(RunCategory category, boolean canSendPacket, CallbackInfo ci){
@@ -44,5 +51,16 @@ public abstract class InGameTimerMixin {
     @ModifyArg(method = "writeRecordFile", at = @At(value = "INVOKE", target = "Ljava/io/File;<init>(Ljava/io/File;Ljava/lang/String;)V", ordinal = 0), index = 0)
     private File writeToEndfightRecordsDir(File original) {
         return EndFightMod.endFightRecordsFile;
+    }
+
+    /**
+     * Because we stop the timer on finishing runs and then immediately reset the stats fields to default values, we
+     * need ot be careful we don't write these to the records file.
+     */
+    @Redirect(method = "setPause(ZLcom/redlimerl/speedrunigt/timer/TimerStatus;Ljava/lang/String;)V", at = @At(value = "INVOKE", target = "Lcom/redlimerl/speedrunigt/timer/InGameTimer;updateRecordString()V"))
+    private void dontUpdateRecordStringAfterRun(InGameTimer instance, boolean toPause, TimerStatus toStatus, String reason) {
+        if (!isCompleted()) {
+            updateRecordString();
+        }
     }
 }
