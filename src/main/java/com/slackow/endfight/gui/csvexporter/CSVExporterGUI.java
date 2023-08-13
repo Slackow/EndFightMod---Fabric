@@ -28,6 +28,7 @@ public class CSVExporterGUI extends Screen {
     );
     private final Screen from;
     private int modeIndex;
+    private boolean includeMs;
     private TextFieldWidget exportDestination;
     private TextFieldWidget specificDate;
     private TextFieldWidget attemptsCount;
@@ -38,14 +39,15 @@ public class CSVExporterGUI extends Screen {
     }
 
     public void init() {
-        buttons.add(new TooltipButtonWidget(0, width/2 - 75, 20, 150, 20, modes.get(modeIndex).first(), modes.get(modeIndex).second()));
-        buttons.add(new ButtonWidget(1, width / 2 - 75, height / 6 + 122, 150, 20, "Start Export"));
-        buttons.add(new ButtonWidget(2, width/2 + 130, 120, 50, 20, "Browse..."));
-        buttons.add(new ButtonWidget(3, width / 2 - 100, height / 6 + 174, 200, 20, I18n.translate("gui.done")));
+        buttons.add(new TooltipButtonWidget(0, width/2 - 85, 20, 170, 20, "Export Mode: " + modes.get(modeIndex).first(), modes.get(modeIndex).second()));
+        buttons.add(new ButtonWidget(1, width/2 - 50, 47, 100, 20, "Include ms: " + (includeMs ? "on" : "off")));
+        buttons.add(new ButtonWidget(2, width / 2 - 75, height / 6 + 122, 150, 20, "Start Export"));
+        buttons.add(new ButtonWidget(3, width/2 + 130, 120, 50, 20, "Browse..."));
+        buttons.add(new ButtonWidget(4, width / 2 - 100, height / 6 + 174, 200, 20, I18n.translate("gui.done")));
         exportDestination = new TextFieldWidget(textRenderer, width/2 - 125, 120, 250, 20);
         exportDestination.setMaxLength(128);
         exportDestination.setText(FabricLoader.getInstance().getGameDir().toString());
-        specificDate = new TextFieldWidget(textRenderer, width/2 - 75, 70, 150, 20);
+        specificDate = new TextFieldWidget(textRenderer, width/2 - 75, 75, 150, 20);
         specificDate.setText(new SimpleDateFormat("MM/dd/yyyy").format(new Date()));
         attemptsCount = new TextFieldWidget(textRenderer, width/2 - 75, 70, 150, 20);
         attemptsCount.setText("100");
@@ -56,10 +58,13 @@ public class CSVExporterGUI extends Screen {
         switch (button.id) {
             case 0:
                 modeIndex = (modeIndex + 1) % 3;
-                button.message = modes.get(modeIndex).first();
+                button.message = "Export Mode: " + modes.get(modeIndex).first();
                 ((TooltipButtonWidget)button).setTooltip(modes.get(modeIndex).second());
                 break;
             case 1:
+                button.message = "Include ms: " + ((includeMs = !includeMs) ? "on" : "off");
+                break;
+            case 2:
                 Path exportPath = new File(exportDestination.getText()).toPath();
                 switch (modeIndex) {
                     case 0:
@@ -72,7 +77,7 @@ public class CSVExporterGUI extends Screen {
                             date = sdf.format(new Date());
                             specificDate.setText(date);
                         }
-                        CSVExporter.exportSpecificDayAttempts(exportPath, date);
+                        CSVExporter.exportSpecificDayAttempts(exportPath, date, includeMs);
                         break;
                     case 1:
                         int attempts;
@@ -82,14 +87,14 @@ public class CSVExporterGUI extends Screen {
                             attempts = 100;
                             attemptsCount.setText("" + attempts);
                         }
-                        CSVExporter.exportLastXAttempts(exportPath, attempts);
+                        CSVExporter.exportLastXAttempts(exportPath, attempts, includeMs);
                         break;
                     case 2:
-                        CSVExporter.exportAllAttempts(exportPath);
+                        CSVExporter.exportAllAttempts(exportPath, includeMs);
                         break;
                 }
                 break;
-            case 2:
+            case 3:
                 JFrame frame = new JFrame();
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 frame.setVisible(true);
@@ -102,7 +107,7 @@ public class CSVExporterGUI extends Screen {
                 }
                 frame.dispose();
                 break;
-            case 3:
+            case 4:
                 client.setScreen(from);
                 break;
         }
@@ -112,11 +117,10 @@ public class CSVExporterGUI extends Screen {
     public void render(int mouseX, int mouseY, float tickDelta) {
         renderBackground();
         drawCenteredString(textRenderer, "Export Endfight Stats as CSV", width/2,5, 0xFFFFFF);
-        drawWithShadow(textRenderer, "Export Mode", width/2 - 72, 42, -6250336);
         switch (modeIndex) {
             case 0:
                 specificDate.render();
-                drawWithShadow(textRenderer, "Date (mm/dd/yyyy)", width/2 - 72, 94, -6250336);
+                drawWithShadow(textRenderer, "Date (mm/dd/yyyy)", width/2 - 72, 99, -6250336);
                 break;
             case 1:
                 attemptsCount.render();

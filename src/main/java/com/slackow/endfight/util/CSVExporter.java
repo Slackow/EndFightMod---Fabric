@@ -13,7 +13,7 @@ import java.util.*;
 import java.util.function.Predicate;
 
 public class CSVExporter {
-    public static void exportLastXAttempts(Path exportPath, int attempts) {
+    public static void exportLastXAttempts(Path exportPath, int attempts, boolean includeMs) {
         File[] recordsFiles = EndFightMod.endFightRecordsFile.listFiles();
         PriorityQueue<File> recentFiles = new PriorityQueue<>(Comparator.comparingLong(File::lastModified));
         for (File file : recordsFiles) {
@@ -29,10 +29,10 @@ public class CSVExporter {
         }
         File[] lastXAttempts = recentFiles.toArray(new File[0]);
         Arrays.sort(lastXAttempts, Comparator.comparing(File::lastModified).reversed());
-        writeRecordsFilesToCSV(exportPath, lastXAttempts, "last-" + attempts + "-attempts-as-of-" + new SimpleDateFormat("MMddyyyyhhmmss").format(new Date()));
+        writeRecordsFilesToCSV(exportPath, lastXAttempts, "last-" + attempts + "-attempts-as-of-" + new SimpleDateFormat("MMddyyyyhhmmss").format(new Date()), includeMs);
     }
 
-    public static void exportSpecificDayAttempts(Path exportPath, String formattedDate) {
+    public static void exportSpecificDayAttempts(Path exportPath, String formattedDate, boolean includeMs) {
         File[] recordsFiles = EndFightMod.endFightRecordsFile.listFiles();
         Predicate<File> filter = (file) -> {
             SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
@@ -42,17 +42,18 @@ public class CSVExporter {
                 .filter(filter)
                 .sorted(Comparator.comparingLong(File::lastModified).reversed())
                 .toArray(File[]::new);
-        writeRecordsFilesToCSV(exportPath, recordsFiles, "from-specific-day-" + formattedDate.replace("/", ""));
+        writeRecordsFilesToCSV(exportPath, recordsFiles, "from-specific-day-" + formattedDate.replace("/", ""), includeMs);
     }
 
-    public static void exportAllAttempts(Path exportPath) {
+    public static void exportAllAttempts(Path exportPath, boolean includeMs) {
         File[] recordsFiles = EndFightMod.endFightRecordsFile.listFiles();
         Arrays.sort(recordsFiles, Comparator.comparingLong(File::lastModified).reversed());
-        writeRecordsFilesToCSV(exportPath, recordsFiles, "all-attempts-as-of-" + new SimpleDateFormat("MMddyyyyhhmmss").format(new Date()));
+        writeRecordsFilesToCSV(exportPath, recordsFiles, "all-attempts-as-of-" + new SimpleDateFormat("MMddyyyyhhmmss").format(new Date()), includeMs);
     }
 
-    private static void writeRecordsFilesToCSV(Path exportPath, File[] recordsFiles, String suffix) {
+    private static void writeRecordsFilesToCSV(Path exportPath, File[] recordsFiles, String suffix, boolean includeMs) {
         String filePath = exportPath + "\\endfights-" + suffix + ".csv";
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("mm:ss" + (includeMs ? ".SSS" : ""));
         try (FileWriter fileWriter = new FileWriter(filePath);
              BufferedWriter bufferedWriter = new BufferedWriter(fileWriter)) {
             bufferedWriter.write("In Game Time,Real Time,Loadout,Island Type,Arrows Hit,Arrows Fired,Arrow Accuracy,");
@@ -134,8 +135,8 @@ public class CSVExporter {
                             ++completionCount;
                             runningIgt += finalIgt;
                             bestIgt = Math.min(finalIgt, bestIgt);
-                            formattedFinalIgt =  LocalTime.ofSecondOfDay(MathHelper.clamp((int)finalIgt/1000, 0, 84599)).format(DateTimeFormatter.ofPattern("mm:ss"));
-                            formattedFinalRta =  LocalTime.ofSecondOfDay(MathHelper.clamp((int)finalRta/1000, 0, 84599)).format(DateTimeFormatter.ofPattern("mm:ss"));
+                            formattedFinalIgt = LocalTime.ofNanoOfDay(Math.min(finalIgt * 1000000, 86400 * 1000000000L - 1)).format(timeFormatter);
+                            formattedFinalRta = LocalTime.ofNanoOfDay(Math.min(finalRta * 1000000, 86400 * 1000000000L - 1)).format(timeFormatter);
                         } else if (firstRunWasDNF == 0) {
                             firstRunWasDNF = 1;
                         }
@@ -159,8 +160,8 @@ public class CSVExporter {
             }
             int endOfFirstLine = stringBuilder.indexOf("\n");
             StringBuilder stringBuilder2 = new StringBuilder();
-            String averageIgtString = LocalTime.ofSecondOfDay(MathHelper.clamp((int) ((float) runningIgt / completionCount) / 1000, 0, 84599)).format(DateTimeFormatter.ofPattern("mm:ss"));
-            String bestIgtString = LocalTime.ofSecondOfDay(MathHelper.clamp((int) bestIgt / 1000, 0, 84599)).format(DateTimeFormatter.ofPattern("mm:ss"));
+            String averageIgtString = LocalTime.ofNanoOfDay(Math.min((runningIgt / completionCount) * 1000000, 86400 * 1000000000L - 1)).format(timeFormatter);
+            String bestIgtString = LocalTime.ofNanoOfDay(Math.min(bestIgt * 1000000, 86400 * 1000000000L - 1)).format(timeFormatter);
             if (firstRunWasDNF == 1) {
                 stringBuilder2.append(",,,,,,,,,,");
             }
