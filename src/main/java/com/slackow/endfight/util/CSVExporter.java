@@ -173,8 +173,12 @@ public class CSVExporter {
             }
             int endOfFirstLine = stringBuilder.indexOf("\n");
             StringBuilder stringBuilder2 = new StringBuilder();
-            String averageIgtString = LocalTime.ofNanoOfDay(Math.min((runningIgt / completionCount) * 1000000, 86400 * 1000000000L - 1)).format(timeFormatter);
-            String bestIgtString = LocalTime.ofNanoOfDay(Math.min(bestIgt * 1000000, 86400 * 1000000000L - 1)).format(timeFormatter);
+            String averageIgtString = "N/A";
+            String bestIgtString = "N/A";
+            if (completionCount > 0) {
+                averageIgtString = LocalTime.ofNanoOfDay(Math.min((runningIgt / completionCount) * 1000000, 86400 * 1000000000L - 1)).format(timeFormatter);
+                bestIgtString = LocalTime.ofNanoOfDay(Math.min(bestIgt * 1000000, 86400 * 1000000000L - 1)).format(timeFormatter);
+            }
             if (firstRunWasDnf == 1 && !detailedDnfRows) {
                 stringBuilder2.append(",,,,,,,,,,");
             }
