@@ -13,8 +13,11 @@ import java.util.*;
 import java.util.function.Predicate;
 
 public class CSVExporter {
-    public static void exportLastXAttempts(Path exportPath, int attempts, boolean includeMs) {
+    public static void exportLastXAttempts(Path exportPath, int attempts, boolean includeMs) throws FileNotFoundException {
         File[] recordsFiles = EndFightMod.endFightRecordsFile.listFiles();
+        if (recordsFiles == null || recordsFiles.length == 0) {
+            throw new FileNotFoundException(EndFightMod.endFightRecordsFile.toString());
+        }
         PriorityQueue<File> recentFiles = new PriorityQueue<>(Comparator.comparingLong(File::lastModified));
         for (File file : recordsFiles) {
             if (recentFiles.size() < attempts) {
@@ -32,8 +35,11 @@ public class CSVExporter {
         writeRecordsFilesToCSV(exportPath, lastXAttempts, "last-" + attempts + "-attempts-as-of-" + new SimpleDateFormat("MMddyyyyhhmmss").format(new Date()), includeMs);
     }
 
-    public static void exportSpecificDayAttempts(Path exportPath, String formattedDate, boolean includeMs) {
+    public static void exportSpecificDayAttempts(Path exportPath, String formattedDate, boolean includeMs) throws FileNotFoundException {
         File[] recordsFiles = EndFightMod.endFightRecordsFile.listFiles();
+        if (recordsFiles == null || recordsFiles.length == 0) {
+            throw new FileNotFoundException(EndFightMod.endFightRecordsFile.toString());
+        }
         Predicate<File> filter = (file) -> {
             SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
             return dateFormat.format(new Date(file.lastModified())).equals(formattedDate);
@@ -45,8 +51,11 @@ public class CSVExporter {
         writeRecordsFilesToCSV(exportPath, recordsFiles, "from-specific-day-" + formattedDate.replace("/", ""), includeMs);
     }
 
-    public static void exportAllAttempts(Path exportPath, boolean includeMs) {
+    public static void exportAllAttempts(Path exportPath, boolean includeMs) throws FileNotFoundException {
         File[] recordsFiles = EndFightMod.endFightRecordsFile.listFiles();
+        if (recordsFiles == null || recordsFiles.length == 0) {
+            throw new FileNotFoundException(EndFightMod.endFightRecordsFile.toString());
+        }
         Arrays.sort(recordsFiles, Comparator.comparingLong(File::lastModified).reversed());
         writeRecordsFilesToCSV(exportPath, recordsFiles, "all-attempts-as-of-" + new SimpleDateFormat("MMddyyyyhhmmss").format(new Date()), includeMs);
     }
@@ -59,7 +68,7 @@ public class CSVExporter {
             bufferedWriter.write("In Game Time,Real Time,Loadout,Island Type,Arrows Hit,Arrows Fired,Arrow Accuracy,");
             bufferedWriter.write("Beds Used,Bed Damage,Crystal Damage,Arrow Damage,Melee Damage,Total Damage,");
             bufferedWriter.write("Average (IGT), Best (IGT), Completion%\n");
-            System.out.println(recordsFiles.length);
+            System.out.println("Exporting " + recordsFiles.length + " endfights to " + filePath);
             long bestIgt = Long.MAX_VALUE;
             long runningIgt = 0;
             int runCount = 0;

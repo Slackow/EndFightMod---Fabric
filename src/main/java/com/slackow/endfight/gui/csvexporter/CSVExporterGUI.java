@@ -1,10 +1,12 @@
 package com.slackow.endfight.gui.csvexporter;
 
+import com.slackow.endfight.EndFightMod;
 import com.slackow.endfight.gui.core.TooltipRenderer;
 import com.slackow.endfight.gui.widget.TooltipButtonWidget;
 import com.slackow.endfight.util.CSVExporter;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.tinyremapper.extension.mixin.common.data.Pair;
+import net.minecraft.client.gui.screen.FatalErrorScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
@@ -12,6 +14,7 @@ import net.minecraft.client.resource.language.I18n;
 import javax.swing.*;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.nio.file.Path;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -66,32 +69,37 @@ public class CSVExporterGUI extends Screen {
                 break;
             case 2:
                 Path exportPath = new File(exportDestination.getText()).toPath();
-                switch (modeIndex) {
-                    case 0:
-                        String date;
-                        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
-                        sdf.setLenient(false);
-                        try {
-                            sdf.parse(date = specificDate.getText());
-                        } catch (ParseException e) {
-                            date = sdf.format(new Date());
-                            specificDate.setText(date);
-                        }
-                        CSVExporter.exportSpecificDayAttempts(exportPath, date, includeMs);
-                        break;
-                    case 1:
-                        int attempts;
-                        try {
-                            attempts = Integer.parseInt(attemptsCount.getText());
-                        } catch (NumberFormatException e) {
-                            attempts = 100;
-                            attemptsCount.setText("" + attempts);
-                        }
-                        CSVExporter.exportLastXAttempts(exportPath, attempts, includeMs);
-                        break;
-                    case 2:
-                        CSVExporter.exportAllAttempts(exportPath, includeMs);
-                        break;
+                try {
+                    switch (modeIndex) {
+                        case 0:
+                            String date;
+                            SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
+                            sdf.setLenient(false);
+                            try {
+                                sdf.parse(date = specificDate.getText());
+                            } catch (ParseException e) {
+                                date = sdf.format(new Date());
+                                specificDate.setText(date);
+                            }
+                            CSVExporter.exportSpecificDayAttempts(exportPath, date, includeMs);
+                            break;
+                        case 1:
+                            int attempts;
+                            try {
+                                attempts = Integer.parseInt(attemptsCount.getText());
+                            } catch (NumberFormatException e) {
+                                attempts = 100;
+                                attemptsCount.setText("" + attempts);
+                            }
+                            CSVExporter.exportLastXAttempts(exportPath, attempts, includeMs);
+                            break;
+                        case 2:
+                            CSVExporter.exportAllAttempts(exportPath, includeMs);
+                            break;
+                    }
+                } catch (FileNotFoundException e) {
+                    client.setScreen(new FatalErrorScreen("No endfight records to export.", EndFightMod.endFightRecordsFile + " either doesn't exist or is empty."));
+                    e.printStackTrace();
                 }
                 break;
             case 3:
