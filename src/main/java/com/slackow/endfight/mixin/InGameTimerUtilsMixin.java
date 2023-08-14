@@ -24,6 +24,7 @@ public class InGameTimerUtilsMixin {
         instance.addProperty("arrows_hit", EndFightMod.arrowsHit);
         instance.addProperty("total_damage", EndFightMod.totalDamage);
         instance.addProperty("total_crystal_damage", EndFightMod.totalCrystalDamage);
+        instance.addProperty("total_crystal_bait_damage", EndFightMod.totalCrystalBaitDamage);
         instance.addProperty("total_bed_damage", EndFightMod.totalBedDamage);
         instance.addProperty("total_arrow_damage", EndFightMod.totalArrowDamage);
         instance.addProperty("total_melee_damage", EndFightMod.totalMeleeDamage);

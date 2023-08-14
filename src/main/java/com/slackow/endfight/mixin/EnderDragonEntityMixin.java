@@ -76,6 +76,9 @@ public abstract class EnderDragonEntityMixin extends LivingEntity {
             } else if (explosionType.equals("Crystal Explosion")) {
                 sourceName = explosionType;
                 EndFightMod.totalCrystalDamage += damage;
+            } else if (explosionType.equals("Crystal Bait")) {
+                sourceName = explosionType;
+                EndFightMod.totalCrystalBaitDamage += damage;
             }
         } else if (sourceName.equals("player")) {
             EndFightMod.totalMeleeDamage += damage;

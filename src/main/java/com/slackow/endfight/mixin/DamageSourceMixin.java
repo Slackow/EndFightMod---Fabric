@@ -20,8 +20,10 @@ public abstract class DamageSourceMixin implements IDamageSource {
         DamageSource damageSource = cir.getReturnValue();
         if (explosion instanceof BedExplosion) {
             ((IDamageSource)damageSource).setExplosionType("Bed Explosion");
-        } else if (explosion == null || explosion instanceof CrystalExplosion) { // only one instance of explosion being null and it's with crystals the dragon is healing from
+        } else if (explosion instanceof CrystalExplosion) { // only one instance of explosion being null and it's with crystals the dragon is healing from
             ((IDamageSource)damageSource).setExplosionType("Crystal Explosion");
+        } else if (explosion == null) {
+            ((IDamageSource)damageSource).setExplosionType("Crystal Bait");
         }
     }
 

@@ -42,6 +42,7 @@ public class EndFightMod implements ModInitializer {
 	public static int arrowsHit;
 	public static float totalDamage;
 	public static float totalCrystalDamage;
+	public static float totalCrystalBaitDamage;
 	public static float totalBedDamage;
 	public static float totalArrowDamage;
 	public static float totalMeleeDamage;
@@ -115,6 +116,6 @@ public class EndFightMod implements ModInitializer {
 
 	public static void resetStats() {
 		bedsUsed = arrowsHit = arrowsUsed = 0;
-		totalDamage = totalBedDamage = totalCrystalDamage = totalArrowDamage = totalMeleeDamage = 0.0f;
+		totalDamage = totalBedDamage = totalCrystalDamage = totalCrystalBaitDamage = totalArrowDamage = totalMeleeDamage = 0.0f;
 	}
 }

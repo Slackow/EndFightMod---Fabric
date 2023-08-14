@@ -66,7 +66,7 @@ public class CSVExporter {
         try (FileWriter fileWriter = new FileWriter(filePath);
              BufferedWriter bufferedWriter = new BufferedWriter(fileWriter)) {
             bufferedWriter.write("In Game Time,Real Time,Loadout,Island Type,Arrows Hit,Arrows Fired,Arrow Accuracy,");
-            bufferedWriter.write("Beds Used,Bed Damage,Crystal Damage,Arrow Damage,Melee Damage,Total Damage,");
+            bufferedWriter.write("Beds Used,Bed Damage,Crystal Damage,Crystal Bait Damage,Arrow Damage,Melee Damage,Total Damage,");
             bufferedWriter.write("Average (IGT), Best (IGT), Completion%\n");
             System.out.println("Exporting " + recordsFiles.length + " endfights to " + filePath);
             long bestIgt = Long.MAX_VALUE;
@@ -92,6 +92,7 @@ public class CSVExporter {
                     int arrowsHit = 0;
                     double totalDamage = 0.0f;
                     double totalCrystalDamage = 0.0f;
+                    double totalCrystalBaitDamage = 0.0f;
                     double totalBedDamage = 0.0f;
                     double totalArrowDamage = 0.0f;
                     double totalMeleeDamage = 0.0f;
@@ -123,6 +124,8 @@ public class CSVExporter {
                             totalDamage = jsonReader.nextDouble();
                         } else if (name.equals("total_crystal_damage")) {
                             totalCrystalDamage = jsonReader.nextDouble();
+                        } else if (name.equals("total_crystal_bait_damage")) {
+                            totalCrystalBaitDamage = jsonReader.nextDouble();
                         } else if (name.equals("total_bed_damage")) {
                             totalBedDamage = jsonReader.nextDouble();
                         } else if (name.equals("total_arrow_damage")) {
@@ -159,6 +162,7 @@ public class CSVExporter {
                             stringBuilder.append(bedsUsed).append(",");
                             stringBuilder.append(totalBedDamage).append(",");
                             stringBuilder.append(totalCrystalDamage).append(",");
+                            stringBuilder.append(totalCrystalBaitDamage).append(",");
                             stringBuilder.append(totalArrowDamage).append(",");
                             stringBuilder.append(totalMeleeDamage).append(",");
                             stringBuilder.append(totalDamage);
