@@ -49,7 +49,7 @@ public abstract class EnderDragonEntityMixin extends LivingEntity {
 
     /**
      * Move the damage tracking and logging to this method to avoid the bug caused by multiple DragonParts being damaged
-     * simultaneously and accumulating.
+     * simultaneously and accumulating. Most of this is vanilla code copied from LivingEntity::applyDamage
      */
     @Override
     protected void applyDamage(DamageSource source, float damage) {
@@ -65,7 +65,6 @@ public abstract class EnderDragonEntityMixin extends LivingEntity {
         }
         float f2 = this.getHealth();
         this.setHealth(f2 - damage);
-        // Everything from here to the last 2 lines of this method is vanilla code from LivingEntity:applyDamage
         EndFightMod.totalDamage += damage;
         String sourceName = source.name;
         if (sourceName.equals("explosion")) {
