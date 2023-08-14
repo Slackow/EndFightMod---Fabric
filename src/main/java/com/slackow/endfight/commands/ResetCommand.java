@@ -67,6 +67,7 @@ public class ResetCommand extends EndFightCommand {
         boolean twice = args.length == 0 || !args[0].contains("o");
         if (source instanceof PlayerEntity) {
             PlayerEntity player = (PlayerEntity) source;
+            EndFightMod.gameMode = ((PlayerEntity) source).abilities.creativeMode ? 1 : 0;
             MinecraftServer server = MinecraftServer.getServer();
             for (Object objP : server.getPlayerManager().players) {
                 if (objP instanceof PlayerEntity) {
@@ -161,12 +162,16 @@ public class ResetCommand extends EndFightCommand {
                 EndFightMod.time = System.currentTimeMillis();
                 if (EndFightMod.SRIGT_LOADED) {
                     if (InGameTimer.getInstance().getCategory() == END_FIGHT_CATEGORY) {
+                        if (!InGameTimer.getInstance().isCompleted()) {
+                            InGameTimer.getInstance().writeRecordFile(false); // DNF
+                        }
                         InGameTimer.reset();
                         InGameTimer.getInstance().setCategory(END_FIGHT_CATEGORY, false);
                         InGameTimer.getInstance().setStatus(TimerStatus.RUNNING);
                         InGameTimer.getInstance().setStartTime(EndFightMod.time);
                     }
                 }
+                EndFightMod.resetStats();
             }
 
         }

@@ -3,6 +3,7 @@ package com.slackow.endfight.util;
 import com.redlimerl.speedrunigt.timer.InGameTimer;
 import com.slackow.endfight.EndFightCommand;
 import com.slackow.endfight.EndFightMod;
+import com.slackow.endfight.config.BigConfig;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.entity.player.ControllablePlayerEntity;
@@ -48,10 +49,10 @@ public class Medium {
     /**
      * I Need to make one of these methods anytime I use SRIGT classes inside a mixin, or you et an error. :/
      */
-    public static void completeTimerIfEndFight() {
+    public static void completeEndfightTimer() {
         InGameTimer timer = InGameTimer.getInstance();
         if (timer.getCategory() == END_FIGHT_CATEGORY && timer.isPlaying()) {
-            InGameTimer.complete();
+            InGameTimer.complete(System.currentTimeMillis() + 10000, true);
         }
     }
 
@@ -69,5 +70,9 @@ public class Medium {
         } else {
             player.sendMessage(new LiteralText("Warning: End Fight Category disabled in SpeedrunIGT"));
         }
+    }
+
+    public static long getInGameTime() {
+        return InGameTimer.getInstance().getInGameTime();
     }
 }

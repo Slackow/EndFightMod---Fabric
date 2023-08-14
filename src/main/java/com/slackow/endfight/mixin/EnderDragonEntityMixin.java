@@ -1,6 +1,9 @@
 package com.slackow.endfight.mixin;
 
+import com.redlimerl.speedrunigt.SpeedRunIGT;
+import com.redlimerl.speedrunigt.timer.InGameTimer;
 import com.slackow.endfight.EndFightMod;
+import com.slackow.endfight.explosion.IDamageSource;
 import com.slackow.endfight.util.Medium;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
@@ -9,7 +12,9 @@ import net.minecraft.entity.boss.dragon.EnderDragonEntity;
 import net.minecraft.entity.boss.dragon.EnderDragonPart;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.text.LiteralText;
+import net.minecraft.world.GameMode;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -42,25 +47,79 @@ public abstract class EnderDragonEntityMixin extends LivingEntity {
         super(world);
     }
 
+    /**
+     * Move the damage tracking and logging to this method to avoid the bug caused by multiple DragonParts being damaged
+     * simultaneously and accumulating. Most of this is vanilla code copied from LivingEntity::applyDamage
+     */
+    @Override
+    protected void applyDamage(DamageSource source, float damage) {
+        if (this.method_4447()) {
+            return;
+        }
+        damage = this.applyArmorDamage(source, damage);
+        float f = damage = this.applyEnchantmentsToDamage(source, damage);
+        damage = Math.max(damage - this.getAbsorption(), 0.0f);
+        this.setAbsorption(this.getAbsorption() - (f - damage));
+        if (damage == 0.0f) {
+            return;
+        }
+        float f2 = this.getHealth();
+        this.setHealth(f2 - damage);
+        EndFightMod.totalDamage += damage;
+        String sourceName = source.name;
+        if (sourceName.equals("explosion")) {
+            String explosionType = ((IDamageSource)source).getExplosionType();
+            if (explosionType.equals("Bed Explosion")) {
+                sourceName = explosionType;
+                EndFightMod.totalBedDamage += damage;
+            } else if (explosionType.equals("Crystal Explosion")) {
+                sourceName = explosionType;
+                EndFightMod.totalCrystalDamage += damage;
+            } else if (explosionType.equals("Crystal Bait")) {
+                sourceName = explosionType;
+                EndFightMod.totalCrystalBaitDamage += damage;
+            }
+        } else if (sourceName.equals("player")) {
+            EndFightMod.totalMeleeDamage += damage;
+        } else if (sourceName.equals("arrow")) {
+            EndFightMod.totalArrowDamage += damage;
+            EndFightMod.arrowsHit += 1;
+        }
+        if (getSelectedConfig().damageInfo) {
+            MinecraftClient.getInstance().field_3805.sendMessage(new LiteralText("Dragon damaged by " + sourceName + ": " + damage));
+        }
+        //
+        this.getDamageTracker().onDamage(source, f2, damage);
+        this.setAbsorption(this.getAbsorption() - damage);
+    }
+
     @Inject(method = "method_6302", at = @At("RETURN"))
     public void onDamage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
         if (cir.getReturnValue()) {
-            if (getSelectedConfig().damageInfo) {
-                MinecraftClient.getInstance().field_3805.sendMessage(new LiteralText("Dragon damaged by " + source.getName() + ": " + amount));
-            }
             if (getSelectedConfig().dGodDragon) {
                 setHealth(getMaxHealth() - amount);
             }
             if (getHealth() <= 0) {
-                int seconds = (int) ((System.currentTimeMillis() - EndFightMod.time) / 1000);
+                int seconds;
+                String timeType;
+                EndFightMod.gameMode = world.getClosestPlayer(this, 1000).abilities.creativeMode ? 1 : 0;
+                if (EndFightMod.SRIGT_LOADED) {
+                    seconds = (int) (Medium.getInGameTime() / 1000);
+                    Medium.completeEndfightTimer();
+                    timeType = "[IGT]";
+                } else {
+                    seconds = (int) ((System.currentTimeMillis() - EndFightMod.time) / 1000);
+                    timeType = "[RTA]";
+                }
                 seconds = clamp(seconds, 0, 86399);
                 MinecraftClient.getInstance().field_3805.sendMessage(
-                        new LiteralText("Dragon Killed in about " + LocalTime.ofSecondOfDay(seconds)
-                                .format(DateTimeFormatter.ofPattern("mm:ss")) + " [RTA]"));
+                        new LiteralText("Dragon Killed in " + LocalTime.ofSecondOfDay(seconds)
+                                .format(DateTimeFormatter.ofPattern("mm:ss")) + " " + timeType));
+                MinecraftClient.getInstance().field_3805.sendMessage(
+                        new LiteralText("Total endfight time: " + LocalTime.ofSecondOfDay(seconds + 10)
+                                .format(DateTimeFormatter.ofPattern("mm:ss")) + " " + timeType));
                 EndFightMod.time = System.currentTimeMillis();
-                if (EndFightMod.SRIGT_LOADED) {
-                    Medium.completeTimerIfEndFight();
-                }
+                EndFightMod.resetStats();
             }
         }
     }
