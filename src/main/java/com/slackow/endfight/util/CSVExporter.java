@@ -2,7 +2,6 @@ package com.slackow.endfight.util;
 
 import com.google.gson.stream.JsonReader;
 import com.slackow.endfight.EndFightMod;
-import net.minecraft.util.math.MathHelper;
 
 import java.io.*;
 import java.nio.file.Path;
@@ -13,7 +12,7 @@ import java.util.*;
 import java.util.function.Predicate;
 
 public class CSVExporter {
-    public static void exportLastXAttempts(Path exportPath, int attempts, boolean includeMs) throws FileNotFoundException {
+    public static void exportLastXAttempts(Path exportPath, int attempts, boolean includeMs, boolean detailedDnfRows) throws FileNotFoundException {
         File[] recordsFiles = EndFightMod.endFightRecordsFile.listFiles();
         if (recordsFiles == null || recordsFiles.length == 0) {
             throw new FileNotFoundException(EndFightMod.endFightRecordsFile.toString());
@@ -32,10 +31,11 @@ public class CSVExporter {
         }
         File[] lastXAttempts = recentFiles.toArray(new File[0]);
         Arrays.sort(lastXAttempts, Comparator.comparing(File::lastModified).reversed());
-        writeRecordsFilesToCSV(exportPath, lastXAttempts, "last-" + attempts + "-attempts-as-of-" + new SimpleDateFormat("MMddyyyyhhmmss").format(new Date()), includeMs);
+        writeRecordsFilesToCSV(exportPath, lastXAttempts,
+                "last-" + attempts + "-attempts-as-of-" + new SimpleDateFormat("MMddyyyyhhmmss").format(new Date()), includeMs, detailedDnfRows);
     }
 
-    public static void exportSpecificDayAttempts(Path exportPath, String formattedDate, boolean includeMs) throws FileNotFoundException {
+    public static void exportSpecificDayAttempts(Path exportPath, String formattedDate, boolean includeMs, boolean detailedDnfRows) throws FileNotFoundException {
         File[] recordsFiles = EndFightMod.endFightRecordsFile.listFiles();
         if (recordsFiles == null || recordsFiles.length == 0) {
             throw new FileNotFoundException(EndFightMod.endFightRecordsFile.toString());
@@ -48,19 +48,19 @@ public class CSVExporter {
                 .filter(filter)
                 .sorted(Comparator.comparingLong(File::lastModified).reversed())
                 .toArray(File[]::new);
-        writeRecordsFilesToCSV(exportPath, recordsFiles, "from-specific-day-" + formattedDate.replace("/", ""), includeMs);
+        writeRecordsFilesToCSV(exportPath, recordsFiles, "from-specific-day-" + formattedDate.replace("/", ""), includeMs, detailedDnfRows);
     }
 
-    public static void exportAllAttempts(Path exportPath, boolean includeMs) throws FileNotFoundException {
+    public static void exportAllAttempts(Path exportPath, boolean includeMs, boolean detailedDnfRows) throws FileNotFoundException {
         File[] recordsFiles = EndFightMod.endFightRecordsFile.listFiles();
         if (recordsFiles == null || recordsFiles.length == 0) {
             throw new FileNotFoundException(EndFightMod.endFightRecordsFile.toString());
         }
         Arrays.sort(recordsFiles, Comparator.comparingLong(File::lastModified).reversed());
-        writeRecordsFilesToCSV(exportPath, recordsFiles, "all-attempts-as-of-" + new SimpleDateFormat("MMddyyyyhhmmss").format(new Date()), includeMs);
+        writeRecordsFilesToCSV(exportPath, recordsFiles, "all-attempts-as-of-" + new SimpleDateFormat("MMddyyyyhhmmss").format(new Date()), includeMs, detailedDnfRows);
     }
 
-    private static void writeRecordsFilesToCSV(Path exportPath, File[] recordsFiles, String suffix, boolean includeMs) {
+    private static void writeRecordsFilesToCSV(Path exportPath, File[] recordsFiles, String suffix, boolean includeMs, boolean detailedDnfRows) {
         String filePath = exportPath + "\\endfights-" + suffix + ".csv";
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("mm:ss" + (includeMs ? ".SSS" : ""));
         try (FileWriter fileWriter = new FileWriter(filePath);
@@ -73,7 +73,7 @@ public class CSVExporter {
             long runningIgt = 0;
             int runCount = 0;
             int completionCount = 0;
-            int firstRunWasDNF = 0;
+            int firstRunWasDnf = 0;
             StringBuilder stringBuilder = new StringBuilder();
             for (File recordsFile : recordsFiles) {
                 ++runCount;
@@ -141,20 +141,20 @@ public class CSVExporter {
                         String formattedFinalIgt = "DNF";
                         String formattedFinalRta = "DNF";
                         if (isCompleted) {
-                            if (firstRunWasDNF == 0) {
-                                firstRunWasDNF = -1;
+                            if (firstRunWasDnf == 0) {
+                                firstRunWasDnf = -1;
                             }
                             ++completionCount;
                             runningIgt += finalIgt;
                             bestIgt = Math.min(finalIgt, bestIgt);
                             formattedFinalIgt = LocalTime.ofNanoOfDay(Math.min(finalIgt * 1000000, 86400 * 1000000000L - 1)).format(timeFormatter);
                             formattedFinalRta = LocalTime.ofNanoOfDay(Math.min(finalRta * 1000000, 86400 * 1000000000L - 1)).format(timeFormatter);
-                        } else if (firstRunWasDNF == 0) {
-                            firstRunWasDNF = 1;
+                        } else if (firstRunWasDnf == 0) {
+                            firstRunWasDnf = 1;
                         }
                         stringBuilder.append(formattedFinalIgt).append(",");
                         stringBuilder.append(formattedFinalRta).append(",");
-                        if (!formattedFinalIgt.equals("DNF") && !formattedFinalRta.equals("DNF")) {
+                        if (detailedDnfRows || (!formattedFinalIgt.equals("DNF") && !formattedFinalRta.equals("DNF"))) {
                             stringBuilder.append(initialBeds).append(" Beds ").append(initialArrows).append(" Arrows").append(",");
                             stringBuilder.append(islandType == -2 ? "Random" : "Set").append(",");
                             stringBuilder.append(arrowsHit).append(",").append(arrowsUsed).append(",");
@@ -175,7 +175,7 @@ public class CSVExporter {
             StringBuilder stringBuilder2 = new StringBuilder();
             String averageIgtString = LocalTime.ofNanoOfDay(Math.min((runningIgt / completionCount) * 1000000, 86400 * 1000000000L - 1)).format(timeFormatter);
             String bestIgtString = LocalTime.ofNanoOfDay(Math.min(bestIgt * 1000000, 86400 * 1000000000L - 1)).format(timeFormatter);
-            if (firstRunWasDNF == 1) {
+            if (firstRunWasDnf == 1 && !detailedDnfRows) {
                 stringBuilder2.append(",,,,,,,,,,");
             }
             stringBuilder2.append(",").append(averageIgtString).append(",");
