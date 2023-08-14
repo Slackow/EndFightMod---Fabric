@@ -180,7 +180,7 @@ public class CSVExporter {
                 bestIgtString = LocalTime.ofNanoOfDay(Math.min(bestIgt * 1000000, 86400 * 1000000000L - 1)).format(timeFormatter);
             }
             if (firstRunWasDnf == 1 && !detailedDnfRows) {
-                stringBuilder2.append(",,,,,,,,,,");
+                stringBuilder2.append(",,,,,,,,,,,");
             }
             stringBuilder2.append(",").append(averageIgtString).append(",");
             stringBuilder2.append(bestIgtString).append(",");
