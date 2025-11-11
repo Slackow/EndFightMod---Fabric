@@ -15,7 +15,10 @@ import net.minecraft.command.CommandException;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.world.GameMode;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -28,9 +31,21 @@ import static com.redlimerl.speedrunigt.option.SpeedRunOptions.TIMER_CATEGORY;
 import static com.slackow.endfight.speedrunigt.EndFightCategory.END_FIGHT_CATEGORY;
 
 public class EndFightMod implements ModInitializer {
-
+	public static final File endFightRecordsFile = FabricLoader.getInstance().getGameDir().resolve("speedrunigt/endfight-records").toFile();
 	public static long time = System.currentTimeMillis();
 	public static boolean SRIGT_LOADED = false;
+	public static int gameMode = 0;
+	public static int initialBeds;
+	public static int initialArrows;
+    public static int bedsUsed;
+	public static int arrowsUsed;
+	public static int arrowsHit;
+	public static float totalDamage;
+	public static float totalCrystalDamage;
+	public static float totalCrystalBaitDamage;
+	public static float totalBedDamage;
+	public static float totalArrowDamage;
+	public static float totalMeleeDamage;
 
 	public static void setInventory(PlayerEntity player, Kit kit) {
 		kit.contents = Stream.concat(Arrays.stream(player.inventory.main), Arrays.stream(player.inventory.armor))
@@ -61,6 +76,8 @@ public class EndFightMod implements ModInitializer {
 				.toArray(ItemStack[]::new);
 		System.arraycopy(full, 0, player.inventory.main, 0, 36);
 		System.arraycopy(full, 36, player.inventory.armor, 0, 4);
+		initialBeds = Arrays.stream(player.inventory.main).filter(itemStack -> itemStack != null && itemStack.getItem() == Items.BED).mapToInt(itemStack -> itemStack.count).sum();
+		initialArrows = Arrays.stream(player.inventory.main).filter(itemStack -> itemStack != null && itemStack.getItem() == Items.ARROW).mapToInt(itemStack -> itemStack.count).sum();
 	}
 
 
@@ -95,5 +112,10 @@ public class EndFightMod implements ModInitializer {
 
 	public static Path getDataPath() {
 		return MinecraftClient.getInstance().runDirectory.toPath().resolve("end.txt");
+	}
+
+	public static void resetStats() {
+		bedsUsed = arrowsHit = arrowsUsed = 0;
+		totalDamage = totalBedDamage = totalCrystalDamage = totalCrystalBaitDamage = totalArrowDamage = totalMeleeDamage = 0.0f;
 	}
 }
